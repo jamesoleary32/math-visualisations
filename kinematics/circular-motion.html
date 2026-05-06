@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Circular Motion – Kinematics</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../shared/layout.css">
+  <style>
+    .vec-label {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-style: italic;
+      font-size: 15px;
+      font-weight: bold;
+      pointer-events: none;
+      user-select: none;
+      text-shadow: 0 0 5px #fff, 0 0 5px #fff;
+    }
+    .vec-label.sm { font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="panel">
+      <a href="../index.html" id="back">← All visualizations</a>
+      <div id="subject">Kinematics</div>
+      <h1 id="step-title"></h1>
+      <p id="step-description"></p>
+      <div id="equation"></div>
+      <p id="step-notes"></p>
+      <div id="nav">
+        <button id="prev">← Prev</button>
+        <span id="counter"></span>
+        <button id="next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls }              from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const canvas    = document.getElementById('canvas');
+    const container = document.getElementById('canvas-container');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.domElement.style.position     = 'absolute';
+    labelRenderer.domElement.style.top          = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 8, 3);
+    camera.lookAt(0, 0, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+
+    scene.add(new THREE.GridHelper(8, 8, 0xcccccc, 0xe8e8e8));
+
+    // Centre marker
+    scene.add(Object.assign(
+      new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0x333333 }))
+    ));
+
+    function resize() {
+      const w = container.clientWidth || 600;
+      const h = container.clientHeight || 600;
+      renderer.setSize(w, h);
+      labelRenderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 0);
+
+    // ── Geometry ──────────────────────────────────────────────────────────
+    const R = 2.2; // radius
+
+    // Fixed circle path
+    const circlePts = [];
+    for (let i = 0; i <= 128; i++) {
+      const a = (i / 128) * Math.PI * 2;
+      circlePts.push(new THREE.Vector3(R * Math.cos(a), R * Math.sin(a), 0));
+    }
+    const circleGeo = new THREE.BufferGeometry().setFromPoints(circlePts);
+    const circleLine = new THREE.Line(circleGeo, new THREE.LineBasicMaterial({ color: 0xbbbbbb }));
+    scene.add(circleLine);
+
+    // ── Object management ─────────────────────────────────────────────────
+    let objects = [];
+    function clear() { objects.forEach(o => scene.remove(o)); objects = []; }
+
+    let live = [];
+    function clearLive() { live.forEach(o => scene.remove(o)); live = []; }
+
+    function mkArrow(dir, origin, color, length, pool) {
+      const p = pool || live;
+      const d = new THREE.Vector3(...dir);
+      const len = length ?? d.length();
+      if (len < 0.001) return;
+      const a = new THREE.ArrowHelper(
+        d.clone().normalize(), new THREE.Vector3(...origin),
+        len, color, Math.min(len * 0.2, 0.32), Math.min(len * 0.1, 0.16)
+      );
+      scene.add(a); p.push(a);
+    }
+
+    function mkLabel(text, pos, color, small, pool) {
+      const p = pool || live;
+      const div = document.createElement('div');
+      div.className = small ? 'vec-label sm' : 'vec-label';
+      div.textContent = text;
+      div.style.color = color;
+      const obj = new CSS2DObject(div);
+      obj.position.set(...pos);
+      scene.add(obj); p.push(obj);
+    }
+
+    function mkLine(pts, color, pool) {
+      const p = pool || live;
+      const geo = new THREE.BufferGeometry().setFromPoints(pts.map(v => new THREE.Vector3(...v)));
+      const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l); p.push(l);
+    }
+
+    function mkArc(fromAngle, toAngle, radius, color, pool) {
+      const p = pool || live;
+      const pts = [];
+      for (let i = 0; i <= 32; i++) {
+        const a = fromAngle + (i / 32) * (toAngle - fromAngle);
+        pts.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l); p.push(l);
+    }
+
+    // ── Animation state ───────────────────────────────────────────────────
+    const OMEGA_CONST = 1.1;       // rad/s for uniform steps
+    const ALPHA_AMP   = 0.5;       // rad/s² amplitude for non-uniform steps
+    const ALPHA_FREQ  = 0.7;       // oscillation frequency for alpha
+
+    let simTheta = 0.4;
+    let simTime  = 0;
+    let simOmega = OMEGA_CONST;
+    let lastTime = performance.now();
+
+    // Per-step display flags
+    let cfg = {
+      showR: false, showAngle: false, showOmega: false,
+      showV: false,
+      showAN: false, showDeltaV: false,
+      showAT: false,
+      uniform: true,
+    };
+
+    // ── Per-frame live update ─────────────────────────────────────────────
+    function updateLive() {
+      const now = performance.now();
+      const dt  = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime  = now;
+      simTime  += dt;
+
+      // Angular kinematics
+      const alpha = cfg.uniform ? 0 : ALPHA_AMP * ALPHA_FREQ * Math.cos(simTime * ALPHA_FREQ);
+      simOmega    = cfg.uniform
+        ? OMEGA_CONST
+        : OMEGA_CONST + ALPHA_AMP * Math.sin(simTime * ALPHA_FREQ);
+
+      simTheta += simOmega * dt;
+      if (simTheta > 2 * Math.PI) simTheta -= 2 * Math.PI;
+
+      // Derived quantities
+      const cosT  = Math.cos(simTheta), sinT = Math.sin(simTheta);
+      const er    = new THREE.Vector3(cosT, sinT, 0);          // radial outward
+      const eth   = new THREE.Vector3(-sinT, cosT, 0);         // transverse (CCW)
+      const pos   = er.clone().multiplyScalar(R);
+      const speed = Math.abs(simOmega) * R;
+      const an    = simOmega * simOmega * R;  // centripetal magnitude
+      const at    = Math.abs(alpha) * R;      // tangential magnitude
+
+      clearLive();
+
+      // ── Point P ─────────────────────────────────────────────
+      const pm = new THREE.Mesh(
+        new THREE.SphereGeometry(0.11, 16, 16),
+        new THREE.MeshBasicMaterial({ color: 0x1a237e })
+      );
+      pm.position.copy(pos);
+      scene.add(pm); live.push(pm);
+      mkLabel('P', [pos.x + 0.15, pos.y + 0.18, 0], '#1a237e');
+
+      // ── r vector ─────────────────────────────────────────────
+      if (cfg.showR) {
+        mkArrow([pos.x, pos.y, 0], [0, 0, 0], 0x888888);
+        mkLabel('r', [pos.x * 0.48 + 0.12, pos.y * 0.48 + 0.12, 0], '#666666', true);
+      }
+
+      // ── Angle arc + ω label ──────────────────────────────────
+      if (cfg.showAngle) {
+        mkArc(0, simTheta, 0.55, 0xaaaaaa);
+        const midA = simTheta * 0.5;
+        mkLabel('θ', [Math.cos(midA) * 0.75, Math.sin(midA) * 0.75, 0], '#888888', true);
+      }
+
+      if (cfg.showOmega) {
+        // ω as a curved arrow arc
+        mkArc(simTheta - 0.6, simTheta, R + 0.35, 0xe65100);
+        mkLabel('ω', [pos.x * 1.22, pos.y * 1.22, 0], '#e65100', true);
+      }
+
+      // ── Velocity vector v = r·ω·êθ ──────────────────────────
+      if (cfg.showV) {
+        const VSCALE = 0.65;
+        const vx = eth.x * speed * VSCALE;
+        const vy = eth.y * speed * VSCALE;
+        mkArrow([vx, vy, 0], [pos.x, pos.y, 0], 0x2e7d32);
+        mkLabel('v', [pos.x + vx + 0.14, pos.y + vy + 0.1, 0], '#2e7d32');
+      }
+
+      // ── Centripetal acceleration aₙ = rω² toward centre ─────
+      if (cfg.showAN) {
+        const ASCALE = 0.55;
+        const anx = -er.x * an * ASCALE;
+        const any = -er.y * an * ASCALE;
+        mkArrow([anx, any, 0], [pos.x, pos.y, 0], 0xc62828);
+        mkLabel('aₙ', [pos.x + anx - 0.05, pos.y + any - 0.28, 0], '#c62828');
+      }
+
+      // ── Δv proof: two velocity vectors, their difference ─────
+      if (cfg.showDeltaV) {
+        const LOOK  = 0.55; // rad ahead
+        const VSCALE = 0.6;
+        const th2   = simTheta + LOOK;
+        const eth2  = new THREE.Vector3(-Math.sin(th2), Math.cos(th2), 0);
+
+        // v₁ (current velocity direction, from P)
+        const v1 = eth.clone().multiplyScalar(speed * VSCALE);
+        mkArrow([v1.x, v1.y, 0], [pos.x, pos.y, 0], 0x43a047);
+        mkLabel('v₁', [pos.x + v1.x + 0.12, pos.y + v1.y + 0.1, 0], '#43a047', true);
+
+        // v₂ (future velocity direction, also from P)
+        const v2 = eth2.clone().multiplyScalar(speed * VSCALE);
+        mkArrow([v2.x, v2.y, 0], [pos.x, pos.y, 0], 0xa5d6a7);
+        mkLabel('v₂', [pos.x + v2.x + 0.12, pos.y + v2.y + 0.1, 0], '#388e3c', true);
+
+        // Δv = v₂ − v₁  (shows direction of acceleration)
+        const dv  = v2.clone().sub(v1);
+        mkArrow([dv.x, dv.y, 0], [pos.x + v1.x, pos.y + v1.y, 0], 0xc62828, dv.length());
+        mkLabel('Δv', [pos.x + v1.x + dv.x * 0.5 - 0.3, pos.y + v1.y + dv.y * 0.5, 0], '#c62828', true);
+
+        // Dashed line from v₁ tip to v₂ tip (to show Δv geometrically)
+        mkLine(
+          [[pos.x + v1.x, pos.y + v1.y, 0], [pos.x + v2.x, pos.y + v2.y, 0]],
+          0xdddddd
+        );
+      }
+
+      // ── Tangential acceleration aₜ = r·α along êθ ───────────
+      if (cfg.showAT && Math.abs(at) > 0.05) {
+        const ASCALE = 0.55;
+        const sign   = alpha >= 0 ? 1 : -1;
+        const atx    = eth.x * sign * at * ASCALE;
+        const aty    = eth.y * sign * at * ASCALE;
+        mkArrow([atx, aty, 0], [pos.x, pos.y, 0], 0x7b1fa2);
+        mkLabel('aₜ', [pos.x + atx + 0.14, pos.y + aty + 0.1, 0], '#7b1fa2');
+      }
+
+      // ── Total acceleration resultant ─────────────────────────
+      if (cfg.showAN && cfg.showAT && Math.abs(at) > 0.05) {
+        const ASCALE = 0.55;
+        const sign   = alpha >= 0 ? 1 : -1;
+        const anx    = -er.x * an * ASCALE;
+        const any    = -er.y * an * ASCALE;
+        const atx    = eth.x * sign * at * ASCALE;
+        const aty    = eth.y * sign * at * ASCALE;
+        const ax = anx + atx, ay = any + aty;
+
+        // Parallelogram lines (dashed guides)
+        mkLine([[pos.x + anx, pos.y + any, 0], [pos.x + ax, pos.y + ay, 0]], 0xccaacc);
+        mkLine([[pos.x + atx, pos.y + aty, 0], [pos.x + ax, pos.y + ay, 0]], 0xaaccaa);
+
+        // Total acceleration arrow
+        mkArrow([ax, ay, 0], [pos.x, pos.y, 0], 0xe65100);
+        mkLabel('a', [pos.x + ax + 0.14, pos.y + ay + 0.1, 0], '#e65100');
+      }
+    }
+
+    // ── Animate loop ──────────────────────────────────────────────────────
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      updateLive();
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+    })();
+
+    // ── Steps ─────────────────────────────────────────────────────────────
+    const steps = [
+      {
+        title: "Position and Angular Velocity",
+        description: "Point P moves around a circle of radius r. Its position is fully described by the angle θ — measured from the x-axis. The rate at which θ grows is the angular velocity ω. If ω is constant, the motion is uniform.",
+        equation: "P = (r\\cos\\theta,\\; r\\sin\\theta) \\qquad \\omega = \\dot{\\theta} = \\frac{d\\theta}{dt}",
+        notes: "r = 2.2 m (fixed radius)\nω ≈ 1.1 rad/s (constant here)\n\nω is measured in radians per second.\n1 full revolution = 2π radians.\n\nPeriod: T = 2π/ω ≈ 5.7 s",
+        setup() {
+          cfg = { showR: true, showAngle: true, showOmega: true, showV: false, showAN: false, showDeltaV: false, showAT: false, uniform: true };
+        }
+      },
+      {
+        title: "Velocity: v = rω",
+        description: "The velocity of P is always tangent to the circle — perpendicular to the radius r. Its magnitude is v = rω. The direction is along êθ = (−sinθ, cosθ), the unit vector 90° ahead of êr.",
+        equation: "\\vec{v} = r\\dot{\\theta}\\,\\hat{e}_\\theta = r\\omega\\,\\hat{e}_\\theta \\qquad |v| = r\\omega",
+        notes: "v = 2.2 × 1.1 ≈ 2.4 m/s\n\nv is always perpendicular to r — so the dot product r · v = 0 always.\n\nThis is exactly the transverse component rθ̇êθ from the plane-motion visualization — with no radial component since r is fixed (ṙ = 0).",
+        setup() {
+          cfg = { showR: true, showAngle: false, showOmega: false, showV: true, showAN: false, showDeltaV: false, showAT: false, uniform: true };
+        }
+      },
+      {
+        title: "Centripetal Acceleration: aₙ = rω²",
+        description: "Even at constant speed, P accelerates — because the direction of v is always changing. The green vectors v₁ and v₂ show the velocity at two moments. Their difference Δv points toward the centre. So the acceleration points inward.",
+        equation: "\\vec{a}_n = -r\\omega^2\\,\\hat{e}_r = -\\frac{v^2}{r}\\,\\hat{e}_r \\qquad |a_n| = r\\omega^2 = \\frac{v^2}{r}",
+        notes: "aₙ = 2.2 × 1.1² ≈ 2.7 m/s²\n\nThe red arrow is aₙ — it always points toward the centre O, opposite to r.\n\nThis is NOT caused by speeding up or slowing down — it exists purely because the direction of v keeps rotating. This is why circular motion requires a centripetal force (gravity, tension, etc.).",
+        setup() {
+          cfg = { showR: true, showAngle: false, showOmega: false, showV: false, showAN: true, showDeltaV: true, showAT: false, uniform: true };
+        }
+      },
+      {
+        title: "Tangential Acceleration: aₜ = rα",
+        description: "When ω is not constant, there is also a tangential acceleration along the direction of motion. α = dω/dt is the angular acceleration. aₜ acts along êθ — the same direction as v — speeding up or slowing down the motion.",
+        equation: "\\vec{a}_t = r\\alpha\\,\\hat{e}_\\theta \\qquad \\alpha = \\dot{\\omega} = \\ddot{\\theta}",
+        notes: "The purple arrow is aₜ — it flips direction when α changes sign (P alternately speeds up and slows down).\n\nKey contrast:\n  aₙ (red) = always toward centre, exists even at constant speed\n  aₜ (purple) = along tangent, zero when speed is constant\n\nWatch aₜ shrink to zero when ω momentarily stops changing.",
+        setup() {
+          cfg = { showR: false, showAngle: false, showOmega: false, showV: true, showAN: true, showDeltaV: false, showAT: true, uniform: false };
+        }
+      },
+      {
+        title: "Total Acceleration",
+        description: "The two components aₙ and aₜ are always perpendicular to each other — aₙ points inward, aₜ points along the tangent. The total acceleration is their vector sum, shown as the orange arrow.",
+        equation: "|\\vec{a}| = \\sqrt{a_n^2 + a_t^2} = \\sqrt{(r\\omega^2)^2 + (r\\alpha)^2} = r\\sqrt{\\omega^4 + \\alpha^2}",
+        notes: "The dashed lines form a rectangle — aₙ and aₜ are its sides, total a is its diagonal.\n\nFor uniform circular motion (α = 0): a = aₙ only, always pointing inward.\nFor non-uniform (α ≠ 0): the total a tilts away from the centre.\n\nThe angle of a relative to the inward direction: tan⁻¹(aₜ/aₙ) = tan⁻¹(α/ω²)",
+        setup() {
+          cfg = { showR: false, showAngle: false, showOmega: false, showV: true, showAN: true, showDeltaV: false, showAT: true, uniform: false };
+        }
+      }
+    ];
+
+    // ── UI ────────────────────────────────────────────────────────────────
+    let current = 0;
+
+    function go(i) {
+      current = i;
+      clear();
+      steps[i].setup();
+
+      document.getElementById('step-title').textContent       = steps[i].title;
+      document.getElementById('step-description').textContent = steps[i].description;
+      document.getElementById('step-notes').textContent       = steps[i].notes;
+      document.getElementById('counter').textContent          = `${i + 1} / ${steps.length}`;
+
+      katex.render(steps[i].equation, document.getElementById('equation'), {
+        throwOnError: false, displayMode: true
+      });
+
+      document.getElementById('prev').disabled = i === 0;
+      document.getElementById('next').disabled = i === steps.length - 1;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => go(current - 1));
+    document.getElementById('next').addEventListener('click', () => go(current + 1));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' && current < steps.length - 1) go(current + 1);
+      if (e.key === 'ArrowLeft'  && current > 0)               go(current - 1);
+    });
+
+    go(0);
+  </script>
+</body>
+</html>
