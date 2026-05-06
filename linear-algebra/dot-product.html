@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dot Product – Linear Algebra</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../shared/layout.css">
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="panel">
+      <a href="../index.html" id="back">← All visualizations</a>
+      <div id="subject">Linear Algebra</div>
+      <h1 id="step-title"></h1>
+      <p id="step-description"></p>
+      <div id="equation"></div>
+      <p id="step-notes"></p>
+      <div id="nav">
+        <button id="prev">← Prev</button>
+        <span id="counter"></span>
+        <button id="next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // --- Scene setup ---
+    const canvas = document.getElementById('canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(3, 3, 5);
+    camera.lookAt(0, 0, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+
+    scene.add(new THREE.AxesHelper(3));
+    const grid = new THREE.GridHelper(6, 6, 0xcccccc, 0xe8e8e8);
+    scene.add(grid);
+
+    function resize() {
+      const container = document.getElementById('canvas-container');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+
+    // --- Scene object management ---
+    let objects = [];
+
+    function clear() {
+      objects.forEach(o => scene.remove(o));
+      objects = [];
+    }
+
+    function arrow(dir, origin, color) {
+      const d = new THREE.Vector3(...dir);
+      const len = d.length();
+      const norm = d.clone().normalize();
+      const a = new THREE.ArrowHelper(norm, new THREE.Vector3(...origin), len, color, len * 0.18, len * 0.09);
+      scene.add(a);
+      objects.push(a);
+    }
+
+    function line(from, to, color) {
+      const geo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(...from),
+        new THREE.Vector3(...to)
+      ]);
+      const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l);
+      objects.push(l);
+    }
+
+    function arc(fromAngle, toAngle, radius, color) {
+      const pts = [];
+      const N = 32;
+      for (let i = 0; i <= N; i++) {
+        const a = fromAngle + (i / N) * (toAngle - fromAngle);
+        pts.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l);
+      objects.push(l);
+    }
+
+    // --- Concept data ---
+    const v = [2, 1, 0];
+    const w = [1, 2, 0];
+
+    const vLen = Math.hypot(...v);
+    const wLen = Math.hypot(...w);
+    const dot  = v[0]*w[0] + v[1]*w[1] + v[2]*w[2];
+
+    const projScale = dot / (wLen * wLen);
+    const proj = w.map(c => c * projScale);
+
+    const angleV = Math.atan2(v[1], v[0]);
+    const angleW = Math.atan2(w[1], w[0]);
+
+    const steps = [
+      {
+        title: "Two Vectors",
+        description: "We start with two vectors, v and w, sitting in the xy-plane. Each has a direction and a magnitude.",
+        equation: "\\vec{v} = (2,\\,1,\\,0) \\qquad \\vec{w} = (1,\\,2,\\,0)",
+        notes: "|v| = √(4+1) = √5 ≈ 2.24\n|w| = √(1+4) = √5 ≈ 2.24\n\nDrag to orbit the scene.",
+        render() {
+          arrow(v, [0,0,0], 0x1565c0);
+          arrow(w, [0,0,0], 0xc62828);
+        }
+      },
+      {
+        title: "The Dot Product",
+        description: "Multiply corresponding components and sum them. The result is a scalar — a single number, not a vector.",
+        equation: "\\vec{v}\\cdot\\vec{w} = v_x w_x + v_y w_y + v_z w_z",
+        notes: "= (2)(1) + (1)(2) + (0)(0)\n= 2 + 2 + 0\n= 4",
+        render() {
+          arrow(v, [0,0,0], 0x1565c0);
+          arrow(w, [0,0,0], 0xc62828);
+        }
+      },
+      {
+        title: "The Angle Between Them",
+        description: "The dot product equals the product of the two magnitudes times the cosine of the angle between them. This connects algebra to geometry.",
+        equation: "\\vec{v}\\cdot\\vec{w} = |\\vec{v}|\\,|\\vec{w}|\\cos\\theta \\implies \\cos\\theta = \\frac{4}{\\sqrt{5}\\cdot\\sqrt{5}} = \\frac{4}{5}",
+        notes: "θ = arccos(4/5) ≈ 36.87°\n\nKey insight: if two vectors are perpendicular, cos(90°) = 0, so their dot product is always 0.",
+        render() {
+          arrow(v, [0,0,0], 0x1565c0);
+          arrow(w, [0,0,0], 0xc62828);
+          arc(angleV, angleW, 0.7, 0xe65100);
+        }
+      },
+      {
+        title: "Projection",
+        description: "The dot product tells us how much of v lies along w — the shadow v casts onto w. The grey line is perpendicular from the tip of v down to the line of w.",
+        equation: "\\text{proj}_{\\vec{w}}\\vec{v} = \\frac{\\vec{v}\\cdot\\vec{w}}{|\\vec{w}|^2}\\,\\vec{w} = \\frac{4}{5}(1,2,0) = (0.8,\\,1.6,\\,0)",
+        notes: "The orange vector is the projection.\nThe grey line is perpendicular to w.\n\nThis is the foundation of: least squares, orthogonality, reflection, and more.",
+        render() {
+          arrow(v, [0,0,0], 0x1565c0);
+          arrow(w, [0,0,0], 0xc62828);
+          arrow(proj, [0,0,0], 0xe65100);
+          line(v, proj, 0xaaaaaa);
+        }
+      }
+    ];
+
+    // --- UI ---
+    let current = 0;
+
+    function go(i) {
+      current = i;
+      clear();
+      const step = steps[i];
+      step.render();
+
+      document.getElementById('step-title').textContent       = step.title;
+      document.getElementById('step-description').textContent = step.description;
+      document.getElementById('step-notes').textContent       = step.notes;
+      document.getElementById('counter').textContent          = `${i + 1} / ${steps.length}`;
+
+      katex.render(step.equation, document.getElementById('equation'), {
+        throwOnError: false,
+        displayMode: true
+      });
+
+      document.getElementById('prev').disabled = i === 0;
+      document.getElementById('next').disabled = i === steps.length - 1;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => go(current - 1));
+    document.getElementById('next').addEventListener('click', () => go(current + 1));
+
+    // Keyboard nav
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' && current < steps.length - 1) go(current + 1);
+      if (e.key === 'ArrowLeft'  && current > 0)               go(current - 1);
+    });
+
+    go(0);
+  </script>
+</body>
+</html>
