@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Areal Rate – Kinematics</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../shared/layout.css">
+  <style>
+    .vec-label {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-style: italic;
+      font-size: 15px;
+      font-weight: bold;
+      pointer-events: none;
+      user-select: none;
+      text-shadow: 0 0 5px #fff, 0 0 5px #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="panel">
+      <a href="../index.html" id="back">← All visualizations</a>
+      <div id="subject">Kinematics</div>
+      <h1 id="step-title"></h1>
+      <p id="step-description"></p>
+      <div id="equation"></div>
+      <p id="step-notes"></p>
+      <div id="nav">
+        <button id="prev">← Prev</button>
+        <span id="counter"></span>
+        <button id="next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls }              from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const canvas    = document.getElementById('canvas');
+    const container = document.getElementById('canvas-container');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.domElement.style.position     = 'absolute';
+    labelRenderer.domElement.style.top          = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    // Slightly elevated top-down view — orbital mechanics lives in the xy-plane
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(1, 9, 3);
+    camera.lookAt(0.5, 0, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.set(0.5, 0, 0);
+
+    scene.add(new THREE.GridHelper(10, 10, 0xcccccc, 0xe8e8e8));
+
+    function resize() {
+      const w = container.clientWidth || 600;
+      const h = container.clientHeight || 600;
+      renderer.setSize(w, h);
+      labelRenderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    setTimeout(resize, 0);
+
+    // ─── Orbital parameters (Keplerian conic) ────────────────────────────
+    const p_orb = 1.8;   // semi-latus rectum
+    const e_orb = 0.65;  // eccentricity (moderately elliptical)
+    const h_orb = 1.8;   // specific angular momentum (= r²·θ̇ = constant)
+
+    function rOfTheta(theta) {
+      return p_orb / (1 + e_orb * Math.cos(theta));
+    }
+
+    function posOfTheta(theta) {
+      const r = rOfTheta(theta);
+      return new THREE.Vector3(r * Math.cos(theta), r * Math.sin(theta), 0);
+    }
+
+    function thetaDot(theta) {
+      const r = rOfTheta(theta);
+      return h_orb / (r * r); // dθ/dt = h / r²
+    }
+
+    // ─── Pre-compute full orbit path ──────────────────────────────────────
+    const orbitPath = [];
+    for (let i = 0; i <= 256; i++) {
+      orbitPath.push(posOfTheta((i / 256) * 2 * Math.PI));
+    }
+
+    function drawOrbitPath(color = 0xcccccc) {
+      const geo = new THREE.BufferGeometry().setFromPoints(orbitPath);
+      const l   = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l); objects.push(l);
+    }
+
+    // ─── Pre-compute sectors for Kepler step ─────────────────────────────
+    // Both sectors swept in the SAME duration T — equal areas guaranteed by h = const
+    const SECTOR_T = 1.4; // seconds (simulated)
+    const SECTOR_SUBSTEPS = 60;
+
+    function computeSector(theta0) {
+      const pts = [];
+      let theta = theta0;
+      const dt  = SECTOR_T / SECTOR_SUBSTEPS;
+      for (let i = 0; i <= SECTOR_SUBSTEPS; i++) {
+        pts.push(posOfTheta(theta));
+        theta += thetaDot(theta) * dt;
+      }
+      return pts;
+    }
+
+    // Sector near periapsis (θ=0, P moves fast through large angle)
+    const periSector = computeSector(0);
+    // Sector near apoapsis (θ=π, P moves slow through small angle)
+    const apoSector  = computeSector(Math.PI);
+
+    function makeSectorMesh(pts, color, opacity) {
+      const verts = [];
+      for (let i = 0; i < pts.length - 1; i++) {
+        verts.push(0, 0, 0);
+        verts.push(pts[i].x,   pts[i].y,   0);
+        verts.push(pts[i+1].x, pts[i+1].y, 0);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+      const mesh = new THREE.Mesh(
+        geo,
+        new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity })
+      );
+      return mesh;
+    }
+
+    function drawSectorOutline(pts, color) {
+      const closed = [...pts, new THREE.Vector3(0, 0, 0)];
+      const geo = new THREE.BufferGeometry().setFromPoints(closed);
+      const l   = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l); objects.push(l);
+    }
+
+    // ─── Focus / Sun marker ───────────────────────────────────────────────
+    const sunMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.12, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xf9a825 })
+    );
+    scene.add(sunMesh);
+
+    // ─── Object management ────────────────────────────────────────────────
+    let objects = [];
+    function clear() { objects.forEach(o => scene.remove(o)); objects = []; }
+
+    let live = [];
+    function clearLive() { live.forEach(o => scene.remove(o)); live = []; }
+
+    function addArrow(dir, origin, color, length, arr) {
+      const pool = arr || objects;
+      const d    = new THREE.Vector3(...dir);
+      const len  = length ?? d.length();
+      if (len < 0.001) return;
+      const a = new THREE.ArrowHelper(
+        d.clone().normalize(), new THREE.Vector3(...origin),
+        len, color, Math.min(len * 0.2, 0.3), Math.min(len * 0.1, 0.14)
+      );
+      scene.add(a); pool.push(a);
+    }
+
+    function addLabel(text, pos, color, arr) {
+      const pool = arr || objects;
+      const div  = document.createElement('div');
+      div.className   = 'vec-label';
+      div.textContent = text;
+      div.style.color = color;
+      const obj = new CSS2DObject(div);
+      obj.position.set(...pos);
+      scene.add(obj); pool.push(obj);
+    }
+
+    function addLine(pts, color, arr) {
+      const pool = arr || objects;
+      const geo  = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
+      const l    = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l); pool.push(l);
+    }
+
+    // ─── Animation state ──────────────────────────────────────────────────
+    let simTheta  = 0.3;
+    let lastTime  = performance.now();
+    const SPEED   = 0.45;
+
+    // Accumulated arc points for the growing-sector step
+    let arcPts = [];
+
+    // Per-step rendering config
+    let cfg = {
+      showOrbit:    false,
+      showP:        true,
+      showR:        false,
+      showV:        false,
+      showTriangle: false,   // tiny area triangle for one dt
+      showSector:   false,   // growing accumulated sector
+      showKepler:   false,   // two pre-computed equal sectors (static)
+      showH:        false,   // angular momentum vector (perpendicular to plane)
+      pauseAt:      null,    // freeze animation at a specific theta
+    };
+
+    // ─── Per-frame update ─────────────────────────────────────────────────
+    const DT_LOOKAHEAD = 0.25; // seconds simulated, for triangle preview
+
+    function updateLive() {
+      const now = performance.now();
+      const dt  = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime  = now;
+
+      if (cfg.pauseAt === null) {
+        simTheta += thetaDot(simTheta) * dt * SPEED;
+        if (simTheta > 2 * Math.PI) { simTheta -= 2 * Math.PI; arcPts = []; }
+      }
+
+      const r   = rOfTheta(simTheta);
+      const pos = posOfTheta(simTheta);
+
+      // Velocity direction tangent to orbit: v = ṙ·êr + r·θ̇·êθ
+      // For this conic: ṙ = h·e·sin(θ)/p, r·θ̇ = h/r
+      const rdot  = h_orb * e_orb * Math.sin(simTheta) / p_orb;
+      const rThDot = h_orb / r; // transverse speed = r·θ̇
+      const er    = new THREE.Vector3(Math.cos(simTheta), Math.sin(simTheta), 0);
+      const eth   = new THREE.Vector3(-Math.sin(simTheta), Math.cos(simTheta), 0);
+      const vel   = er.clone().multiplyScalar(rdot).add(eth.clone().multiplyScalar(rThDot));
+
+      clearLive();
+
+      // Planet
+      if (cfg.showP) {
+        const pm = new THREE.Mesh(
+          new THREE.SphereGeometry(0.1, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0x1565c0 })
+        );
+        pm.position.copy(pos);
+        scene.add(pm); live.push(pm);
+        addLabel('P', [pos.x + 0.15, pos.y + 0.15, 0], '#1565c0', live);
+      }
+
+      // r vector
+      if (cfg.showR) {
+        addArrow([pos.x, pos.y, 0], [0, 0, 0], 0x555555, undefined, live);
+        addLabel('r', [pos.x * 0.5 + 0.1, pos.y * 0.5 + 0.15, 0], '#555555', live);
+      }
+
+      // v vector (scaled for visibility)
+      if (cfg.showV) {
+        const vScale = 0.55;
+        const vx = vel.x * vScale, vy = vel.y * vScale;
+        addArrow([vx, vy, 0], [pos.x, pos.y, 0], 0x2e7d32, undefined, live);
+        addLabel('v', [pos.x + vx + 0.15, pos.y + vy + 0.1, 0], '#2e7d32', live);
+      }
+
+      // Small triangle: area swept in the next DT_LOOKAHEAD seconds
+      if (cfg.showTriangle) {
+        let theta2 = simTheta;
+        const steps = 12;
+        const dtSmall = DT_LOOKAHEAD / steps;
+        for (let i = 0; i < steps; i++) theta2 += thetaDot(theta2) * dtSmall;
+        const pos2 = posOfTheta(theta2);
+        // Filled triangle: origin → pos → pos2
+        const verts = new Float32Array([
+          0, 0, 0, pos.x, pos.y, 0, pos2.x, pos2.y, 0
+        ]);
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+        const mesh = new THREE.Mesh(
+          geo,
+          new THREE.MeshBasicMaterial({ color: 0x1565c0, side: THREE.DoubleSide, transparent: true, opacity: 0.35 })
+        );
+        scene.add(mesh); live.push(mesh);
+        // Outline
+        addLine([[0,0,0],[pos.x,pos.y,0],[pos2.x,pos2.y,0],[0,0,0]], 0x1565c0, live);
+        // Label midpoint of arc
+        const mid = posOfTheta(simTheta + (theta2 - simTheta) * 0.5);
+        addLabel('dA', [mid.x * 0.4 + 0.1, mid.y * 0.4 + 0.2, 0], '#1565c0', live);
+      }
+
+      // Growing accumulated sector
+      if (cfg.showSector) {
+        arcPts.push([pos.x, pos.y]);
+        if (arcPts.length > 2) {
+          const verts = [];
+          for (let i = 0; i < arcPts.length - 1; i++) {
+            verts.push(0, 0, 0, arcPts[i][0], arcPts[i][1], 0, arcPts[i+1][0], arcPts[i+1][1], 0);
+          }
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+          const mesh = new THREE.Mesh(
+            geo,
+            new THREE.MeshBasicMaterial({ color: 0x1565c0, side: THREE.DoubleSide, transparent: true, opacity: 0.2 })
+          );
+          scene.add(mesh); live.push(mesh);
+        }
+      }
+
+      // h vector (angular momentum, perpendicular to plane)
+      if (cfg.showH) {
+        addArrow([0, 0, 2], [pos.x, pos.y, 0], 0xe65100, 2, live);
+        addLabel('h = r × v', [pos.x + 0.15, pos.y + 0.1, 2.2], '#e65100', live);
+      }
+    }
+
+    // ─── Animate loop ─────────────────────────────────────────────────────
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      updateLive();
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+    })();
+
+    // ─── Steps ────────────────────────────────────────────────────────────
+    const steps = [
+      {
+        title: "The Position Vector Sweeps Area",
+        description: "As point P moves along its path, the position vector r (from the fixed origin O) sweeps out a thin triangle in each small time interval dt. The question is: how fast is that area growing?",
+        equation: "dA = \\tfrac{1}{2}|\\vec{r} \\times \\vec{v}|\\,dt",
+        notes: "The shaded blue triangle is the area dA swept in the next small interval.\n\nBase ≈ |v|·dt (arc length)\nHeight = perpendicular distance from O to the velocity line\n\nArea of triangle = ½ × base × height = ½|r × v| dt",
+        setup() {
+          cfg = { showOrbit: true, showP: true, showR: true, showV: true, showTriangle: true, showSector: false, showKepler: false, showH: false, pauseAt: null };
+          drawOrbitPath(); arcPts = [];
+        }
+      },
+      {
+        title: "The Areal Rate Formula",
+        description: "The areal rate dA/dt depends on the transverse component of velocity only — the radial part (ṙ) contributes no area because it moves along r. From the plane motion equations: v_transverse = r·θ̇, so the areal rate simplifies neatly.",
+        equation: "\\frac{dA}{dt} = \\tfrac{1}{2}|\\vec{r}\\times\\vec{v}| = \\tfrac{1}{2}r^2\\dot{\\theta} = \\tfrac{1}{2}h",
+        notes: "r × v = (r·êr) × (ṙ·êr + r·θ̇·êθ)\n     = r²θ̇ (êr × êθ)\n     = r²θ̇ k̂\n\nSo |r × v| = r²θ̇ = h (specific angular momentum).\n\nThe areal rate is exactly half the angular momentum per unit mass.\n\nNote: the radial velocity ṙ contributes zero area — it only changes how far P is from O.",
+        setup() {
+          cfg = { showOrbit: true, showP: true, showR: true, showV: true, showTriangle: true, showSector: false, showKepler: false, showH: false, pauseAt: null };
+          drawOrbitPath(); arcPts = [];
+        }
+      },
+      {
+        title: "The Growing Sector",
+        description: "As P orbits, the position vector r sweeps out a growing sector. Near the bottom of the orbit (periapsis) P moves fast — the thin triangle has small r but large v. Near the top (apoapsis) P moves slowly — large r, small v.",
+        equation: "A(t) = \\int_0^t \\tfrac{1}{2}h\\,d\\tau = \\tfrac{1}{2}h\\,t \\quad(\\text{if }h = \\text{const})",
+        notes: "Watch the blue sector grow as P orbits.\n\nIf h is constant, area grows linearly with time — equal areas in equal times.\n\nIs h actually constant here? That depends on whether there's a central force...",
+        setup() {
+          cfg = { showOrbit: true, showP: true, showR: true, showV: false, showTriangle: false, showSector: true, showKepler: false, showH: false, pauseAt: null };
+          drawOrbitPath(); arcPts = [];
+        }
+      },
+      {
+        title: "Equal Areas in Equal Times (Kepler's 2nd Law)",
+        description: "For any central force (force directed toward O — like gravity), angular momentum is conserved: h = r²θ̇ = constant. This means equal areas are swept in equal times, regardless of where in the orbit P is.",
+        equation: "h = r^2\\dot{\\theta} = \\text{const} \\implies \\Delta A_1 = \\Delta A_2 \\text{ in same } \\Delta t",
+        notes: "Blue sector: near periapsis. P moves FAST through a LARGE angle in time T.\nOrange sector: near apoapsis. P moves SLOW through a SMALL angle in the same time T.\n\nBoth sectors have exactly the same area = ½h·T.\n\nThis is Kepler's Second Law — derived purely from conservation of angular momentum.",
+        setup() {
+          cfg = { showOrbit: true, showP: true, showR: false, showV: false, showTriangle: false, showSector: false, showKepler: true, showH: false, pauseAt: null };
+          drawOrbitPath(0xdddddd);
+
+          // Periapsis sector (blue)
+          const periMesh = makeSectorMesh(periSector, 0x1565c0, 0.3);
+          scene.add(periMesh); objects.push(periMesh);
+          drawSectorOutline(periSector, 0x1565c0);
+
+          // Apoapsis sector (orange)
+          const apoMesh = makeSectorMesh(apoSector, 0xe65100, 0.3);
+          scene.add(apoMesh); objects.push(apoMesh);
+          drawSectorOutline(apoSector, 0xe65100);
+
+          // Labels
+          const pMid = posOfTheta(0.25);
+          addLabel('same area', [pMid.x * 0.35, pMid.y * 0.35 + 0.3, 0], '#1565c0');
+
+          const aMid = posOfTheta(Math.PI + 0.05);
+          addLabel('same area', [aMid.x * 0.7 - 0.4, aMid.y * 0.7, 0], '#e65100');
+
+          // Highlight the two arc edges
+          const periEnd = periSector[periSector.length - 1];
+          const apoEnd  = apoSector[apoSector.length - 1];
+
+          addLabel('fast', [periSector[0].x * 0.85, periSector[0].y * 0.85 - 0.25, 0], '#1565c0');
+          addLabel('slow', [apoEnd.x * 0.85 - 0.2, apoEnd.y * 0.85 + 0.2, 0], '#e65100');
+        }
+      },
+      {
+        title: "Angular Momentum — the Perpendicular Vector",
+        description: "h = r × v is the specific angular momentum. It points perpendicular to the orbital plane (along the z-axis here). Its magnitude is h = r²θ̇. For any central force, this vector is constant — it doesn't change in direction or magnitude.",
+        equation: "\\vec{h} = \\vec{r} \\times \\vec{v} = r^2\\dot{\\theta}\\,\\hat{k} = \\text{constant}",
+        notes: "The orange arrow is the angular momentum vector h = r × v.\nIt always points perpendicular to the orbital plane — upward here.\n\nThis connects everything:\n• The cross product gives perpendicular direction (like in the cross product visualization)\n• Its magnitude r²θ̇ is the areal rate × 2\n• Conservation of this vector is why orbits are planar\n• And why Kepler's 2nd law holds for any inverse-square (or other central) force",
+        setup() {
+          cfg = { showOrbit: true, showP: true, showR: true, showV: true, showTriangle: false, showSector: false, showKepler: false, showH: true, pauseAt: null };
+          drawOrbitPath(); arcPts = [];
+        }
+      }
+    ];
+
+    // ─── UI ───────────────────────────────────────────────────────────────
+    let current = 0;
+
+    function go(i) {
+      current = i;
+      clear();
+      steps[i].setup();
+
+      document.getElementById('step-title').textContent       = steps[i].title;
+      document.getElementById('step-description').textContent = steps[i].description;
+      document.getElementById('step-notes').textContent       = steps[i].notes;
+      document.getElementById('counter').textContent          = `${i + 1} / ${steps.length}`;
+
+      katex.render(steps[i].equation, document.getElementById('equation'), {
+        throwOnError: false, displayMode: true
+      });
+
+      document.getElementById('prev').disabled = i === 0;
+      document.getElementById('next').disabled = i === steps.length - 1;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => go(current - 1));
+    document.getElementById('next').addEventListener('click', () => go(current + 1));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' && current < steps.length - 1) go(current + 1);
+      if (e.key === 'ArrowLeft'  && current > 0)               go(current - 1);
+    });
+
+    go(0);
+  </script>
+</body>
+</html>
