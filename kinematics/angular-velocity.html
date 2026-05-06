@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Angular Velocity – Kinematics</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../shared/layout.css">
+  <style>
+    .vec-label {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-style: italic;
+      font-size: 17px;
+      font-weight: bold;
+      pointer-events: none;
+      user-select: none;
+      text-shadow: 0 0 6px #fff, 0 0 6px #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div id="panel">
+      <a href="../index.html" id="back">← All visualizations</a>
+      <div id="subject">Kinematics</div>
+      <h1 id="step-title"></h1>
+      <p id="step-description"></p>
+      <div id="equation"></div>
+      <p id="step-notes"></p>
+      <div id="nav">
+        <button id="prev">← Prev</button>
+        <span id="counter"></span>
+        <button id="next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls }             from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    // --- Scene ---
+    const canvas    = document.getElementById('canvas');
+    const container = document.getElementById('canvas-container');
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.domElement.style.position    = 'absolute';
+    labelRenderer.domElement.style.top         = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 6, 7);
+    camera.lookAt(0, 0, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping  = true;
+    controls.dampingFactor  = 0.08;
+
+    scene.add(new THREE.AxesHelper(3));
+    scene.add(new THREE.GridHelper(8, 8, 0xcccccc, 0xe8e8e8));
+
+    function resize() {
+      const w = container.clientWidth, h = container.clientHeight;
+      renderer.setSize(w, h);
+      labelRenderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- Per-step objects (cleared on step change) ---
+    let objects = [];
+    function clear() { objects.forEach(o => scene.remove(o)); objects = []; }
+
+    // --- Per-frame animated objects (cleared every frame) ---
+    let liveObjects = [];
+    function clearLive() { liveObjects.forEach(o => scene.remove(o)); liveObjects = []; }
+
+    // --- Helpers ---
+    function arrow(dir, origin, color, targetArray) {
+      const arr = targetArray || objects;
+      const d   = new THREE.Vector3(...dir);
+      const len = d.length();
+      if (len < 0.001) return;
+      const a = new THREE.ArrowHelper(
+        d.clone().normalize(), new THREE.Vector3(...origin),
+        len, color, len * 0.18, len * 0.09
+      );
+      scene.add(a);
+      arr.push(a);
+    }
+
+    function label(text, position, color, targetArray) {
+      const arr = targetArray || objects;
+      const div = document.createElement('div');
+      div.className   = 'vec-label';
+      div.textContent = text;
+      div.style.color = color;
+      const obj = new CSS2DObject(div);
+      obj.position.set(...position);
+      scene.add(obj);
+      arr.push(obj);
+    }
+
+    function sphere(pos, radius, color, targetArray) {
+      const arr  = targetArray || objects;
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(radius, 16, 16),
+        new THREE.MeshBasicMaterial({ color })
+      );
+      mesh.position.set(...pos);
+      scene.add(mesh);
+      arr.push(mesh);
+    }
+
+    function ring(radius, color) {
+      const pts = [];
+      for (let i = 0; i <= 128; i++) {
+        const a = (i / 128) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const l   = new THREE.Line(geo, new THREE.LineBasicMaterial({ color, linewidth: 1 }));
+      scene.add(l);
+      objects.push(l);
+    }
+
+    // Curved arrow (arc with arrowhead) to show rotation direction
+    function rotationArc(radius, color) {
+      const pts = [];
+      for (let i = 0; i <= 48; i++) {
+        const a = (i / 48) * Math.PI * 1.5 + Math.PI * 0.1;
+        pts.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const l   = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
+      scene.add(l);
+      objects.push(l);
+
+      // Small arrowhead at end of arc
+      const endAngle = Math.PI * 1.6;
+      const tip      = new THREE.Vector3(Math.cos(endAngle) * radius, Math.sin(endAngle) * radius, 0);
+      const tangent  = new THREE.Vector3(-Math.sin(endAngle), Math.cos(endAngle), 0).normalize();
+      const a = new THREE.ArrowHelper(tangent, tip.clone().sub(tangent.clone().multiplyScalar(0.001)), 0.001, color, 0.25, 0.15);
+      scene.add(a);
+      objects.push(a);
+    }
+
+    // --- Animation state ---
+    const RADIUS  = 2;
+    const OMEGA   = 0.8; // rad/s
+    let   angle   = Math.PI / 6;
+    let   lastTime = performance.now();
+
+    // What the current step wants to show in the live layer
+    let cfg = { point: true, r: false, v: false, omega: false };
+
+    function updateLive() {
+      const now = performance.now();
+      const dt  = (now - lastTime) / 1000;
+      lastTime  = now;
+
+      angle += OMEGA * dt;
+
+      const px = RADIUS * Math.cos(angle);
+      const py = RADIUS * Math.sin(angle);
+
+      // v = ω × r = (0,0,ω)×(px,py,0) = (−ω·py, ω·px, 0)
+      const vx = -OMEGA * py;
+      const vy =  OMEGA * px;
+      const vScale = 0.8; // shorten for clarity
+
+      clearLive();
+
+      if (cfg.point) {
+        sphere([px, py, 0], 0.12, 0x1565c0, liveObjects);
+        label('P', [px + 0.2, py + 0.2, 0], '#1565c0', liveObjects);
+      }
+
+      if (cfg.r) {
+        arrow([px, py, 0], [0, 0, 0], 0x888888, liveObjects);
+        label('r', [px * 0.5 + 0.15, py * 0.5 + 0.15, 0], '#888888', liveObjects);
+      }
+
+      if (cfg.v) {
+        arrow([vx * vScale, vy * vScale, 0], [px, py, 0], 0x2e7d32, liveObjects);
+        label('v', [px + vx * vScale + 0.15, py + vy * vScale + 0.15, 0], '#2e7d32', liveObjects);
+      }
+
+      if (cfg.omega) {
+        arrow([0, 0, 2], [0, 0, 0], 0xe65100, liveObjects);
+        label('ω', [0.25, 0.25, 2.3], '#e65100', liveObjects);
+      }
+    }
+
+    // --- Animate loop ---
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      updateLive();
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+    })();
+
+    // --- Steps ---
+    const steps = [
+      {
+        title: "Rotation in a Plane",
+        description: "A point P moves in a circle in the xy-plane. It has a position, a speed, and a direction of spin. The question is: how do we describe all of that with a single vector?",
+        equation: "P(t) = r(\\cos\\omega t,\\; \\sin\\omega t,\\; 0)",
+        notes: "Radius = 2 units\nAngular speed = 0.8 rad/s\n\nDrag to orbit. Notice the rotation is entirely in the xy-plane.",
+        setup() {
+          cfg = { point: true, r: false, v: false, omega: false };
+          ring(RADIUS, 0xbbbbbb);
+        }
+      },
+      {
+        title: "The Angular Velocity Vector ω",
+        description: "We define ω as a vector pointing along the axis of rotation — perpendicular to the plane of spin. Its magnitude is the angular speed in rad/s. Its direction encodes clockwise vs. counterclockwise via the right-hand rule.",
+        equation: "\\vec{\\omega} = \\omega\\,\\hat{k} = (0,\\; 0,\\; 0.8) \\text{ rad/s}",
+        notes: "ω points up the z-axis because rotation is in the xy-plane.\n\n|ω| = 0.8 rad/s — the rate of spin.\n\nOrbit so you're looking down the z-axis — you'll see the circle face-on.",
+        setup() {
+          cfg = { point: true, r: false, v: false, omega: true };
+          ring(RADIUS, 0xbbbbbb);
+        }
+      },
+      {
+        title: "The Right-Hand Rule",
+        description: "The direction of ω follows the right-hand rule: curl the fingers of your right hand in the direction of rotation — your thumb points in the direction of ω. Counterclockwise rotation (viewed from above) → ω points upward.",
+        equation: "\\text{CCW from above} \\implies \\vec{\\omega} = +\\hat{k}",
+        notes: "Try it: hold your right hand over the screen, curl your fingers counterclockwise — thumb points toward you (out of the screen = +z).\n\nIf the rotation reversed to clockwise, ω would flip to (0, 0, −0.8).",
+        setup() {
+          cfg = { point: true, r: false, v: false, omega: true };
+          ring(RADIUS, 0xbbbbbb);
+          rotationArc(RADIUS * 0.55, 0xaaaaaa);
+        }
+      },
+      {
+        title: "Linear Velocity: v = ω × r",
+        description: "Every point on a rotating body has a linear velocity. We get it from the cross product of ω and r. The result v is always tangent to the circle — perpendicular to r, in the plane of rotation.",
+        equation: "\\vec{v} = \\vec{\\omega} \\times \\vec{r}",
+        notes: "Watch v (green) as P orbits. It's always tangent to the circle.\n\nω = (0,0,0.8), r = (px, py, 0)\nω × r = (−0.8·py, 0.8·px, 0)\n\nThis is exactly the velocity of circular motion.",
+        setup() {
+          cfg = { point: true, r: true, v: true, omega: true };
+          ring(RADIUS, 0xbbbbbb);
+        }
+      },
+      {
+        title: "Why Must ω Be Orthogonal?",
+        description: "If ω were in the xy-plane instead — say ω = (1, 0, 0) — then ω × r would point out of the xy-plane. That can't be a velocity for something rotating in that plane. Only when ω is perpendicular to the plane of rotation does ω × r produce a valid in-plane velocity.",
+        equation: "\\underbrace{(1,0,0)}_{\\text{wrong }\\omega} \\times (0,2,0) = (0,0,2) \\quad\\leftarrow \\text{out of plane!}",
+        notes: "Wrong ω → velocity leaves the plane → physically impossible for circular motion.\n\nCorrect ω = (0,0,1):\n(0,0,1) × (0,2,0) = (−2, 0, 0) ← tangent, stays in plane ✓\n\nThe orthogonal representation isn't arbitrary — it's the only one that makes v = ω × r work.",
+        setup() {
+          cfg = { point: true, r: true, v: true, omega: true };
+          ring(RADIUS, 0xbbbbbb);
+
+          // Show the "wrong" ω in the plane for comparison
+          arrow([1.5, 0, 0], [0, 0, 0], 0xf48fb1, objects);
+          label("ω?", [1.7, 0.25, 0], '#c62828', objects);
+
+          // Show wrong cross product result: (1,0,0)×(0,2,0) = (0,0,2)
+          arrow([0, 0, 2], [0, 2, 0], 0xf48fb1, objects);
+          label("v?", [0.2, 2.2, 2.2], '#c62828', objects);
+        }
+      }
+    ];
+
+    // --- UI ---
+    let current = 0;
+
+    function go(i) {
+      current = i;
+      clear();
+      steps[i].setup();
+
+      document.getElementById('step-title').textContent       = steps[i].title;
+      document.getElementById('step-description').textContent = steps[i].description;
+      document.getElementById('step-notes').textContent       = steps[i].notes;
+      document.getElementById('counter').textContent          = `${i + 1} / ${steps.length}`;
+
+      katex.render(steps[i].equation, document.getElementById('equation'), {
+        throwOnError: false, displayMode: true
+      });
+
+      document.getElementById('prev').disabled = i === 0;
+      document.getElementById('next').disabled = i === steps.length - 1;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => go(current - 1));
+    document.getElementById('next').addEventListener('click', () => go(current + 1));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' && current < steps.length - 1) go(current + 1);
+      if (e.key === 'ArrowLeft'  && current > 0)               go(current - 1);
+    });
+
+    go(0);
+  </script>
+</body>
+</html>
