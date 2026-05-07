@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Impulse & Momentum Visualisation</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: #0f1115;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+  }
+
+  .panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 360px;
+    background: rgba(20,20,25,0.92);
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 18px;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    line-height: 1.5;
+    color: #d0d0d0;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .equation {
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .controls {
+    margin-top: 16px;
+  }
+
+  label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    color: #ccc;
+    font-size: 14px;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  button {
+    margin-top: 14px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #4c8dff;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(20,20,25,0.92);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  .momentum {
+    color: #7ee787;
+  }
+
+  .impulse {
+    color: #ff7b72;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="panel">
+  <h1>Impulse & Momentum</h1>
+
+  <p>
+    Newton's 2nd law:
+  </p>
+
+  <div class="equation">
+    F = dp/dt
+  </div>
+
+  <p>
+    Integrating force over time gives impulse:
+  </p>
+
+  <div class="equation">
+    ∫F dt = Δp
+  </div>
+
+  <p>
+    The collision conserves total momentum, while the impulse changes each particle's momentum individually.
+  </p>
+
+  <div class="controls">
+
+    <label>Mass m₁</label>
+    <input type="range" id="m1" min="1" max="10" value="4">
+
+    <label>Mass m₂</label>
+    <input type="range" id="m2" min="1" max="10" value="4">
+
+    <label>Velocity v₁</label>
+    <input type="range" id="v1" min="1" max="10" value="6">
+
+    <label>Velocity v₂</label>
+    <input type="range" id="v2" min="-5" max="5" value="0">
+
+    <label>Coefficient of restitution e</label>
+    <input type="range" id="e" min="0" max="1" step="0.01" value="0.8">
+
+    <button onclick="resetSim()">Restart Simulation</button>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="momentum">Green = Momentum vectors</div>
+  <div class="impulse">Red pulse = Collision impulse</div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+let state;
+
+function resetSim() {
+
+  const m1 = +document.getElementById("m1").value;
+  const m2 = +document.getElementById("m2").value;
+  const v1 = +document.getElementById("v1").value;
+  const v2 = +document.getElementById("v2").value;
+  const e = +document.getElementById("e").value;
+
+  state = {
+    m1,
+    m2,
+    v1,
+    v2,
+    e,
+
+    x1: 180,
+    x2: canvas.width - 180,
+
+    collided: false,
+    impactTime: 0
+  };
+}
+
+resetSim();
+
+function drawBall(x, y, r, color, label) {
+
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  ctx.fillStyle = "white";
+  ctx.font = "16px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(label, x, y + 5);
+}
+
+function drawArrow(x, y, length, color) {
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + length, y);
+  ctx.stroke();
+
+  const dir = Math.sign(length);
+
+  ctx.beginPath();
+  ctx.moveTo(x + length, y);
+  ctx.lineTo(x + length - 12 * dir, y - 8);
+  ctx.lineTo(x + length - 12 * dir, y + 8);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function collisionResponse() {
+
+  const {m1,m2,v1,v2,e} = state;
+
+  const newV1 =
+    ((m1 - e*m2)*v1 + (1+e)*m2*v2) / (m1+m2);
+
+  const newV2 =
+    ((m2 - e*m1)*v2 + (1+e)*m1*v1) / (m1+m2);
+
+  state.v1 = newV1;
+  state.v2 = newV2;
+
+  state.collided = true;
+  state.impactTime = performance.now();
+}
+
+function update(dt) {
+
+  state.x1 += state.v1 * 60 * dt;
+  state.x2 += state.v2 * 60 * dt;
+
+  if (!state.collided && state.x1 + 40 >= state.x2 - 40) {
+    collisionResponse();
+  }
+}
+
+function render() {
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const y = canvas.height * 0.62;
+
+  ctx.strokeStyle = "#444";
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(0, y + 42);
+  ctx.lineTo(canvas.width, y + 42);
+  ctx.stroke();
+
+  drawBall(state.x1, y, 40, "#58a6ff", "m₁");
+  drawBall(state.x2, y, 40, "#f778ba", "m₂");
+
+  drawArrow(
+    state.x1,
+    y - 80,
+    state.m1 * state.v1 * 8,
+    "#7ee787"
+  );
+
+  drawArrow(
+    state.x2,
+    y - 80,
+    state.m2 * state.v2 * 8,
+    "#7ee787"
+  );
+
+  ctx.fillStyle = "#ccc";
+  ctx.font = "18px Arial";
+
+  ctx.fillText(
+    `p₁ = ${(state.m1 * state.v1).toFixed(2)}`,
+    state.x1,
+    y - 105
+  );
+
+  ctx.fillText(
+    `p₂ = ${(state.m2 * state.v2).toFixed(2)}`,
+    state.x2,
+    y - 105
+  );
+
+  const totalP =
+    state.m1 * state.v1 +
+    state.m2 * state.v2;
+
+  ctx.fillStyle = "white";
+  ctx.font = "24px Arial";
+
+  ctx.fillText(
+    `Total Momentum = ${totalP.toFixed(2)}`,
+    canvas.width/2,
+    70
+  );
+
+  if (state.collided) {
+
+    const elapsed =
+      (performance.now() - state.impactTime) / 1000;
+
+    if (elapsed < 0.35) {
+
+      const alpha = 1 - elapsed / 0.35;
+
+      ctx.strokeStyle = `rgba(255,120,120,${alpha})`;
+      ctx.lineWidth = 18;
+
+      ctx.beginPath();
+      ctx.moveTo(
+        (state.x1 + state.x2)/2,
+        y - 70
+      );
+
+      ctx.lineTo(
+        (state.x1 + state.x2)/2,
+        y + 70
+      );
+
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(255,120,120,${alpha})`;
+
+      ctx.font = "28px Arial";
+      ctx.fillText(
+        "IMPULSE",
+        (state.x1 + state.x2)/2,
+        y - 100
+      );
+    }
+  }
+
+  ctx.fillStyle = "#aaa";
+  ctx.font = "18px Arial";
+
+  ctx.fillText(
+    `e = ${state.e.toFixed(2)}`,
+    canvas.width - 120,
+    50
+  );
+
+  ctx.fillText(
+    `Velocity of separation / approach`,
+    canvas.width - 240,
+    80
+  );
+}
+
+let last = performance.now();
+
+function animate(now) {
+
+  const dt = (now - last) / 1000;
+  last = now;
+
+  update(dt);
+  render();
+
+  requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+</script>
+
+</body>
+</html>

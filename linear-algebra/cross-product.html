@@ -12,16 +12,14 @@
   }
   </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="../shared/layout.css">
+  <link rel="stylesheet" href="../src/styles/layout.css">
 </head>
 <body>
   <div id="app">
-    <div id="canvas-container">
-      <canvas id="canvas"></canvas>
-    </div>
+    <div id="canvas-container"><canvas id="canvas"></canvas></div>
     <div id="panel">
       <a href="../index.html" id="back">← All visualizations</a>
-      <div id="subject">Linear Algebra</div>
+      <div id="subject"></div>
       <h1 id="step-title"></h1>
       <p id="step-description"></p>
       <div id="equation"></div>
@@ -33,205 +31,11 @@
       </div>
     </div>
   </div>
-
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-    // --- Scene setup ---
-    const canvas = document.getElementById('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
-
-    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-    camera.position.set(5, 4, 5);
-    camera.lookAt(0, 0, 0);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-
-    scene.add(new THREE.AxesHelper(3));
-    scene.add(new THREE.GridHelper(6, 6, 0xcccccc, 0xe8e8e8));
-
-    function resize() {
-      const container = document.getElementById('canvas-container');
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      renderer.setSize(w, h);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    (function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    })();
-
-    // --- Scene helpers ---
-    let objects = [];
-
-    function clear() {
-      objects.forEach(o => scene.remove(o));
-      objects = [];
-    }
-
-    function arrow(dir, origin, color) {
-      const d = new THREE.Vector3(...dir);
-      const len = d.length();
-      const a = new THREE.ArrowHelper(
-        d.clone().normalize(),
-        new THREE.Vector3(...origin),
-        len, color, len * 0.18, len * 0.09
-      );
-      scene.add(a);
-      objects.push(a);
-    }
-
-    function line(from, to, color) {
-      const geo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(...from),
-        new THREE.Vector3(...to)
-      ]);
-      const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color }));
-      scene.add(l);
-      objects.push(l);
-    }
-
-    function parallelogram(v, w, color) {
-      const vw = [v[0]+w[0], v[1]+w[1], v[2]+w[2]];
-      const O  = [0, 0, 0];
-
-      // Filled quad (two triangles)
-      const positions = new Float32Array([
-        ...O, ...v, ...w,
-        ...v, ...vw, ...w
-      ]);
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geo.computeVertexNormals();
-      const mesh = new THREE.Mesh(
-        geo,
-        new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity: 0.18 })
-      );
-      scene.add(mesh);
-      objects.push(mesh);
-
-      // Outline
-      line(O,  v,  color);
-      line(O,  w,  color);
-      line(v,  vw, color);
-      line(w,  vw, color);
-    }
-
-    // --- Concept data ---
-    const v = [2, 0, 0];
-    const w = [0, 1, 1];
-
-    // v × w
-    const cross = [
-      v[1]*w[2] - v[2]*w[1],   //  0*1 - 0*1 = 0
-      v[2]*w[0] - v[0]*w[2],   //  0*0 - 2*1 = -2
-      v[0]*w[1] - v[1]*w[0]    //  2*1 - 0*0 = 2
-    ];
-    // = (0, -2, 2)
-
-    const steps = [
-      {
-        title: "Two Vectors in 3D",
-        description: "Unlike the dot product, the cross product only makes sense in 3D. We need two vectors — and this time w has a z-component so both vectors genuinely live in 3D space.",
-        equation: "\\vec{v} = (2,\\,0,\\,0) \\qquad \\vec{w} = (0,\\,1,\\,1)",
-        notes: "|v| = 2\n|w| = √2 ≈ 1.41\n\nDrag to orbit — the 3D geometry is the whole point here.",
-        render() {
-          arrow(v, [0,0,0], 0x1565c0);
-          arrow(w, [0,0,0], 0xc62828);
-        }
-      },
-      {
-        title: "The Formula",
-        description: "The cross product is computed as a 3×3 determinant. Each component of the result mixes two components of the two input vectors.",
-        equation: `\\vec{v}\\times\\vec{w} = \\begin{vmatrix}\\mathbf{i}&\\mathbf{j}&\\mathbf{k}\\\\2&0&0\\\\0&1&1\\end{vmatrix}`,
-        notes: "i: (0)(1) − (0)(1) = 0\nj: −[(2)(1) − (0)(0)] = −2\nk: (2)(1) − (0)(0) = 2\n\nResult: (0, −2, 2)",
-        render() {
-          arrow(v, [0,0,0], 0x1565c0);
-          arrow(w, [0,0,0], 0xc62828);
-        }
-      },
-      {
-        title: "The Result Vector",
-        description: "The cross product v × w is itself a vector — it sticks out of the plane that v and w define. Orbit the scene to see how it stands perpendicular to both.",
-        equation: "\\vec{v}\\times\\vec{w} = (0,\\,-2,\\,2)",
-        notes: "|v × w| = √(0 + 4 + 4) = 2√2 ≈ 2.83\n\nThe orange vector is the cross product. Notice it points away from the plane of the blue and red vectors.",
-        render() {
-          arrow(v, [0,0,0], 0x1565c0);
-          arrow(w, [0,0,0], 0xc62828);
-          arrow(cross, [0,0,0], 0xe65100);
-        }
-      },
-      {
-        title: "Perpendicular to Both",
-        description: "The cross product is always perpendicular to both input vectors. We can verify this by taking dot products — perpendicular vectors always have a dot product of zero.",
-        equation: "(\\vec{v}\\times\\vec{w})\\cdot\\vec{v} = 0 \\qquad (\\vec{v}\\times\\vec{w})\\cdot\\vec{w} = 0",
-        notes: "(0,−2,2)·(2,0,0) = 0+0+0 = 0 ✓\n(0,−2,2)·(0,1,1) = 0−2+2 = 0 ✓\n\nThis is not a coincidence — it follows directly from the determinant definition.",
-        render() {
-          arrow(v, [0,0,0], 0x1565c0);
-          arrow(w, [0,0,0], 0xc62828);
-          arrow(cross, [0,0,0], 0xe65100);
-        }
-      },
-      {
-        title: "Area of the Parallelogram",
-        description: "The magnitude of the cross product equals the area of the parallelogram spanned by v and w. This is the geometric heart of it — the cross product encodes both direction (perpendicular) and size (area).",
-        equation: "|\\vec{v}\\times\\vec{w}| = |\\vec{v}|\\,|\\vec{w}|\\sin\\theta = \\text{Area}",
-        notes: "Area = 2√2 ≈ 2.83\n\nWhen v ∥ w: sin(0°) = 0 → area = 0, cross product = 0.\nWhen v ⊥ w: sin(90°) = 1 → maximum area.\n\nThis is used in physics to compute torque and angular momentum.",
-        render() {
-          arrow(v, [0,0,0], 0x1565c0);
-          arrow(w, [0,0,0], 0xc62828);
-          arrow(cross, [0,0,0], 0xe65100);
-          parallelogram(v, w, 0x5c6bc0);
-        }
-      }
-    ];
-
-    // --- UI ---
-    let current = 0;
-
-    function go(i) {
-      current = i;
-      clear();
-      const step = steps[i];
-      step.render();
-
-      document.getElementById('step-title').textContent       = step.title;
-      document.getElementById('step-description').textContent = step.description;
-      document.getElementById('step-notes').textContent       = step.notes;
-      document.getElementById('counter').textContent          = `${i + 1} / ${steps.length}`;
-
-      katex.render(step.equation, document.getElementById('equation'), {
-        throwOnError: false,
-        displayMode: true
-      });
-
-      document.getElementById('prev').disabled = i === 0;
-      document.getElementById('next').disabled = i === steps.length - 1;
-    }
-
-    document.getElementById('prev').addEventListener('click', () => go(current - 1));
-    document.getElementById('next').addEventListener('click', () => go(current + 1));
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight' && current < steps.length - 1) go(current + 1);
-      if (e.key === 'ArrowLeft'  && current > 0)               go(current - 1);
-    });
-
-    go(0);
+    import { run } from '../src/main.js';
+    import lesson  from '../src/lessons/linear-algebra/crossProduct.js';
+    run(lesson);
   </script>
 </body>
 </html>
