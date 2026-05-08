@@ -3,6 +3,8 @@
 // All conics are drawn parametrically in world space.
 // Eccentricity slider is shared across steps 2-5.
 
+import { renderEquation } from '../../ui/equation.js';
+
 // ── Conic geometry helpers ────────────────────────────────────────────────────
 
 // Polar form of a conic with focus at origin, semi-latus rectum p, eccentricity e.
@@ -41,6 +43,85 @@ function semiAxes(p, e) {
   const a = p / (1 - e * e);
   const b = p / Math.sqrt(1 - e * e);
   return { a, b };
+}
+
+// ── Form-aware conic helpers ──────────────────────────────────────────────────
+// The four standard polar forms differ only in cos/sin and ±.
+
+const FORM_EQUATIONS = {
+  a: 'r = \\dfrac{p}{1 + e\\cos\\theta}',
+  b: 'r = \\dfrac{p}{1 - e\\cos\\theta}',
+  c: 'r = \\dfrac{p}{1 + e\\sin\\theta}',
+  d: 'r = \\dfrac{p}{1 - e\\sin\\theta}',
+};
+
+const FORM_LABELS = {
+  a: '1 + e cos θ',
+  b: '1 − e cos θ',
+  c: '1 + e sin θ',
+  d: '1 − e sin θ',
+};
+
+function conicRForm(p, e, theta, form) {
+  let denom;
+  if      (form === 'a') denom = 1 + e * Math.cos(theta);
+  else if (form === 'b') denom = 1 - e * Math.cos(theta);
+  else if (form === 'c') denom = 1 + e * Math.sin(theta);
+  else                   denom = 1 - e * Math.sin(theta);
+  return Math.abs(denom) < 1e-9 ? Infinity : p / denom;
+}
+
+function sampleConicForm(p, e, form, nPts = 400) {
+  const segments = [[]];
+  for (let i = 0; i <= nPts; i++) {
+    const theta = (i / nPts) * Math.PI * 2;
+    const r = conicRForm(p, e, theta, form);
+    if (!isFinite(r) || r > 30) {
+      if (segments[segments.length - 1].length > 0) segments.push([]);
+      continue;
+    }
+    segments[segments.length - 1].push([r * Math.cos(theta), r * Math.sin(theta)]);
+  }
+  return segments.filter(s => s.length > 1);
+}
+
+// Periapsis world position for each form (closest point to focus)
+function periapsisPos(p, e, form) {
+  const r = p / (1 + e);
+  if (form === 'a') return [ r,  0];
+  if (form === 'b') return [-r,  0];
+  if (form === 'c') return [ 0,  r];
+  return                   [ 0, -r];
+}
+
+// Apoapsis world position (ellipse only)
+function apoapsisPos(p, e, form) {
+  const r = p / (1 - e);
+  if (form === 'a') return [-r,  0];
+  if (form === 'b') return [ r,  0];
+  if (form === 'c') return [ 0, -r];
+  return                   [ 0,  r];
+}
+
+// Directrix line endpoints and label position for each form
+function directrixGeom(p, e, form) {
+  const d = p / e;
+  if (form === 'a') return { pts: [[ d,-5],[ d, 5]], lx:  d+0.1, ly: 2.6, horiz: false };
+  if (form === 'b') return { pts: [[-d,-5],[-d, 5]], lx: -d-1.5, ly: 2.6, horiz: false };
+  if (form === 'c') return { pts: [[-5, d],[ 5, d]], lx:  2.6,   ly: d+0.2, horiz: true };
+  return                   { pts: [[-5,-d],[ 5,-d]], lx:  2.6,   ly:-d-0.3, horiz: true };
+}
+
+function drawDirectrixForm(c2d, p, e, form, live) {
+  if (e < 1e-6) return;
+  const { pts, lx, ly } = directrixGeom(p, e, form);
+  if (live) {
+    c2d.showLine(pts, { color: COLORS.directrix, width: 1, dash: [5, 4] });
+    c2d.showText('directrix', lx, ly, { color: COLORS.directrix, size: 11 });
+  } else {
+    c2d.addLine(pts, { color: COLORS.directrix, width: 1, dash: [5, 4] });
+    c2d.addText('directrix', lx, ly, { color: COLORS.directrix, size: 11 });
+  }
 }
 
 // ── Shared slider helper ───────────────────────────────────────────────────────
@@ -155,8 +236,36 @@ function drawFocusDirectrixPoint(c2d, p, e, theta) {
 
 // ── Lesson ────────────────────────────────────────────────────────────────────
 
+function addFormSelector(container, currentForm, onChange) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+  const label = document.createElement('div');
+  label.style.cssText = 'font-size:12px;color:#888;font-family:system-ui';
+  label.textContent = 'polar form';
+  wrap.appendChild(label);
+  const btns = document.createElement('div');
+  btns.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:5px;';
+  ['a','b','c','d'].forEach(key => {
+    const btn = document.createElement('button');
+    btn.dataset.form = key;
+    btn.textContent = FORM_LABELS[key];
+    const active = key === currentForm;
+    btn.style.cssText = `padding:6px 4px;border-radius:6px;border:1px solid ${active ? '#1565c0' : '#ddd'};background:${active ? '#e3f2fd' : '#f8f8f8'};color:${active ? '#1565c0' : '#666'};cursor:pointer;font-size:11px;font-family:Georgia,serif;transition:all 0.1s`;
+    btn.addEventListener('click', () => {
+      btns.querySelectorAll('button').forEach(b => {
+        b.style.borderColor = '#ddd'; b.style.background = '#f8f8f8'; b.style.color = '#666';
+      });
+      btn.style.borderColor = '#1565c0'; btn.style.background = '#e3f2fd'; btn.style.color = '#1565c0';
+      onChange(key);
+    });
+    btns.appendChild(btn);
+  });
+  wrap.appendChild(btns);
+  container.appendChild(wrap);
+}
+
 function mkInitState() {
-  return { e: 0.6, p: 1.8, theta: Math.PI / 4, animT: 0, _controls: null };
+  return { e: 0.6, p: 1.8, form: 'a', theta: Math.PI / 4, animT: 0, _controls: null };
 }
 
 export default {
@@ -245,37 +354,53 @@ export default {
       }
     },
     {
-      title: "The Polar Equation",
-      description: "With the focus at the origin, all conics share a single polar equation. p is the semi-latus rectum — the half-width of the curve at the focus. e controls the shape.",
-      equation: "r(\\theta) = \\frac{p}{1 + e\\cos\\theta}",
-      notes: "θ = 0 (rightward) gives the periapsis — the closest point to the focus:\n  r_min = p / (1 + e)\n\nθ = π (leftward) gives the apoapsis — farthest point (only for ellipse):\n  r_max = p / (1 − e)\n\nThis is exactly the equation of a Keplerian orbit. The two-body problem reduces to solving this curve — the orbit shape falls directly out of the inverse-square force law.\n\nDrag e and p to explore the family.",
+      title: "Four Polar Forms",
+      description: "Changing cos↔sin rotates the conic 90°. Changing the sign flips which side the periapsis faces. All four forms describe the same family — just in different orientations. Select a form to see the conic and its directrix rotate.",
+      equation: "r = \\dfrac{p}{1 + e\\cos\\theta}",
+      notes: "The directrix is always perpendicular to the axis of symmetry, on the same side as the periapsis.\n\ncos θ → axis along x  (conic opens left or right)\nsin θ → axis along y  (conic opens up or down)\n\n+ → periapsis toward +axis,  directrix at +p/e\n− → periapsis toward −axis,  directrix at −p/e\n\nThe red dot marks the periapsis (closest point to focus). For ellipses the blue dot marks the apoapsis.",
       setup(c2d, state) {
+        state.form = state.form ?? 'a';
         clearControls(state);
+        addFormSelector(state._controls, state.form, key => {
+          state.form = key;
+          renderEquation(FORM_EQUATIONS[key]);
+        });
         addSlider(state._controls, 'eccentricity  e', 0, 1.9, 0.01, state.e, v => state.e = v);
         addSlider(state._controls, 'semi-latus rectum  p', 0.5, 3.0, 0.05, state.p, v => state.p = v);
+        renderEquation(FORM_EQUATIONS[state.form]);
       },
       update(c2d, state) {
         c2d.clearPersistent();
         drawAxes(c2d);
-        const color = conicColor(state.e);
-        drawConicCurve(c2d, state.p, state.e, color, false);
+        const { e, p, form } = state;
+        const color = conicColor(e);
+
+        // Conic curve
+        const segs = sampleConicForm(p, e, form);
+        for (const seg of segs) c2d.addLine(seg, { color, width: 2.5 });
+
+        // Directrix
+        drawDirectrixForm(c2d, p, e, form, false);
+
+        // Focus
         drawFocus(c2d, false);
 
-        // Mark periapsis and apoapsis
-        const rPeri = state.p / (1 + state.e);
-        c2d.addPoint(rPeri, 0, { radius: 4, color: '#c62828' });
-        c2d.addText(`r_min = ${rPeri.toFixed(2)}`, rPeri + 0.1, -0.25, { color: '#c62828', size: 11 });
+        // Periapsis
+        const [px, py] = periapsisPos(p, e, form);
+        c2d.addPoint(px, py, { radius: 5, color: '#c62828' });
+        c2d.addText(`r_min=${( p/(1+e) ).toFixed(2)}`, px + 0.12, py - 0.28, { color: '#c62828', size: 11 });
 
-        if (state.e < 1) {
-          const rApo = state.p / (1 - state.e);
+        // Apoapsis (ellipse only)
+        if (e < 1) {
+          const rApo = p / (1 - e);
           if (rApo < 8) {
-            c2d.addPoint(-rApo, 0, { radius: 4, color: '#1565c0' });
-            c2d.addText(`r_max = ${rApo.toFixed(2)}`, -rApo - 1.5, -0.25, { color: '#1565c0', size: 11 });
+            const [ax, ay] = apoapsisPos(p, e, form);
+            c2d.addPoint(ax, ay, { radius: 5, color: '#1565c0' });
+            c2d.addText(`r_max=${rApo.toFixed(2)}`, ax + 0.12, ay - 0.28, { color: '#1565c0', size: 11 });
           }
         }
 
-        c2d.addText(`${conicName(state.e)}   e = ${state.e.toFixed(2)},  p = ${state.p.toFixed(2)}`,
-          -3.8, 3.0, { color, size: 13 });
+        c2d.addText(`${conicName(e)}   e = ${e.toFixed(2)},  p = ${p.toFixed(2)}`, -3.8, 3.0, { color, size: 13 });
       }
     },
     {
