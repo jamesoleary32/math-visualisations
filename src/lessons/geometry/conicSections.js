@@ -420,32 +420,60 @@ export default {
         const { e, p } = state;
         if (e >= 1) { state.e = 0.95; return; }
 
-        const a = p / (1 - e*e);
-        const b = p / Math.sqrt(1 - e*e);
-        const c = a * e; // focus-to-centre distance
-        const cx = -c;   // centre x (focus at origin → centre at -ae)
+        const a  = p / (1 - e * e);
+        const b  = p / Math.sqrt(1 - e * e);
+        const fc = a * e;   // focus-to-centre distance
+        const ox = -fc;     // centre x (focus at origin → centre at −ae)
 
         drawConicCurve(c2d, p, e, COLORS.ellipse, false);
 
-        // Major axis
-        c2d.addLine([[cx - a, 0], [cx + a, 0]], { color: '#ccc', width: 1, dash: [4, 3] });
-        // Minor axis
-        c2d.addLine([[cx, -b], [cx, b]], { color: '#ccc', width: 1, dash: [4, 3] });
+        // Full extent dashed axes through centre
+        c2d.addLine([[ox - a, 0], [ox + a, 0]], { color: '#ddd', width: 1, dash: [4, 3] });
+        c2d.addLine([[ox, -b],    [ox, b]],      { color: '#ddd', width: 1, dash: [4, 3] });
+
+        // ── Semi-major axis arrow: centre → right vertex ──────────────────────
+        const COLOR_A = '#1565c0';
+        c2d.addArrow(ox, 0, ox + a, 0, { color: COLOR_A, width: 2 });
+        c2d.addText(`a = ${a.toFixed(2)}`, ox + a * 0.45, 0.22, { color: COLOR_A, size: 12 });
+
+        // ── Semi-minor axis arrow: centre → top ───────────────────────────────
+        const COLOR_B = '#2e7d32';
+        c2d.addArrow(ox, 0, ox, b, { color: COLOR_B, width: 2 });
+        c2d.addText(`b = ${b.toFixed(2)}`, ox + 0.12, b * 0.52, { color: COLOR_B, size: 12 });
+
+        // ── c arrow: centre → F₁ (focus at origin) ───────────────────────────
+        const COLOR_C = COLORS.focus;
+        c2d.addArrow(ox, 0, 0, 0, { color: COLOR_C, width: 2 });
+        c2d.addText(`c = ${fc.toFixed(2)}`, ox * 0.5 + 0.05, -0.28, { color: COLOR_C, size: 12 });
+
+        // Right-angle marker at centre where the two arrows meet
+        c2d.raw((ctx, self) => {
+          const s  = 0.15;
+          const sx = self.wx(ox + s);
+          const sy = self.wy(s);
+          const ex = self.wx(ox);
+          const ey = self.wy(0);
+          ctx.save();
+          ctx.strokeStyle = '#aaa';
+          ctx.lineWidth   = 1;
+          ctx.beginPath();
+          ctx.moveTo(sx, ey);
+          ctx.lineTo(sx, sy);
+          ctx.lineTo(ex, sy);
+          ctx.stroke();
+          ctx.restore();
+        });
 
         // Both foci
-        c2d.addPoint(0,      0, { radius: 5, color: COLORS.focus });
-        c2d.addPoint(-2*c,   0, { radius: 5, color: COLORS.focus });
-        c2d.addText('F₁', 0.1, -0.3,    { color: COLORS.focus, size: 11 });
-        c2d.addText('F₂', -2*c+0.1, -0.3,{ color: COLORS.focus, size: 11 });
+        c2d.addPoint(0,     0, { radius: 5, color: COLOR_C });
+        c2d.addPoint(-2*fc, 0, { radius: 5, color: COLOR_C });
+        c2d.addText('F₁', 0.12,      -0.35, { color: COLOR_C, size: 11 });
+        c2d.addText('F₂', -2*fc+0.12,-0.35, { color: COLOR_C, size: 11 });
 
         // Centre
-        c2d.addPoint(cx, 0, { radius: 3, color: '#aaa' });
-        c2d.addText('O', cx + 0.1, 0.15, { color: '#aaa', size: 11 });
+        c2d.addPoint(ox, 0, { radius: 3, color: '#aaa' });
+        c2d.addText('O', ox - 0.3, 0.15, { color: '#aaa', size: 11 });
 
-        // Dimension labels
-        c2d.addText(`a = ${a.toFixed(2)}`, cx + 0.1, -0.55, { color: '#555', size: 11 });
-        c2d.addText(`b = ${b.toFixed(2)}`, cx + 0.12, b * 0.5, { color: '#555', size: 11 });
-        c2d.addText(`c = ${c.toFixed(2)}`, -c * 0.5, -0.55, { color: COLORS.focus, size: 11 });
         c2d.addText(`e = ${e.toFixed(2)}`, -3.8, 3.0, { color: COLORS.ellipse, size: 13 });
       }
     }
