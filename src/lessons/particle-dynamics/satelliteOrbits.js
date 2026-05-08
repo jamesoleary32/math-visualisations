@@ -238,7 +238,7 @@ export default {
     {
       title: "Equations of Motion in Polar Coordinates",
       description: "Applying Newton's second law in polar coordinates splits the motion into radial and transverse components. The transverse equation immediately yields a conservation law.",
-      equation: "\\underbrace{\\ddot{r} - r\\dot{\\theta}^2}_{\\text{radial}} = -\\frac{K}{r^2} \\qquad \\underbrace{r\\ddot{\\theta} + 2\\dot{r}\\dot{\\theta}}_{\\text{transverse}} = \\frac{1}{r}\\frac{d}{dt}(r^2\\dot{\\theta}) = 0",
+      equation: "\\underbrace{\\ddot{r} - r\\dot{\\theta}^2}_{\\text{radial}} = -\\dfrac{K}{r^2} \\\\[10pt] \\underbrace{r\\ddot{\\theta} + 2\\dot{r}\\dot{\\theta}}_{\\text{transverse}} = \\dfrac{1}{r}\\dfrac{d}{dt}(r^2\\dot{\\theta}) = 0",
       notes: "These equations come from differentiating r = r·r̂ twice. Because r̂ and θ̂ rotate with the particle (ṙ̂ = θ̇·θ̂, θ̂̇ = −θ̇·r̂), the product rule generates extra terms:\n\nVelocity:  v = ṙ·r̂ + rθ̇·θ̂\n  vᵣ = ṙ        (radial — how fast r stretches)\n  v_θ = rθ̇      (transverse — how fast the direction rotates)\n\nAcceleration:  a = (r̈ − rθ̇²)·r̂ + (rθ̈ + 2ṙθ̇)·θ̂\n  aᵣ = r̈ − rθ̇²      (radial acceleration)\n  a_θ = rθ̈ + 2ṙθ̇   (transverse acceleration)\n\nThe extra terms (rθ̇², 2ṙθ̇) are geometry, not physics — they appear purely because the coordinate directions are rotating.\n\nSetting F = ma with F = (−K/r², 0) gives both equations directly.\n\nGreen arrow = θ̂ (transverse).  Red arrow = r̂ (radial outward).",
       setup(c2d, state) {
         Object.assign(state, mkInitState());
