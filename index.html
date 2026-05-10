@@ -37,24 +37,6 @@
       color: #999;
     }
 
-    .progress-strip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .prog-pill {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      padding: 3px 9px;
-      border-radius: 20px;
-    }
-
-    .prog-pill.y1 { background: #e3f2fd; color: #1565c0; }
-    .prog-pill.y2 { background: #e8f5e9; color: #2e7d32; }
-    .prog-pill.y3 { background: #fff3e0; color: #e65100; }
-
     .catalog-link {
       font-size: 12px;
       color: #aaa;
@@ -102,27 +84,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .year-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    .year-badge.y1 { background: #e3f2fd; color: #1565c0; }
-    .year-badge.y2 { background: #e8f5e9; color: #2e7d32; }
-    .year-badge.y3 { background: #fff3e0; color: #e65100; }
-
     .card-title {
       font-size: 15px;
       font-weight: 600;
       color: #111;
       margin-bottom: 6px;
-      padding-right: 36px;
     }
 
     .card-desc {
@@ -137,11 +103,6 @@
     <h1>Learning Visualizations</h1>
     <div class="header-meta">
       <p>Interactive explorations of mathematics and physics</p>
-      <div class="progress-strip">
-        <span class="prog-pill y1">Year 1 · 9</span>
-        <span class="prog-pill y2">Year 2 · 13</span>
-        <span class="prog-pill y3">Year 3 · 4</span>
-      </div>
       <a href="catalog.html" class="catalog-link">Sources &amp; Textbooks →</a>
     </div>
   </header>
@@ -150,17 +111,14 @@
     <h2>Linear Algebra</h2>
     <div class="grid">
       <a href="linear-algebra/dot-product.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Dot Product</div>
         <div class="card-desc">Vectors, angles, and projection</div>
       </a>
       <a href="linear-algebra/cross-product.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Cross Product</div>
         <div class="card-desc">Perpendicular vectors and parallelogram area</div>
       </a>
       <a href="linear-algebra/moment.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Moment of a Force</div>
         <div class="card-desc">Torque as a cross product: M = r × F</div>
       </a>
@@ -171,32 +129,26 @@
     <h2>Kinematics</h2>
     <div class="grid">
       <a href="kinematics/angular-velocity.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Angular Velocity</div>
         <div class="card-desc">Why ω is orthogonal, and v = ω × r</div>
       </a>
       <a href="kinematics/plane-motion.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Plane Motion</div>
         <div class="card-desc">Radial and transverse components in polar coordinates</div>
       </a>
       <a href="kinematics/instantaneous-center.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Instantaneous Center</div>
         <div class="card-desc">The point about which the body is rotating instantaneously</div>
       </a>
       <a href="kinematics/euler-angles.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Euler Angles</div>
         <div class="card-desc">ψ, θ, φ and transformation of displacements</div>
       </a>
       <a href="kinematics/areal-rate.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Areal Rate</div>
         <div class="card-desc">r × v, equal areas, and Kepler's second law</div>
       </a>
       <a href="kinematics/circular-motion.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Circular Motion</div>
         <div class="card-desc">v = rω, centripetal and tangential acceleration</div>
       </a>
@@ -207,17 +159,14 @@
     <h2>Particle Dynamics — Kepler's Laws</h2>
     <div class="grid">
       <a href="particle-dynamics/kepler-first.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Kepler's First Law</div>
         <div class="card-desc">Orbits are conic sections — derived from Newton's inverse-square law via Binet's substitution</div>
       </a>
       <a href="particle-dynamics/kepler-second.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Kepler's Second Law</div>
         <div class="card-desc">Equal areas in equal times — conservation of angular momentum h = r²θ̇</div>
       </a>
       <a href="particle-dynamics/kepler-third.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Kepler's Third Law</div>
         <div class="card-desc">T² = 4π²a³/K — period depends only on semi-major axis, not eccentricity</div>
       </a>
@@ -228,27 +177,22 @@
     <h2>Particle Dynamics</h2>
     <div class="grid">
       <a href="particle-dynamics/a.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Impulse &amp; Momentum</div>
         <div class="card-desc">Visualisation of impulse and momentum</div>
       </a>
       <a href="particle-dynamics/satellite-orbits.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Satellite Orbits</div>
         <div class="card-desc">Radial &amp; transverse equations, Binet's substitution, orbit as a conic</div>
       </a>
       <a href="particle-dynamics/two-body.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Two-Body Problem</div>
         <div class="card-desc">CoM reduction, relative coordinate, and reduced mass</div>
       </a>
       <a href="particle-dynamics/orbit-initial-conditions.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Orbit from Initial Conditions</div>
         <div class="card-desc">χ, eccentricity from v₀ and β₀, and the Fig 4.9-2 chart</div>
       </a>
       <a href="particle-dynamics/hohmann-transfer.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Hohmann Transfer</div>
         <div class="card-desc">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂, transfer time</div>
       </a>
@@ -259,7 +203,6 @@
     <h2>Particle Dynamics — Scenarios</h2>
     <div class="grid">
       <a href="particle-dynamics/scenarios/repulsive-orbit.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">Repulsive Inverse-Square Force</div>
         <div class="card-desc">F = +K/r² produces the repulsive branch of a hyperbola — Rutherford scattering geometry</div>
       </a>
@@ -270,12 +213,10 @@
     <h2>Geometry</h2>
     <div class="grid">
       <a href="geometry/conic-sections.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Conic Sections</div>
         <div class="card-desc">Eccentricity, focus-directrix definition, and the polar equation</div>
       </a>
       <a href="geometry/ellipse-geometry.html" class="card">
-        <div class="year-badge y1">Y1</div>
         <div class="card-title">Ellipse Geometry</div>
         <div class="card-desc">Semi-axes, area = πab, focal properties, and the bridge to orbital mechanics</div>
       </a>
@@ -286,17 +227,14 @@
     <h2>Differential Equations</h2>
     <div class="grid">
       <a href="differential-equations/ode-overview.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">ODE Overview</div>
         <div class="card-desc">Slope fields, solution curves, initial conditions, order and linearity</div>
       </a>
       <a href="differential-equations/pendulum.html" class="card">
-        <div class="year-badge y2">Y2</div>
         <div class="card-title">The Pendulum</div>
         <div class="card-desc">SHM, phase portrait, separatrix, and nonlinear period corrections</div>
       </a>
       <a href="differential-equations/heat-equation.html" class="card">
-        <div class="year-badge y3">Y3</div>
         <div class="card-title">The Heat Equation</div>
         <div class="card-desc">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</div>
       </a>
@@ -304,10 +242,15 @@
   </section>
 
   <section>
+    <h2>Probability</h2>
+    <div class="grid">
+    </div>
+  </section>
+
+  <section>
     <h2>Machine Learning</h2>
     <div class="grid">
       <a href="machine-learning/perceptron.html" class="card">
-        <div class="year-badge y3">Y3</div>
         <div class="card-title">Perceptron</div>
         <div class="card-desc">Weighted sum, activation, decision boundary, and the learning rule</div>
       </a>
@@ -318,7 +261,6 @@
     <h2>Gyrodynamics</h2>
     <div class="grid">
       <a href="gyrodynamics/polhode-herpolhode.html" class="card">
-        <div class="year-badge y3">Y3</div>
         <div class="card-title">Polhode &amp; Herpolhode</div>
         <div class="card-desc">The motion of the instantaneous rotation axis in body and space frames</div>
       </a>

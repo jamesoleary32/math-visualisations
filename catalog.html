@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sources & Textbooks — Learning Visualizations</title>
+  <title>Sources &amp; Textbooks — Learning Visualizations</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -72,6 +72,10 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
 
+    .book-card.planned {
+      opacity: 0.55;
+    }
+
     .book-title {
       font-size: 15px;
       font-weight: 600;
@@ -83,7 +87,7 @@
     .book-authors {
       font-size: 12px;
       color: #888;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       font-style: italic;
     }
 
@@ -109,10 +113,6 @@
       color: #666;
     }
 
-    .topic-tag.y1 { background: #e3f2fd; color: #1565c0; }
-    .topic-tag.y2 { background: #e8f5e9; color: #2e7d32; }
-    .topic-tag.y3 { background: #fff3e0; color: #e65100; }
-
     .book-notes {
       font-size: 12px;
       color: #999;
@@ -121,43 +121,17 @@
       padding-top: 10px;
     }
 
-    .add-card {
-      background: #fafafa;
-      border: 1px dashed #ddd;
-      border-radius: 10px;
-      padding: 22px 24px;
-      width: 300px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ccc;
-      font-size: 13px;
-      cursor: default;
-    }
-
-    .legend {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
-      align-items: center;
-    }
-
-    .legend-label {
-      font-size: 11px;
-      color: #aaa;
-      margin-right: 4px;
-    }
-
-    .legend-pill {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
+    .planned-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
       border-radius: 4px;
+      background: #f0f0f0;
+      color: #aaa;
+      margin-bottom: 8px;
     }
-
-    .legend-pill.y1 { background: #e3f2fd; color: #1565c0; }
-    .legend-pill.y2 { background: #e8f5e9; color: #2e7d32; }
-    .legend-pill.y3 { background: #fff3e0; color: #e65100; }
   </style>
 </head>
 <body>
@@ -165,94 +139,58 @@
   <header>
     <a href="index.html" class="back">← All visualizations</a>
     <h1>Sources &amp; Textbooks</h1>
-    <p>Books and references used across the visualization library</p>
+    <p>Books and video series used across the visualization library</p>
   </header>
 
-  <div class="legend">
-    <span class="legend-label">topic level:</span>
-    <span class="legend-pill y1">Year 1</span>
-    <span class="legend-pill y2">Year 2</span>
-    <span class="legend-pill y3">Year 3</span>
-  </div>
-
   <section>
-    <h2>Engineering Mechanics</h2>
+    <h2>Video Series</h2>
     <div class="book-grid">
 
       <div class="book-card">
-        <div class="book-title">Engineering Mechanics: Dynamics</div>
-        <div class="book-authors">Meriam, J.L. &amp; Kraige, L.G.</div>
-        <div class="book-edition">7th Edition — Wiley</div>
+        <div class="book-title">Essence of Linear Algebra</div>
+        <div class="book-authors">3Blue1Brown (Grant Sanderson)</div>
+        <div class="book-edition">YouTube — 16 videos</div>
         <div class="book-topics">
-          <span class="topic-tag y1">Kinematics</span>
-          <span class="topic-tag y1">Circular Motion</span>
-          <span class="topic-tag y2">Particle Dynamics</span>
-          <span class="topic-tag y2">Orbital Mechanics</span>
-          <span class="topic-tag y2">Hohmann Transfer</span>
-          <span class="topic-tag y3">Gyrodynamics</span>
+          <span class="topic-tag">Dot Product</span>
+          <span class="topic-tag">Cross Product</span>
+          <span class="topic-tag">Vectors</span>
+          <span class="topic-tag">Moment of a Force</span>
         </div>
-        <div class="book-notes">Primary source for particle dynamics and orbital mechanics content. Sections 4.7 (satellite orbits, radial/transverse equations, Binet's substitution) and 4.9 (orbit from initial conditions, χ parameter, Fig 4.9-2) map directly to lessons.</div>
+        <div class="book-notes">Primary source for the linear algebra section. Builds geometric intuition for vectors, dot and cross products before any algebraic formalism.</div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-title">Differential Equations</div>
+        <div class="book-authors">3Blue1Brown (Grant Sanderson)</div>
+        <div class="book-edition">YouTube — 8 videos</div>
+        <div class="book-topics">
+          <span class="topic-tag">Heat Equation</span>
+          <span class="topic-tag">Fourier Series</span>
+        </div>
+        <div class="book-notes">Source for the heat equation lesson. The series covers ODEs, Fourier analysis, and the connection between eigenfunctions and boundary-value problems.</div>
       </div>
 
     </div>
   </section>
 
   <section>
-    <h2>Mathematics</h2>
+    <h2>Textbooks — Engineering &amp; Physics</h2>
     <div class="book-grid">
 
       <div class="book-card">
-        <div class="book-title">— add textbook —</div>
-        <div class="book-authors">Linear Algebra</div>
-        <div class="book-edition"></div>
+        <div class="book-title">Introduction to Space Dynamics</div>
+        <div class="book-authors">William T. Thomson</div>
+        <div class="book-edition">Dover Publications</div>
         <div class="book-topics">
-          <span class="topic-tag y1">Dot Product</span>
-          <span class="topic-tag y1">Cross Product</span>
-          <span class="topic-tag y1">Vectors</span>
+          <span class="topic-tag">Kinematics</span>
+          <span class="topic-tag">Circular Motion</span>
+          <span class="topic-tag">Euler Angles</span>
+          <span class="topic-tag">Particle Dynamics</span>
+          <span class="topic-tag">Orbital Mechanics</span>
+          <span class="topic-tag">Hohmann Transfer</span>
+          <span class="topic-tag">Gyrodynamics</span>
         </div>
-        <div class="book-notes">Edit catalog.html to add the linear algebra reference used for vectors, dot product, and cross product content.</div>
-      </div>
-
-      <div class="book-card">
-        <div class="book-title">— add textbook —</div>
-        <div class="book-authors">Differential Equations</div>
-        <div class="book-edition"></div>
-        <div class="book-topics">
-          <span class="topic-tag y2">ODEs</span>
-          <span class="topic-tag y2">SHM / Pendulum</span>
-          <span class="topic-tag y3">Heat Equation</span>
-          <span class="topic-tag y3">Fourier Series</span>
-        </div>
-        <div class="book-notes">Edit catalog.html to add the differential equations reference used for ODE slope fields, the pendulum phase portrait, and heat equation Fourier analysis.</div>
-      </div>
-
-      <div class="book-card">
-        <div class="book-title">— add textbook —</div>
-        <div class="book-authors">Geometry / Conics</div>
-        <div class="book-edition"></div>
-        <div class="book-topics">
-          <span class="topic-tag y1">Conic Sections</span>
-          <span class="topic-tag y1">Ellipse Geometry</span>
-        </div>
-        <div class="book-notes">Edit catalog.html to add the geometry reference for conic sections, eccentricity, and ellipse properties.</div>
-      </div>
-
-    </div>
-  </section>
-
-  <section>
-    <h2>Machine Learning</h2>
-    <div class="book-grid">
-
-      <div class="book-card">
-        <div class="book-title">— add textbook —</div>
-        <div class="book-authors">Neural Networks / ML</div>
-        <div class="book-edition"></div>
-        <div class="book-topics">
-          <span class="topic-tag y3">Perceptron</span>
-          <span class="topic-tag y3">Learning Rule</span>
-        </div>
-        <div class="book-notes">Edit catalog.html to add the machine learning reference used for the perceptron, decision boundary, and learning rule content.</div>
+        <div class="book-notes">Primary source for kinematics, particle dynamics, orbital mechanics, and gyrodynamics. Sections 4.7 (satellite orbits, Binet's substitution) and 4.9 (orbit from initial conditions, χ parameter, Fig 4.9-2) map directly to lessons.</div>
       </div>
 
     </div>
@@ -261,7 +199,74 @@
   <section>
     <h2>Online Resources</h2>
     <div class="book-grid">
-      <div class="add-card">add references here</div>
+
+      <div class="book-card">
+        <div class="book-title">Probability — Course Notes</div>
+        <div class="book-authors">Richard Weber</div>
+        <div class="book-edition">University of Cambridge, Statistical Laboratory · 2015</div>
+        <div class="book-topics">
+          <span class="topic-tag">Probability</span>
+          <span class="topic-tag">Random Variables</span>
+          <span class="topic-tag">Distributions</span>
+        </div>
+        <div class="book-notes">Part IA course notes for first-year mathematicians at Cambridge. Self-contained lecture units covering classical probability, distributions, random walks, and generating functions. Includes examples sheets and a table of distributions.<br><br><a href="https://www.statslab.cam.ac.uk/~rrw1/prob/index.html" style="font-size:11px;color:#aaa;">statslab.cam.ac.uk/~rrw1/prob</a></div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-title">Probability — Example Sheets</div>
+        <div class="book-authors">Cambridge DPMMS</div>
+        <div class="book-edition">Part IA, 2025–2026</div>
+        <div class="book-topics">
+          <span class="topic-tag">Probability</span>
+          <span class="topic-tag">Problem Sets</span>
+        </div>
+        <div class="book-notes">Official Part IA Probability example sheets from the Department of Pure Mathematics and Mathematical Statistics. Four sheets per year; archive goes back to 2007.<br><br><a href="https://www.dpmms.cam.ac.uk/study/IA/Probability/" style="font-size:11px;color:#aaa;">dpmms.cam.ac.uk/study/IA/Probability</a></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Textbooks — Mathematics</h2>
+    <div class="book-grid">
+
+      <div class="book-card">
+        <div class="book-title">Linear Algebra: Step by Step</div>
+        <div class="book-authors">Kuldeep Singh</div>
+        <div class="book-edition">Oxford University Press, 2013</div>
+        <div class="book-topics">
+          <span class="topic-tag">Vectors</span>
+          <span class="topic-tag">Dot Product</span>
+          <span class="topic-tag">Cross Product</span>
+          <span class="topic-tag">Linear Algebra</span>
+        </div>
+        <div class="book-notes">Supplementary reference for the linear algebra section alongside 3Blue1Brown. Provides formal algebraic treatment alongside 3B1B's geometric approach.</div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-title">Ordinary Differential Equations</div>
+        <div class="book-authors">V.I. Arnold, trans. Silverman</div>
+        <div class="book-edition">MIT Press, 1978</div>
+        <div class="book-topics">
+          <span class="topic-tag">ODE Overview</span>
+          <span class="topic-tag">Slope Fields</span>
+          <span class="topic-tag">Pendulum</span>
+          <span class="topic-tag">Phase Portraits</span>
+        </div>
+        <div class="book-notes">Source for the ODE overview and pendulum lessons. Arnold's geometric/qualitative approach — phase portraits, slope fields, separatrices — shapes how the visualizations are framed.</div>
+      </div>
+
+      <div class="book-card planned">
+        <div class="planned-tag">PLANNED</div>
+        <div class="book-title">Basic Topology</div>
+        <div class="book-authors">M.A. Armstrong</div>
+        <div class="book-edition">Springer, Undergraduate Texts in Mathematics</div>
+        <div class="book-topics">
+          <span class="topic-tag">Topology</span>
+        </div>
+        <div class="book-notes">Planned source for a future topology section. No lessons built yet.</div>
+      </div>
+
     </div>
   </section>
 
