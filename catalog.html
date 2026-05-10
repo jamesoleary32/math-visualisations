@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sources & Textbooks — Learning Visualizations</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    .back {
+      display: inline-block;
+      font-size: 13px;
+      color: #999;
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: color 0.15s;
+    }
+    .back:hover { color: #555; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+
+    .book-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .book-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 22px 24px;
+      width: 300px;
+      position: relative;
+    }
+
+    .book-card:hover {
+      border-color: #bbb;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .book-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .book-authors {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .book-edition {
+      font-size: 11px;
+      color: #bbb;
+      margin-bottom: 12px;
+    }
+
+    .book-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+
+    .topic-tag {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .topic-tag.y1 { background: #e3f2fd; color: #1565c0; }
+    .topic-tag.y2 { background: #e8f5e9; color: #2e7d32; }
+    .topic-tag.y3 { background: #fff3e0; color: #e65100; }
+
+    .book-notes {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.6;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 10px;
+    }
+
+    .add-card {
+      background: #fafafa;
+      border: 1px dashed #ddd;
+      border-radius: 10px;
+      padding: 22px 24px;
+      width: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+      font-size: 13px;
+      cursor: default;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      align-items: center;
+    }
+
+    .legend-label {
+      font-size: 11px;
+      color: #aaa;
+      margin-right: 4px;
+    }
+
+    .legend-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .legend-pill.y1 { background: #e3f2fd; color: #1565c0; }
+    .legend-pill.y2 { background: #e8f5e9; color: #2e7d32; }
+    .legend-pill.y3 { background: #fff3e0; color: #e65100; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="back">← All visualizations</a>
+    <h1>Sources &amp; Textbooks</h1>
+    <p>Books and references used across the visualization library</p>
+  </header>
+
+  <div class="legend">
+    <span class="legend-label">topic level:</span>
+    <span class="legend-pill y1">Year 1</span>
+    <span class="legend-pill y2">Year 2</span>
+    <span class="legend-pill y3">Year 3</span>
+  </div>
+
+  <section>
+    <h2>Engineering Mechanics</h2>
+    <div class="book-grid">
+
+      <div class="book-card">
+        <div class="book-title">Engineering Mechanics: Dynamics</div>
+        <div class="book-authors">Meriam, J.L. &amp; Kraige, L.G.</div>
+        <div class="book-edition">7th Edition — Wiley</div>
+        <div class="book-topics">
+          <span class="topic-tag y1">Kinematics</span>
+          <span class="topic-tag y1">Circular Motion</span>
+          <span class="topic-tag y2">Particle Dynamics</span>
+          <span class="topic-tag y2">Orbital Mechanics</span>
+          <span class="topic-tag y2">Hohmann Transfer</span>
+          <span class="topic-tag y3">Gyrodynamics</span>
+        </div>
+        <div class="book-notes">Primary source for particle dynamics and orbital mechanics content. Sections 4.7 (satellite orbits, radial/transverse equations, Binet's substitution) and 4.9 (orbit from initial conditions, χ parameter, Fig 4.9-2) map directly to lessons.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Mathematics</h2>
+    <div class="book-grid">
+
+      <div class="book-card">
+        <div class="book-title">— add textbook —</div>
+        <div class="book-authors">Linear Algebra</div>
+        <div class="book-edition"></div>
+        <div class="book-topics">
+          <span class="topic-tag y1">Dot Product</span>
+          <span class="topic-tag y1">Cross Product</span>
+          <span class="topic-tag y1">Vectors</span>
+        </div>
+        <div class="book-notes">Edit catalog.html to add the linear algebra reference used for vectors, dot product, and cross product content.</div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-title">— add textbook —</div>
+        <div class="book-authors">Differential Equations</div>
+        <div class="book-edition"></div>
+        <div class="book-topics">
+          <span class="topic-tag y2">ODEs</span>
+          <span class="topic-tag y2">SHM / Pendulum</span>
+          <span class="topic-tag y3">Heat Equation</span>
+          <span class="topic-tag y3">Fourier Series</span>
+        </div>
+        <div class="book-notes">Edit catalog.html to add the differential equations reference used for ODE slope fields, the pendulum phase portrait, and heat equation Fourier analysis.</div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-title">— add textbook —</div>
+        <div class="book-authors">Geometry / Conics</div>
+        <div class="book-edition"></div>
+        <div class="book-topics">
+          <span class="topic-tag y1">Conic Sections</span>
+          <span class="topic-tag y1">Ellipse Geometry</span>
+        </div>
+        <div class="book-notes">Edit catalog.html to add the geometry reference for conic sections, eccentricity, and ellipse properties.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Machine Learning</h2>
+    <div class="book-grid">
+
+      <div class="book-card">
+        <div class="book-title">— add textbook —</div>
+        <div class="book-authors">Neural Networks / ML</div>
+        <div class="book-edition"></div>
+        <div class="book-topics">
+          <span class="topic-tag y3">Perceptron</span>
+          <span class="topic-tag y3">Learning Rule</span>
+        </div>
+        <div class="book-notes">Edit catalog.html to add the machine learning reference used for the perceptron, decision boundary, and learning rule content.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Online Resources</h2>
+    <div class="book-grid">
+      <div class="add-card">add references here</div>
+    </div>
+  </section>
+
+</body>
+</html>
