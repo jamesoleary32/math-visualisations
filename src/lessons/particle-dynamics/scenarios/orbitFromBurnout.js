@@ -1,39 +1,32 @@
 // Scenario: Orbit from Burnout Conditions — Thomson Example 4.13-I
 //
-// A satellite is launched with:
-//   r₀v₀²/K = 1.40   (dimensionless energy parameter χ)
-//   β₀ = 20°          (heading angle from normal to r, i.e. from θ̂)
-//   r₀/R = 2.0        (injection radius in units of Earth radius)
-//
-// Goal: find eccentricity e and semi-major axis a/R, and locate initial
-// position θ₀ relative to perigee.
-//
-// References: Thomson "Introduction to Space Dynamics" §4.9, §4.13.
+// Given at engine cutoff: χ = r₀v₀²/K = 1.40, β₀ = 20°, r₀/R = 2.0
+// Find: eccentricity e, semi-major axis a/R, initial position θ₀ from perigee.
+
+const K  = 1.0;
+const R  = 1.0;
+const R0 = 2.0 * R;
 
 // ── Orbital mechanics ─────────────────────────────────────────────────────────
 
-const K  = 1.0;
-const R  = 1.0;   // Earth radius (normalised)
-const R0 = 2.0 * R;
-
 function computeOrbit(chi, betaDeg) {
-  const b   = betaDeg * Math.PI / 180;
-  const v0  = Math.sqrt(chi * K / R0);
-  const h   = R0 * v0 * Math.cos(b);
-  const p   = h * h / K;
-  const eCosT = chi * Math.cos(b) * Math.cos(b) - 1;
-  const eSinT = chi * Math.sin(b) * Math.cos(b);
-  const e     = Math.sqrt(eCosT * eCosT + eSinT * eSinT);
+  const b      = betaDeg * Math.PI / 180;
+  const v0     = Math.sqrt(chi * K / R0);
+  const h      = R0 * v0 * Math.cos(b);
+  const p      = h * h / K;
+  const eCosT  = chi * Math.cos(b) * Math.cos(b) - 1;
+  const eSinT  = chi * Math.sin(b) * Math.cos(b);
+  const e      = Math.sqrt(eCosT * eCosT + eSinT * eSinT);
   const theta0 = Math.atan2(eSinT, eCosT);
-  const a  = p / (1 - e * e);        // semi-major axis (negative = hyperbola)
-  const E  = 0.5 * v0 * v0 - K / R0; // specific energy
+  const a      = e < 1 ? p / (1 - e * e) : null;
+  const E      = 0.5 * v0 * v0 - K / R0;
   return { chi, b, v0, h, p, e, theta0, eCosT, eSinT, a, E };
 }
 
 function orbitColor(e) {
-  if (e < 0.01)  return '#2e7d32';
-  if (e < 1)     return '#1565c0';
-  if (e < 1.02)  return '#e65100';
+  if (e < 0.01) return '#2e7d32';
+  if (e < 1)    return '#1565c0';
+  if (e < 1.02) return '#e65100';
   return '#7b1fa2';
 }
 function orbitTypeName(e) {
@@ -50,7 +43,7 @@ function traceOrbit(orb) {
     const phi = (i / 600) * Math.PI * 2;
     const d   = 1 + e * Math.cos(phi + theta0);
     if (Math.abs(d) < 0.05) { if (segs[segs.length-1].length) segs.push([]); continue; }
-    const r   = p / d;
+    const r = p / d;
     if (r < 0 || r > 25) { if (segs[segs.length-1].length) segs.push([]); continue; }
     segs[segs.length-1].push([r * Math.cos(phi), r * Math.sin(phi)]);
   }
@@ -62,7 +55,7 @@ function traceOrbit(orb) {
 function drawEarth(c2d) {
   c2d.raw((ctx, cam) => {
     ctx.beginPath();
-    ctx.arc(cam.wx(0), cam.wy(0), cam.ws(R), 0, Math.PI*2);
+    ctx.arc(cam.wx(0), cam.wy(0), cam.ws(R), 0, Math.PI * 2);
     ctx.fillStyle = '#1565c0'; ctx.fill();
     ctx.fillStyle = '#fff'; ctx.font = 'bold 11px system-ui';
     ctx.textAlign = 'center';
@@ -71,11 +64,30 @@ function drawEarth(c2d) {
   });
 }
 
-function drawOrbit(c2d, orb, live) {
+function drawOrbit(c2d, orb) {
   const color = orbitColor(orb.e);
   for (const seg of traceOrbit(orb)) {
-    if (live) c2d.showLine(seg, { color, width: 2.5 });
-    else      c2d.addLine(seg, { color, width: 2.5 });
+    c2d.addLine(seg, { color, width: 2.5 });
+  }
+}
+
+// Perigee + apogee dots + apse line. faint=true → lighter styling for bg use.
+function drawApseLine(c2d, orb, faint = false) {
+  if (orb.e < 0.05) return;
+  const thetaP = -orb.theta0;
+  const rp = orb.p / (1 + orb.e);
+  const ra = orb.e < 1 ? orb.p / (1 - orb.e) : null;
+  const ppx = rp * Math.cos(thetaP), ppy = rp * Math.sin(thetaP);
+
+  if (ra && ra < 18 && rp < 18) {
+    const apx = ra * Math.cos(thetaP + Math.PI), apy = ra * Math.sin(thetaP + Math.PI);
+    c2d.addLine([[ppx, ppy], [apx, apy]], { color: faint ? '#ebebeb' : '#ddd', width: 1, dash: [5, 4] });
+    c2d.addPoint(apx, apy, { radius: faint ? 3 : 5, color: faint ? '#a5d6a7' : '#2e7d32' });
+    if (!faint) c2d.addText('apogee', apx + 0.12, apy + 0.24, { color: '#2e7d32', size: 10 });
+  }
+  if (rp < 18) {
+    c2d.addPoint(ppx, ppy, { radius: faint ? 3 : 5, color: faint ? '#ef9a9a' : '#c62828' });
+    if (!faint) c2d.addText('perigee', ppx + 0.12, ppy - 0.28, { color: '#c62828', size: 10 });
   }
 }
 
@@ -89,9 +101,11 @@ function addSlider(container, label, min, max, step, value, fmt, onChange) {
   wrap.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
   wrap.innerHTML = `
     <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;font-family:system-ui">
-      <span>${label}</span><span id="${id}-v" style="font-family:Georgia,serif;font-style:italic">${fmt(value)}</span>
+      <span>${label}</span>
+      <span id="${id}-v" style="font-family:Georgia,serif;font-style:italic">${fmt(value)}</span>
     </div>
-    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" style="width:100%;accent-color:#1565c0">
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}"
+      style="width:100%;accent-color:#1565c0">
   `;
   container.appendChild(wrap);
   const inp = wrap.querySelector('input');
@@ -103,17 +117,20 @@ function addSlider(container, label, min, max, step, value, fmt, onChange) {
   });
 }
 
+function addSliders(controls, state) {
+  addSlider(controls, 'χ = r₀v₀²/K', 0.5, 3.0, 0.05, state.chi,
+    v => v.toFixed(2), v => state.chi = v);
+  addSlider(controls, 'heading  β₀  (degrees)', -60, 60, 1, state.betaDeg,
+    v => v.toFixed(0) + '°', v => state.betaDeg = v);
+}
+
 // ── Lesson ────────────────────────────────────────────────────────────────────
 
 export default {
   title:   'Orbit from Burnout Conditions (Ex. 4.13-I)',
   subject: 'Particle Dynamics — Scenario',
 
-  initState: () => ({
-    chi: 1.40,       // r₀v₀²/K
-    betaDeg: 20,     // heading angle
-    _controls: null,
-  }),
+  initState: () => ({ chi: 1.40, betaDeg: 20, _controls: null }),
 
   init(c2d, state, panelEl) {
     c2d.scale = 65;
@@ -126,84 +143,72 @@ export default {
 
   steps: [
 
-    // ── Step 1: Setting up the problem ───────────────────────────────────────
+    // ── Step 1: The 3 inputs ─────────────────────────────────────────────────
+    // Message: three numbers at cutoff → one orbit. Show what you choose (β₀)
+    // and the orbit that results. Nothing else.
     {
-      title: 'Burnout Conditions',
-      description: 'At rocket engine cutoff, three numbers characterise the satellite\'s state completely: the injection radius r₀, the speed v₀, and the heading angle β₀ measured from the local transverse direction θ̂. From these three scalars we can determine the entire orbit.',
+      title: 'The Three Inputs at Engine Cutoff',
+      description: 'The moment the engine stops, three numbers fix the orbit completely: r₀ (how high), v₀ (how fast), and β₀ (which direction). Change the sliders to see how the resulting orbit changes. The orbit type and size are the consequence — you choose the inputs.',
       equation: "\\chi = \\frac{r_0 v_0^2}{K} = 1.40 \\qquad \\beta_0 = 20^\\circ \\qquad \\frac{r_0}{R} = 2.0",
-      notes: 'χ = r₀v₀²/K is the dimensionless "energy parameter". It tells you the orbit type at a glance:\n  χ < 1: subcircular — always an ellipse for β₀ = 0\n  χ = 1: circular orbit (when β₀ = 0)\n  χ = 2: escape orbit (parabola) for β₀ = 0\n  χ > 2: hyperbola\n\nHere χ = 1.40 with β₀ = 20° — the satellite is in a bound elliptical orbit but not circular.\n\nThe injection point is fixed at (r₀, 0), i.e. directly to the right of the focus. r₀ = 2R = 2 Earth radii altitude (above centre).',
+      notes: 'β₀ is the angle between the velocity vector v₀ and the local transverse direction θ̂ (the direction along the orbit, perpendicular to r).\n\nβ₀ = 0° → purely sideways burn — most efficient, gives the largest orbit for a given speed.\nβ₀ = 90° → purely radial burn → h = 0 → no orbit at all, falls straight back.\n\nNote: there are TWO angles in this problem. β₀ is your input — you choose it. θ₀ (which part of the orbit the injection landed on) is the output — it comes out of the calculation in step 3.',
       setup(c2d, state) {
         clearControls(state);
-        addSlider(state._controls, 'χ = r₀v₀²/K', 0.5, 3.0, 0.05, state.chi,
-          v => v.toFixed(2), v => state.chi = v);
-        addSlider(state._controls, 'heading  β₀  (degrees)', -60, 60, 1, state.betaDeg,
-          v => v.toFixed(0) + '°', v => state.betaDeg = v);
+        addSliders(state._controls, state);
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         drawEarth(c2d);
-
-        // Show injection point
-        c2d.addPoint(R0, 0, { radius: 7, color: '#e65100' });
-        c2d.addLine([[0, 0], [R0, 0]], { color: '#888', width: 1, dash: [3, 2] });
-        c2d.addText('r₀ = 2R', R0 * 0.42, 0.2, { color: '#888', size: 11, italic: true });
-        c2d.addText('burnout', R0 + 0.12, 0.25, { color: '#e65100', size: 11 });
-
-        // Show β₀ meaning: angle from θ̂ (vertical at injection)
-        c2d.addLine([[R0, -0.8], [R0, 0.8]], { color: '#ccc', width: 1, dash: [3, 2] });
-        c2d.addText('θ̂ (normal to r)', R0 + 0.1, 0.85, { color: '#bbb', size: 10, italic: true });
       },
       update(c2d, state) {
-        const orb = computeOrbit(state.chi, state.betaDeg);
         c2d.clearPersistent();
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
+        const orb = computeOrbit(state.chi, state.betaDeg);
+        drawOrbit(c2d, orb);
         drawEarth(c2d);
-        drawOrbit(c2d, orb, false);
 
+        // Injection point
         c2d.addPoint(R0, 0, { radius: 7, color: '#e65100' });
-        c2d.addLine([[0, 0], [R0, 0]], { color: '#888', width: 1, dash: [3, 2] });
-        c2d.addLine([[R0, -0.8], [R0, 0.8]], { color: '#ccc', width: 1, dash: [3, 2] });
-        c2d.addText('θ̂', R0 + 0.1, 0.85, { color: '#bbb', size: 11, italic: true });
+        c2d.addText('engine cutoff', R0 + 0.12, -0.3, { color: '#e65100', size: 10 });
 
-        // Velocity vector
-        const VS = 2.2;
-        const b  = orb.b;
-        const vx = orb.v0 * Math.sin(b) * VS;
-        const vy = orb.v0 * Math.cos(b) * VS;
-        c2d.showArrow(R0, 0, R0 + vx, vy, { color: '#7b1fa2', width: 2.5 });
-        c2d.showText('v₀', R0 + vx + 0.1, vy + 0.1, { color: '#7b1fa2', size: 13, italic: true });
+        // v₀ arrow
+        const VS = 2.2, b = orb.b;
+        c2d.showArrow(R0, 0, R0 + orb.v0 * Math.sin(b) * VS, orb.v0 * Math.cos(b) * VS,
+          { color: '#7b1fa2', width: 2.5 });
+        c2d.showText('v₀', R0 + orb.v0 * Math.sin(b) * VS + 0.12,
+          orb.v0 * Math.cos(b) * VS + 0.1, { color: '#7b1fa2', size: 13, italic: true });
+
+        // θ̂ guide (short, faint — just enough to show what β₀ is measured from)
+        c2d.showLine([[R0, -0.5], [R0, 0.5]], { color: '#ddd', width: 1, dash: [3, 3] });
+        c2d.showText('θ̂', R0 + 0.08, 0.56, { color: '#ccc', size: 10, italic: true });
 
         // β₀ arc
         c2d.showRaw((ctx, cam) => {
           if (Math.abs(state.betaDeg) < 1) return;
-          const sx = cam.wx(R0), sy = cam.wy(0);
-          const arcR = cam.ws(0.5);
-          const startA = -Math.PI / 2;
-          const endA   = -Math.PI / 2 + b;
+          const sx = cam.wx(R0), sy = cam.wy(0), arcR = cam.ws(0.44);
           ctx.beginPath();
-          ctx.arc(sx, sy, arcR, startA, endA, b < 0);
-          ctx.strokeStyle = '#7b1fa2'; ctx.lineWidth = 1.5; ctx.stroke();
-          const midA = (startA + endA) / 2;
-          ctx.fillStyle = '#7b1fa2'; ctx.font = 'italic 12px Georgia,serif';
-          ctx.fillText('β₀', sx + Math.cos(midA) * (arcR + 12), sy + Math.sin(midA) * (arcR + 10));
+          ctx.arc(sx, sy, arcR, -Math.PI / 2, -Math.PI / 2 + b, b < 0);
+          ctx.strokeStyle = '#7b1fa2'; ctx.lineWidth = 2; ctx.stroke();
+          const midA = -Math.PI / 2 + b / 2;
+          ctx.fillStyle = '#7b1fa2'; ctx.font = 'bold italic 14px Georgia,serif';
+          ctx.fillText('β₀', sx + Math.cos(midA) * (arcR + 14), sy + Math.sin(midA) * (arcR + 10));
         });
 
         const color = orbitColor(orb.e);
         c2d.showText(`${orbitTypeName(orb.e)}   e = ${orb.e.toFixed(3)}`, -4.5, 3.5, { color, size: 13 });
-        c2d.showText(`χ = ${state.chi.toFixed(2)},  β₀ = ${state.betaDeg}°`, -4.5, 3.0, { color: '#888', size: 11 });
+        c2d.showText(`β₀ = ${state.betaDeg}° (input)     χ = ${state.chi.toFixed(2)}`, -4.5, 3.0, { color: '#7b1fa2', size: 11 });
       },
     },
 
-    // ── Step 2: Angular momentum and semi-latus rectum ───────────────────────
+    // ── Step 2: β₀ sets angular momentum ────────────────────────────────────
+    // Message: only the transverse part of v₀ matters for h (and therefore
+    // for orbit scale p). The radial part just shifts where on the orbit
+    // injection occurs — it contributes nothing to h.
     {
-      title: 'Angular Momentum h and Semi-Latus Rectum p',
-      description: 'Only the transverse component of v₀ contributes to angular momentum h = r₀v₀ cos β₀. The semi-latus rectum p = h²/K then gives the orbit scale. The radial component v₀ sin β₀ tells us how fast r is changing at injection — it only shifts where on the orbit injection occurs.',
+      title: 'β₀ Controls Angular Momentum h',
+      description: 'Decompose v₀ into its transverse component (along θ̂, green) and radial component (along r̂, red). Only the transverse part creates angular momentum h = r₀v₀ cos β₀. The radial part simply means the satellite is already moving outward at cutoff — it shifts where on the orbit injection occurs, but does not change the orbit scale.',
       equation: "h = r_0 v_0 \\cos\\beta_0 \\qquad p = \\frac{h^2}{K}",
-      notes: 'Numerically (with K = 1, r₀ = 2, χ = 1.40, β₀ = 20°):\n  v₀ = √(χK/r₀) = √(1.40/2) = 0.8367\n  h  = r₀v₀ cosβ₀ = 2 × 0.8367 × cos20° = 1.573\n  p  = h²/K = 2.474\n\nA pure radial launch (β₀ = ±90°) gives h = 0, so the satellite falls straight back. In that degenerate case there is no orbit — use the green arrow to see how the orbit shrinks as β₀ → ±90°.',
+      notes: 'This is why β₀ = 0 is the most efficient injection: all of v₀ goes into angular momentum.\n\nNumerically: v₀ = √(1.40/2) = 0.837\n  h = 2 × 0.837 × cos 20° = 1.573\n  p = h²/K = 2.474\n\nTry dragging β₀ toward ±90°: the green transverse arrow shrinks to zero, the orbit collapses, and eventually h = 0 means a purely radial trajectory — no orbit at all.',
       setup(c2d, state) {
         clearControls(state);
-        addSlider(state._controls, 'χ = r₀v₀²/K', 0.5, 3.0, 0.05, state.chi,
-          v => v.toFixed(2), v => state.chi = v);
-        addSlider(state._controls, 'heading  β₀  (degrees)', -60, 60, 1, state.betaDeg,
-          v => v.toFixed(0) + '°', v => state.betaDeg = v);
+        addSliders(state._controls, state);
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         drawEarth(c2d);
       },
@@ -211,48 +216,48 @@ export default {
         c2d.clearPersistent();
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         const orb = computeOrbit(state.chi, state.betaDeg);
-        drawOrbit(c2d, orb, false);
+        drawOrbit(c2d, orb);
+        drawApseLine(c2d, orb, true);   // faint perigee/apogee — context only
         drawEarth(c2d);
 
-        const VS = 2.2;
-        const b = orb.b;
+        const VS = 2.2, b = orb.b;
         const vTrans = orb.v0 * Math.cos(b);
         const vRad   = orb.v0 * Math.sin(b);
 
         c2d.addPoint(R0, 0, { radius: 6, color: '#e65100' });
-        c2d.addLine([[0, 0], [R0, 0]], { color: '#888', width: 1, dash: [3, 2] });
 
-        // Transverse component (green, upward)
+        // Transverse component — creates h
         c2d.showArrow(R0, 0, R0, vTrans * VS, { color: '#2e7d32', width: 2.5 });
-        c2d.showText(`v₀cosβ₀ = ${vTrans.toFixed(3)}`, R0 + 0.12, vTrans * VS * 0.5, { color: '#2e7d32', size: 11 });
+        c2d.showText(`v₀ cos β₀ = ${vTrans.toFixed(3)}`, R0 + 0.12, vTrans * VS * 0.48, { color: '#2e7d32', size: 11 });
+        c2d.showText('→ creates h', R0 + 0.12, vTrans * VS * 0.48 - 0.3, { color: '#2e7d32', size: 10 });
 
-        // Radial component (red, horizontal)
+        // Radial component — contributes nothing to h
         if (Math.abs(vRad) > 0.01) {
           c2d.showArrow(R0, 0, R0 + vRad * VS, 0, { color: '#c62828', width: 2 });
-          c2d.showText('v₀sinβ₀', R0 + vRad * VS * 0.4, -0.3, { color: '#c62828', size: 11 });
+          c2d.showText('v₀ sin β₀', R0 + vRad * VS * 0.3, -0.28, { color: '#c62828', size: 11 });
+          c2d.showText('→ no h', R0 + vRad * VS * 0.3, -0.58, { color: '#c62828', size: 10 });
         }
 
-        // Total velocity
+        // Total v₀ arrow
         c2d.showArrow(R0, 0, R0 + vRad * VS, vTrans * VS, { color: '#7b1fa2', width: 2 });
         c2d.showText('v₀', R0 + vRad * VS + 0.1, vTrans * VS + 0.1, { color: '#7b1fa2', size: 13, italic: true });
 
-        c2d.showText(`h = ${orb.h.toFixed(3)}`, -4.5, 3.5, { color: '#2e7d32', size: 13 });
+        c2d.showText(`h = r₀v₀cosβ₀ = ${orb.h.toFixed(3)}`, -4.5, 3.5, { color: '#2e7d32', size: 13 });
         c2d.showText(`p = h²/K = ${orb.p.toFixed(3)}`, -4.5, 3.0, { color: '#555', size: 12 });
       },
     },
 
-    // ── Step 3: Eccentricity and initial angle θ₀ ────────────────────────────
+    // ── Step 3: β₀ vs θ₀ ─────────────────────────────────────────────────────
+    // Message: β₀ (input, at injection point) produces θ₀ (output, at focus).
+    // Two different angles, two different locations.
     {
-      title: 'Eccentricity e and Initial Angle θ₀',
-      description: 'Substituting the velocity components into the orbit equation and its time derivative at the injection point gives e cos θ₀ and e sin θ₀ separately. These two scalars fix both e and where on the orbit injection occurred.',
+      title: 'Two Angles — Two Different Places',
+      description: 'The calculation produces e cosθ₀ and e sinθ₀, which together give both e and θ₀. Notice where each angle lives on the diagram: β₀ is at the injection point (your input), θ₀ is at the focus (the output).',
       equation: "e\\cos\\theta_0 = \\chi\\cos^2\\!\\beta_0 - 1 \\qquad e\\sin\\theta_0 = \\chi\\sin\\beta_0\\cos\\beta_0",
-      notes: 'For χ = 1.40, β₀ = 20°:\n  e cosθ₀ = 1.40 × cos²20° − 1 = 1.40 × 0.883 − 1 = 0.236\n  e sinθ₀ = 1.40 × sin20° × cos20° = 1.40 × 0.321 = 0.450\n\n  e   = √(0.236² + 0.450²) = 0.509\n  θ₀  = arctan(0.450/0.236) = 62.3°\n\nSo at injection, the satellite is at 62.3° ahead of perigee.\n\nThe perigee direction is shown as the red dashed line — it\'s rotated 62.3° clockwise from the injection point.',
+      notes: 'For χ = 1.40, β₀ = 20°:\n  e cosθ₀ = 1.40 × cos²20° − 1 = 0.236\n  e sinθ₀ = 1.40 × sin20° × cos20° = 0.450\n  e = √(0.236² + 0.450²) = 0.509\n  θ₀ = arctan(0.450 / 0.236) = 62.3°\n\nSo injection happened 62.3° past perigee on this ellipse.\n\nβ₀ is the angle you controlled — the direction you fired the engine.\nθ₀ is what fell out of the maths — it tells you where on the resulting orbit the satellite was when the engine stopped.',
       setup(c2d, state) {
         clearControls(state);
-        addSlider(state._controls, 'χ = r₀v₀²/K', 0.5, 3.0, 0.05, state.chi,
-          v => v.toFixed(2), v => state.chi = v);
-        addSlider(state._controls, 'heading  β₀  (degrees)', -60, 60, 1, state.betaDeg,
-          v => v.toFixed(0) + '°', v => state.betaDeg = v);
+        addSliders(state._controls, state);
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         drawEarth(c2d);
       },
@@ -260,58 +265,82 @@ export default {
         c2d.clearPersistent();
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         const orb = computeOrbit(state.chi, state.betaDeg);
-        drawOrbit(c2d, orb, false);
+        drawOrbit(c2d, orb);
+        drawApseLine(c2d, orb, false);  // apse line prominent here — θ₀ is measured from it
         drawEarth(c2d);
 
+        const b = orb.b;
         c2d.addPoint(R0, 0, { radius: 7, color: '#e65100' });
-        c2d.addLine([[0, 0], [R0, 0]], { color: '#888', width: 1, dash: [3, 2] });
 
-        // Perigee direction (opposite of theta0 in world coords)
-        const thetaP = -orb.theta0;
-        const rp = orb.p / (1 + orb.e);
-        if (orb.e > 0.05 && isFinite(rp) && rp < 20) {
-          const px = rp * Math.cos(thetaP), py = rp * Math.sin(thetaP);
-          c2d.addLine([[0, 0], [px, py]], { color: '#c62828', width: 1.5, dash: [4, 3] });
-          c2d.addPoint(px, py, { radius: 5, color: '#c62828' });
-          c2d.addText('perigee', px + 0.1, py - 0.3, { color: '#c62828', size: 11 });
-        }
+        // ── β₀ zone: at the injection point (right side) ──────────────────
+        // Small v₀ arrow + arc + label "β₀ (input) — angle of burn"
+        const VS = 1.5;
+        const vx = orb.v0 * Math.sin(b) * VS, vy = orb.v0 * Math.cos(b) * VS;
+        c2d.addArrow(R0, 0, R0 + vx, vy, { color: '#7b1fa2', width: 2 });
+        c2d.addLine([[R0, -0.5], [R0, 0.5]], { color: '#ddd', width: 1, dash: [3, 3] });
 
-        // Apse line (horizontal)
-        c2d.addLine([[0, 0], [8, 0]], { color: '#ddd', width: 1, dash: [5, 4] });
+        c2d.showRaw((ctx, cam) => {
+          if (Math.abs(state.betaDeg) < 1) return;
+          const sx = cam.wx(R0), sy = cam.wy(0), arcR = cam.ws(0.38);
+          ctx.beginPath();
+          ctx.arc(sx, sy, arcR, -Math.PI / 2, -Math.PI / 2 + b, b < 0);
+          ctx.strokeStyle = '#7b1fa2'; ctx.lineWidth = 2; ctx.stroke();
+          const midA = -Math.PI / 2 + b / 2;
+          ctx.fillStyle = '#7b1fa2'; ctx.font = 'bold italic 13px Georgia,serif';
+          ctx.fillText('β₀', sx + Math.cos(midA) * (arcR + 13), sy + Math.sin(midA) * (arcR + 9));
 
-        // θ₀ arc at injection point
+          // Callout box near injection
+          const bx = sx + cam.ws(0.65), by = sy - cam.ws(0.6);
+          ctx.fillStyle = 'rgba(123,31,162,0.06)';
+          ctx.beginPath(); ctx.rect(bx, by, cam.ws(2.1), cam.ws(0.55)); ctx.fill();
+          ctx.strokeStyle = 'rgba(123,31,162,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+          ctx.fillStyle = '#7b1fa2'; ctx.font = 'bold 11px system-ui';
+          ctx.fillText('β₀ — input', bx + 8, by + 16);
+          ctx.font = '10px system-ui'; ctx.fillStyle = '#9c4dcc';
+          ctx.fillText('aim of burn · at injection point', bx + 8, by + 30);
+        });
+
+        // ── θ₀ zone: at the focus (centre) ───────────────────────────────
+        // Large arc + label "θ₀ (output) — where on orbit"
         c2d.showRaw((ctx, cam) => {
           const t0 = orb.theta0;
           if (Math.abs(t0) < 0.01) return;
-          const sx = cam.wx(0), sy = cam.wy(0);
-          const arcR = cam.ws(1.2);
+          const sx = cam.wx(0), sy = cam.wy(0), arcR = cam.ws(1.35);
           ctx.beginPath();
           ctx.arc(sx, sy, arcR, 0, -t0, t0 < 0);
-          ctx.strokeStyle = '#e65100'; ctx.lineWidth = 1.5; ctx.stroke();
+          ctx.strokeStyle = '#e65100'; ctx.lineWidth = 3; ctx.stroke();
           const midA = -t0 / 2;
-          ctx.fillStyle = '#e65100'; ctx.font = 'italic 12px Georgia,serif';
-          ctx.fillText('θ₀', sx + Math.cos(midA) * (arcR + 16), sy + Math.sin(midA) * (arcR + 12));
+          ctx.fillStyle = '#e65100'; ctx.font = 'bold italic 15px Georgia,serif';
+          ctx.fillText('θ₀', sx + Math.cos(midA) * (arcR + 20), sy + Math.sin(midA) * (arcR + 14));
+
+          // Callout box near focus, below Earth
+          const bx = sx - cam.ws(0.4), by = sy + cam.ws(1.25);
+          ctx.fillStyle = 'rgba(230,81,0,0.06)';
+          ctx.beginPath(); ctx.rect(bx, by, cam.ws(2.4), cam.ws(0.55)); ctx.fill();
+          ctx.strokeStyle = 'rgba(230,81,0,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+          ctx.fillStyle = '#e65100'; ctx.font = 'bold 11px system-ui';
+          ctx.fillText('θ₀ — output', bx + 8, by + 16);
+          ctx.font = '10px system-ui'; ctx.fillStyle = '#f4511e';
+          ctx.fillText('position on orbit · at focus', bx + 8, by + 30);
         });
 
         const color = orbitColor(orb.e);
-        c2d.showText(`e cosθ₀ = ${orb.eCosT.toFixed(3)}`, -4.5, 3.5, { color: '#555', size: 12 });
-        c2d.showText(`e sinθ₀ = ${orb.eSinT.toFixed(3)}`, -4.5, 3.1, { color: '#555', size: 12 });
-        c2d.showText(`e = ${orb.e.toFixed(3)}   θ₀ = ${(orb.theta0*180/Math.PI).toFixed(1)}°`, -4.5, 2.7, { color, size: 13 });
+        c2d.showText(`e = ${orb.e.toFixed(3)}`, -4.5, 3.5, { color, size: 13 });
+        c2d.showText(`β₀ = ${state.betaDeg}° (input)`, -4.5, 3.0, { color: '#7b1fa2', size: 11 });
+        c2d.showText(`θ₀ = ${(orb.theta0 * 180 / Math.PI).toFixed(1)}° past perigee (output)`, -4.5, 2.6, { color: '#e65100', size: 11 });
       },
     },
 
-    // ── Step 4: Semi-major axis a/R ──────────────────────────────────────────
+    // ── Step 4: Orbit size ───────────────────────────────────────────────────
+    // Message: once e and p are known, a = p/(1-e²) gives the physical scale.
     {
-      title: 'Semi-Major Axis a and Orbit Energy',
-      description: 'Once e and p are known, the semi-major axis follows from p = a(1 − e²). The ratio a/R places the orbit in physical scale relative to Earth\'s radius. The specific energy E = −K/(2a) confirms the orbit type.',
-      equation: "a = \\frac{p}{1-e^2} \\qquad \\frac{a}{R} = \\frac{a}{R} \\qquad E = -\\frac{K}{2a}",
-      notes: 'For the example (χ = 1.40, β₀ = 20°, r₀ = 2R):\n  e = 0.509,  p = 2.474\n  a = 2.474/(1 − 0.509²) = 2.474/0.741 = 3.34\n  a/R = 3.34 (three Earth-radii semi-major axis)\n\nSpecific energy: E = ½v₀² − K/r₀ = ½(χK/r₀) − K/r₀ = K(χ/2 − 1)/r₀\n  Er₀/K = χ/2 − 1 = 1.40/2 − 1 = −0.30 < 0 → bound ellipse ✓\n\nAlternatively: E = −K/(2a) → a = −K/(2E). Both routes agree.',
+      title: 'Semi-Major Axis and Orbit Size',
+      description: 'With e and p now known, the semi-major axis a = p/(1 − e²) gives the full physical scale of the orbit. The injection point sits between perigee and apogee at θ₀ = 62.3° — confirming the geometry from step 3.',
+      equation: "a = \\frac{p}{1-e^2} \\qquad r_p = \\frac{p}{1+e} \\qquad r_a = \\frac{p}{1-e}",
+      notes: 'For χ = 1.40, β₀ = 20°:\n  e = 0.509,  p = 2.474\n  a = 2.474 / (1 − 0.509²) = 3.34  →  a/R = 3.34\n  rₚ = 2.474 / 1.509 = 1.64R  (perigee: inside Earth? No — 1.64R means 0.64R above surface)\n  rₐ = 2.474 / 0.491 = 5.04R  (apogee: 4R above surface)\n\nSpecific energy: Er₀/K = χ/2 − 1 = −0.30 < 0 → bound ellipse ✓\nThis also gives: a = −K/(2E) = r₀/(2 − χ) = 2/0.6 = 3.33R ✓',
       setup(c2d, state) {
         clearControls(state);
-        addSlider(state._controls, 'χ = r₀v₀²/K', 0.5, 3.0, 0.05, state.chi,
-          v => v.toFixed(2), v => state.chi = v);
-        addSlider(state._controls, 'heading  β₀  (degrees)', -60, 60, 1, state.betaDeg,
-          v => v.toFixed(0) + '°', v => state.betaDeg = v);
+        addSliders(state._controls, state);
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         drawEarth(c2d);
       },
@@ -319,44 +348,46 @@ export default {
         c2d.clearPersistent();
         c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
         const orb = computeOrbit(state.chi, state.betaDeg);
-        drawOrbit(c2d, orb, false);
+        drawOrbit(c2d, orb);
         drawEarth(c2d);
-
-        c2d.addPoint(R0, 0, { radius: 7, color: '#e65100' });
 
         const thetaP = -orb.theta0;
         const rp = orb.p / (1 + orb.e);
         const ra = orb.e < 1 ? orb.p / (1 - orb.e) : null;
+        const ppx = rp * Math.cos(thetaP), ppy = rp * Math.sin(thetaP);
 
-        if (orb.e > 0.02 && isFinite(rp) && rp < 20) {
-          const px = rp * Math.cos(thetaP), py = rp * Math.sin(thetaP);
-          c2d.addPoint(px, py, { radius: 5, color: '#c62828' });
-          c2d.addText(`rₚ = ${rp.toFixed(2)}R`, px + 0.1, py - 0.3, { color: '#c62828', size: 11 });
+        // Apse line (major axis) — this is the a measurement
+        if (ra && ra < 18 && rp < 18) {
+          const apx = ra * Math.cos(thetaP + Math.PI), apy = ra * Math.sin(thetaP + Math.PI);
+
+          // Full apse line
+          c2d.addLine([[ppx, ppy], [apx, apy]], { color: '#bbb', width: 1.5, dash: [5, 4] });
+
+          // Perigee
+          c2d.addPoint(ppx, ppy, { radius: 5, color: '#c62828' });
+          c2d.addText(`rₚ = ${rp.toFixed(2)}R`, ppx + 0.12, ppy - 0.3, { color: '#c62828', size: 11 });
+
+          // Apogee
+          c2d.addPoint(apx, apy, { radius: 5, color: '#2e7d32' });
+          c2d.addText(`rₐ = ${ra.toFixed(2)}R`, apx + 0.12, apy + 0.28, { color: '#2e7d32', size: 11 });
+
+          // a label on the apse line — from centre of ellipse to perigee
+          const ecx = (ppx + apx) / 2, ecy = (ppy + apy) / 2; // ellipse centre
+          c2d.addPoint(ecx, ecy, { radius: 3, color: '#888' });
+          c2d.addLine([[ecx, ecy], [ppx, ppy]], { color: '#888', width: 2 });
+          c2d.addText('a', (ecx + ppx) / 2 + 0.1, (ecy + ppy) / 2 + 0.2, { color: '#888', size: 12, italic: true });
         }
 
-        if (ra && ra < 20) {
-          const ax = ra * Math.cos(thetaP + Math.PI), ay = ra * Math.sin(thetaP + Math.PI);
-          c2d.addPoint(ax, ay, { radius: 5, color: '#2e7d32' });
-          c2d.addText(`rₐ = ${ra.toFixed(2)}R`, ax + 0.1, ay + 0.2, { color: '#2e7d32', size: 11 });
-        }
-
-        // Semi-major axis visual: line from perigee to apogee through focus
-        if (ra && ra < 20 && rp < 20) {
-          const px = rp * Math.cos(thetaP), py = rp * Math.sin(thetaP);
-          const ax = ra * Math.cos(thetaP + Math.PI), ay = ra * Math.sin(thetaP + Math.PI);
-          c2d.addLine([[px, py], [ax, ay]], { color: '#888', width: 1, dash: [4, 3] });
-        }
+        // Injection point — show it sits on the orbit
+        c2d.addPoint(R0, 0, { radius: 6, color: '#e65100' });
+        c2d.addText(`injection  θ₀ = ${(orb.theta0 * 180 / Math.PI).toFixed(1)}°`, R0 + 0.12, 0.28, { color: '#e65100', size: 10 });
 
         const color = orbitColor(orb.e);
         const Enorm = 0.5 * state.chi - 1;
-        const aVal  = orb.e < 1 ? orb.p / (1 - orb.e * orb.e) : null;
         c2d.showText(`e = ${orb.e.toFixed(3)}   ${orbitTypeName(orb.e)}`, -4.5, 3.5, { color, size: 13 });
-        if (aVal && isFinite(aVal)) {
-          c2d.showText(`a/R = ${(aVal / R).toFixed(3)}`, -4.5, 3.0, { color: '#555', size: 12 });
-        }
+        if (orb.a) c2d.showText(`a/R = ${orb.a.toFixed(3)}`, -4.5, 3.0, { color: '#555', size: 12 });
         c2d.showText(`Er₀/K = ${Enorm.toFixed(3)}  (${Enorm < -0.001 ? 'bound' : Enorm > 0.001 ? 'escape' : 'parabolic'})`,
           -4.5, 2.5, { color: '#888', size: 11 });
-        c2d.showText(`θ₀ = ${(orb.theta0 * 180/Math.PI).toFixed(1)}° ahead of perigee`, -4.5, 2.1, { color: '#e65100', size: 11 });
       },
     },
 
