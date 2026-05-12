@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Orbital Mechanics Glossary</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header { margin-bottom: 48px; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .back {
+      display: inline-block;
+      font-size: 13px;
+      color: #aaa;
+      text-decoration: none;
+      margin-bottom: 24px;
+    }
+    .back:hover { color: #555; }
+
+    section { margin-bottom: 48px; }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .terms { display: flex; flex-direction: column; gap: 1px; }
+
+    .term {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      overflow: hidden;
+      gap: 0;
+    }
+
+    .term-diagram {
+      flex-shrink: 0;
+      width: 220px;
+      border-right: 1px solid #f0f0f0;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .term-diagram canvas {
+      display: block;
+    }
+
+    .term-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .term-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .term-symbol {
+      font-size: 22px;
+      font-weight: 600;
+      color: #111;
+      font-family: Georgia, serif;
+      font-style: italic;
+      min-width: 40px;
+    }
+
+    .term-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      font-style: normal;
+      font-family: system-ui, sans-serif;
+    }
+
+    .term-def {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .term-formula {
+      font-size: 13px;
+      color: #888;
+      background: #f8f8f8;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #efefef;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .term-note {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.5;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 8px;
+      margin-top: 2px;
+    }
+
+    /* shared diagram canvas row — spans two terms */
+    .shared-diagram {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .shared-diagram .term-diagram {
+      width: 260px;
+    }
+
+    .shared-diagram .term-list {
+      flex: 1;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .shared-diagram .term-body {
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .shared-diagram .term-body:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back">← All visualizations</a>
+
+  <header>
+    <h1>Orbital Mechanics Glossary</h1>
+    <p>Key terms with their visual interpretations — drawn at the point of injection into orbit.</p>
+  </header>
+
+  <!-- ── Section 1: Local frame at injection ── -->
+  <section>
+    <h2>Local Reference Frame</h2>
+    <div class="terms">
+
+      <div class="shared-diagram">
+        <div class="term-diagram">
+          <canvas id="c-local-frame" width="196" height="200"></canvas>
+        </div>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">r̂</span>
+              <span class="term-name">Radial unit vector</span>
+            </div>
+            <div class="term-def">Points outward from Earth's centre through the satellite. One of two orthogonal directions defining the local frame at any point on the orbit.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">θ̂</span>
+              <span class="term-name">Transverse unit vector</span>
+            </div>
+            <div class="term-def">Perpendicular to r̂, in the direction of increasing θ (ahead in the orbit). The component of velocity along θ̂ is what generates angular momentum.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">r₀</span>
+              <span class="term-name">Injection radius</span>
+            </div>
+            <div class="term-def">Distance from Earth's centre to the satellite at the moment of engine cutoff. In units of Earth radius R, the example has r₀/R = 2.0.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 2: Launch velocity ── -->
+  <section>
+    <h2>Launch Velocity</h2>
+    <div class="terms">
+
+      <div class="shared-diagram">
+        <div class="term-diagram">
+          <canvas id="c-velocity" width="196" height="200"></canvas>
+        </div>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">v₀</span>
+              <span class="term-name">Speed at burnout</span>
+            </div>
+            <div class="term-def">Magnitude of the satellite's velocity at engine cutoff. Together with r₀ and β₀, it completely determines the orbit. Related to χ by v₀ = √(χK/r₀).</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">β₀</span>
+              <span class="term-name">Heading angle</span>
+            </div>
+            <div class="term-def">Angle from the local transverse direction θ̂ to the velocity vector v₀, measured toward r̂. β₀ = 0 means purely transverse launch — the most efficient injection. β₀ ≠ 0 adds a radial component that shifts where on the orbit injection occurs.</div>
+            <div class="term-note">v₀ cos β₀ → angular momentum h.   v₀ sin β₀ → radial velocity ṙ₀ (how fast r is changing at injection).</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">γ</span>
+              <span class="term-name">Flight-path angle</span>
+            </div>
+            <div class="term-def">Angle from θ̂ to v at any point on the orbit (not just at injection). tan γ = e sin θ / (1 + e cos θ). γ = 0 at perigee and apogee; γ ≠ 0 everywhere else on an ellipse.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 3: Energy parameter ── -->
+  <section>
+    <h2>Energy Parameter</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram">
+          <canvas id="c-chi" width="196" height="200"></canvas>
+        </div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">χ</span>
+            <span class="term-name">Dimensionless energy parameter (chi)</span>
+          </div>
+          <div class="term-formula" id="eq-chi"></div>
+          <div class="term-def">Encodes the orbit type from burnout conditions alone (when β₀ = 0). The diagram shows three orbits launched from the same r₀ with increasing χ.</div>
+          <div class="term-note">
+            χ &lt; 1 — subcircular ellipse &nbsp;·&nbsp;
+            χ = 1 — circle &nbsp;·&nbsp;
+            1 &lt; χ &lt; 2 — ellipse &nbsp;·&nbsp;
+            χ = 2 — parabola (escape) &nbsp;·&nbsp;
+            χ &gt; 2 — hyperbola
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 4: Angular momentum ── -->
+  <section>
+    <h2>Angular Momentum</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram">
+          <canvas id="c-h" width="196" height="200"></canvas>
+        </div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">h</span>
+            <span class="term-name">Specific angular momentum</span>
+          </div>
+          <div class="term-formula" id="eq-h"></div>
+          <div class="term-def">The angular momentum per unit mass. It is conserved throughout the orbit (Kepler's second law) because the gravitational force has no torque about the focus. h is fixed entirely by the transverse velocity at burnout: h = r₀v₀ cos β₀.</div>
+          <div class="term-note">The shaded triangle swept in time δt has area ½ r · r δθ = ½ h δt — equal areas in equal times.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 5: Orbit shape ── -->
+  <section>
+    <h2>Orbit Shape</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram">
+          <canvas id="c-p" width="196" height="200"></canvas>
+        </div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">p</span>
+            <span class="term-name">Semi-latus rectum</span>
+          </div>
+          <div class="term-formula" id="eq-p"></div>
+          <div class="term-def">The orbit radius at θ = 90° from perigee — the half-width of the orbit at the focus. It sets the overall scale of the orbit and depends only on angular momentum h and the gravitational parameter K.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram">
+          <canvas id="c-e" width="196" height="200"></canvas>
+        </div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">e</span>
+            <span class="term-name">Eccentricity</span>
+          </div>
+          <div class="term-formula" id="eq-e"></div>
+          <div class="term-def">Measures how much the orbit deviates from a circle. e = 0 is a circle; 0 &lt; e &lt; 1 is an ellipse; e = 1 is a parabola (just barely escapes); e &gt; 1 is a hyperbola (escapes with speed to spare).</div>
+          <div class="term-note">e² = (χ − 1)²cos²β₀ + sin²β₀ — both χ and β₀ affect eccentricity.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram">
+          <canvas id="c-theta" width="196" height="200"></canvas>
+        </div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">θ</span>
+            <span class="term-name">True anomaly</span>
+          </div>
+          <div class="term-def">The angle measured at the focus from the perigee direction (apse line) to the satellite's current position. Increases in the direction of motion. θ₀ is the true anomaly at injection — it tells you where on the orbit the satellite is when the engine cuts out.</div>
+          <div class="term-note">tan θ₀ = (e sin θ₀) / (e cos θ₀) = (χ sin β₀ cos β₀) / (χ cos²β₀ − 1)</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 6: Orbit size ── -->
+  <section>
+    <h2>Orbit Size</h2>
+    <div class="terms">
+
+      <div class="shared-diagram">
+        <div class="term-diagram">
+          <canvas id="c-axes" width="196" height="200"></canvas>
+        </div>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">rₚ</span>
+              <span class="term-name">Perigee distance</span>
+            </div>
+            <div class="term-def">Closest approach to Earth's centre. rₚ = p / (1 + e). The satellite moves fastest here (Kepler's second law).</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">rₐ</span>
+              <span class="term-name">Apogee distance</span>
+            </div>
+            <div class="term-def">Farthest point from Earth (elliptic orbits only). rₐ = p / (1 − e). The satellite moves slowest here. For hyperbolas, there is no apogee.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">a</span>
+              <span class="term-name">Semi-major axis</span>
+            </div>
+            <div class="term-formula" id="eq-a"></div>
+            <div class="term-def">Half the longest diameter of the ellipse. a = (rₚ + rₐ)/2 = p/(1 − e²). Sets the orbital period via Kepler's third law: T² = 4π²a³/K.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 7: Orbit changes ── -->
+  <section>
+    <h2>Orbit Changes</h2>
+    <div class="terms">
+
+      <div class="shared-diagram">
+        <div class="term-diagram">
+          <canvas id="c-dv" width="196" height="200"></canvas>
+        </div>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">Δv</span>
+              <span class="term-name">Velocity increment</span>
+            </div>
+            <div class="term-def">The change in velocity produced by a short rocket burn (impulse approximation). |Δv| is the mission cost — proportional to propellant consumed via the rocket equation.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">Δvₜ</span>
+              <span class="term-name">Tangential component</span>
+            </div>
+            <div class="term-def">Component of Δv along θ̂. Changes the orbit energy and semi-major axis. Δvₜ = v₂ cos γ₂ − v₁ cos γ₁.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">Δvₙ</span>
+              <span class="term-name">Normal (radial) component</span>
+            </div>
+            <div class="term-def">Component of Δv along r̂. Rotates the velocity vector without directly changing speed. Δvₙ = v₂ sin γ₂ − v₁ sin γ₁. Dominant when the apse line must be preserved but γ differs between orbits.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram">
+          <canvas id="c-apse" width="196" height="200"></canvas>
+        </div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol"></span>
+            <span class="term-name">Apse line</span>
+          </div>
+          <div class="term-def">The line connecting perigee and apogee — i.e. the major axis of the ellipse, passing through the focus. An impulse applied off the apse line generally rotates it. The scenarios in Thomson §4.13 specifically seek Δv that leaves the apse line unchanged.</div>
+          <div class="term-note">Also called the line of apsides. θ is measured from this line.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script>
+    // ── KaTeX formulas ────────────────────────────────────────────────────────
+    const eqs = {
+      'eq-chi': '\\chi = \\dfrac{r_0 v_0^2}{K}',
+      'eq-h':   'h = r^2\\dot{\\theta} = r_0 v_0 \\cos\\beta_0',
+      'eq-p':   'p = \\dfrac{h^2}{K}',
+      'eq-e':   'e = \\sqrt{(\\chi-1)^2\\cos^2\\!\\beta_0 + \\sin^2\\!\\beta_0}',
+      'eq-a':   'a = \\dfrac{p}{1-e^2} = -\\dfrac{K}{2E}',
+    };
+    for (const [id, tex] of Object.entries(eqs)) {
+      const el = document.getElementById(id);
+      if (el) katex.render(tex, el, { displayMode: false, throwOnError: false });
+    }
+
+    // ── Drawing helpers ────────────────────────────────────────────────────────
+    function draw(id, fn) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      fn(ctx, W, H);
+    }
+
+    function arrow(ctx, x0, y0, x1, y1, color = '#333', width = 1.5) {
+      const dx = x1 - x0, dy = y1 - y0;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      if (len < 1) return;
+      const ux = dx/len, uy = dy/len;
+      const head = Math.min(10, len * 0.35);
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 - ux*head - uy*head*0.4, y1 - uy*head + ux*head*0.4);
+      ctx.lineTo(x1 - ux*head + uy*head*0.4, y1 - uy*head - ux*head*0.4);
+      ctx.closePath(); ctx.fill();
+    }
+
+    function label(ctx, text, x, y, color = '#555', size = 11, italic = false) {
+      ctx.fillStyle = color;
+      ctx.font = `${italic ? 'italic ' : ''}${size}px Georgia, serif`;
+      ctx.fillText(text, x, y);
+    }
+
+    function dashedLine(ctx, x0, y0, x1, y1, color = '#ccc', width = 1) {
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.setLineDash([4, 3]);
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function circle(ctx, cx, cy, r, stroke, fill, lw = 1.5) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+    }
+
+    function dot(ctx, x, y, r, color) {
+      circle(ctx, x, y, r, null, color);
+    }
+
+    // Orbit: r = p/(1 + e cosθ), focus at (fx, fy), scale px/unit
+    function drawOrbit(ctx, fx, fy, p, e, sc, strokeColor, lw = 1.5, thetaMin = 0, thetaMax = Math.PI*2) {
+      const pts = [];
+      const n = 400;
+      for (let i = 0; i <= n; i++) {
+        const t = thetaMin + (i/n)*(thetaMax - thetaMin);
+        const d = 1 + e * Math.cos(t);
+        if (Math.abs(d) < 0.05) continue;
+        const r = p / d;
+        if (r < 0 || r * sc > 500) continue;
+        pts.push([fx + r * Math.cos(t) * sc, fy - r * Math.sin(t) * sc]);
+      }
+      if (pts.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = strokeColor; ctx.lineWidth = lw;
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.stroke();
+    }
+
+    // ── 1. Local frame (r̂, θ̂, r₀) ───────────────────────────────────────────
+    draw('c-local-frame', (ctx, W, H) => {
+      const cx = W*0.42, cy = H*0.58, sc = 55;
+      const EARTH_R = 0.32 * sc;
+
+      // grid
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+      // Earth
+      circle(ctx, cx, cy, EARTH_R, null, '#1565c0');
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('Earth', cx, cy + 4); ctx.textAlign = 'left';
+
+      // Satellite position at ~45°
+      const theta = Math.PI * 0.28;
+      const r0 = 1.55 * sc;
+      const sx = cx + r0 * Math.cos(theta);
+      const sy = cy - r0 * Math.sin(theta);
+
+      // r₀ dashed line
+      dashedLine(ctx, cx, cy, sx, sy, '#aaa', 1.2);
+      dot(ctx, sx, sy, 5, '#e65100');
+
+      // mid-label r₀
+      const mx = cx + r0*0.48*Math.cos(theta), my = cy - r0*0.48*Math.sin(theta);
+      label(ctx, 'r₀', mx + 4, my - 4, '#888', 11, true);
+
+      // r̂ arrow (along r direction)
+      const rL = 38;
+      const rx = Math.cos(theta), ry = -Math.sin(theta);
+      arrow(ctx, sx, sy, sx + rx*rL, sy + ry*rL, '#c62828', 2);
+      label(ctx, 'r̂', sx + rx*rL + 4, sy + ry*rL + 4, '#c62828', 12, true);
+
+      // θ̂ arrow (perpendicular to r, in direction of motion)
+      const tx = -Math.sin(theta), ty = -Math.cos(theta);
+      arrow(ctx, sx, sy, sx + tx*rL, sy + ty*rL, '#1565c0', 2);
+      label(ctx, 'θ̂', sx + tx*rL + 4, sy + ty*rL - 2, '#1565c0', 12, true);
+
+      // 90° mark
+      const sqS = 8;
+      ctx.beginPath();
+      ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+      ctx.moveTo(sx + tx*sqS, sy + ty*sqS);
+      ctx.lineTo(sx + tx*sqS + rx*sqS, sy + ty*sqS + ry*sqS);
+      ctx.lineTo(sx + rx*sqS, sy + ry*sqS);
+      ctx.stroke();
+    });
+
+    // ── 2. Velocity (v₀, β₀, γ) ──────────────────────────────────────────────
+    draw('c-velocity', (ctx, W, H) => {
+      const sx = W*0.42, sy = H*0.60, sc = 55;
+      const beta = 25 * Math.PI / 180;
+      const vLen = 62;
+
+      // Grid
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      // Injection point
+      dot(ctx, sx, sy, 5, '#e65100');
+
+      // θ̂ direction (up) dashed guide
+      dashedLine(ctx, sx, sy - 72, sx, sy + 20, '#ddd', 1);
+      label(ctx, 'θ̂', sx + 4, sy - 68, '#bbb', 11, true);
+
+      // Transverse component (along θ̂)
+      const vTx = 0, vTy = -Math.cos(beta) * vLen;
+      arrow(ctx, sx, sy, sx + vTx, sy + vTy, '#2e7d32', 1.8);
+      label(ctx, 'v₀cosβ₀', sx + 5, sy + vTy*0.5, '#2e7d32', 10);
+
+      // Radial component (along r̂ = rightward here)
+      const vRx = Math.sin(beta) * vLen, vRy = 0;
+      arrow(ctx, sx, sy, sx + vRx, sy + vRy, '#c62828', 1.8);
+      label(ctx, 'v₀sinβ₀', sx + vRx*0.3, sy + 14, '#c62828', 10);
+
+      // Total velocity v₀
+      const vx = vRx, vy = vTy;
+      arrow(ctx, sx, sy, sx + vx, sy + vy, '#7b1fa2', 2.2);
+      label(ctx, 'v₀', sx + vx + 4, sy + vy - 2, '#7b1fa2', 13, true);
+
+      // β₀ arc
+      const arcR = 28;
+      ctx.beginPath();
+      ctx.arc(sx, sy, arcR, -Math.PI/2, -Math.PI/2 + beta, false);
+      ctx.strokeStyle = '#7b1fa2'; ctx.lineWidth = 1.2; ctx.stroke();
+      label(ctx, 'β₀', sx + 8, sy - arcR + 6, '#7b1fa2', 11, true);
+    });
+
+    // ── 3. Chi — three orbits ─────────────────────────────────────────────────
+    draw('c-chi', (ctx, W, H) => {
+      const fx = W*0.22, fy = H*0.60, sc = 40;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      circle(ctx, fx, fy, 10, null, '#1565c0');
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 8px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('E', fx, fy + 3); ctx.textAlign = 'left';
+
+      // χ=1 → circle
+      drawOrbit(ctx, fx, fy, 1.0, 0.0, sc, '#2e7d32', 1.5);
+      label(ctx, 'χ=1', fx + 1.02*sc - 4, fy - 8, '#2e7d32', 10);
+
+      // χ=1.5 → ellipse (e ≈ 0.5 for β₀=0)
+      drawOrbit(ctx, fx, fy, 1.5, 0.5, sc, '#1565c0', 1.8);
+      label(ctx, 'χ=1.5', fx + 1.5*sc/1.5 + 2, fy - 15, '#1565c0', 10);
+
+      // χ=2.4 → hyperbola (e ≈ 1.4)
+      const tHalf = Math.acos(-1/1.4) - 0.08;
+      drawOrbit(ctx, fx, fy, 2.4, 1.4, sc, '#c62828', 1.8, -tHalf, tHalf);
+      label(ctx, 'χ=2.4', fx + 60, fy - 55, '#c62828', 10);
+
+      dot(ctx, fx, fy, 4, '#888');
+      label(ctx, 'F', fx + 5, fy + 12, '#888', 10, true);
+    });
+
+    // ── 4. h — angular momentum ───────────────────────────────────────────────
+    draw('c-h', (ctx, W, H) => {
+      const fx = W*0.30, fy = H*0.62, sc = 46;
+      const e = 0.45, p = 1.6;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      drawOrbit(ctx, fx, fy, p, e, sc, '#1565c0', 1.8);
+
+      // Point at θ = 70°
+      const theta = 1.22;
+      const r = p / (1 + e * Math.cos(theta));
+      const px = fx + r * Math.cos(theta) * sc;
+      const py = fy - r * Math.sin(theta) * sc;
+
+      // Small swept area (triangle over δθ)
+      const dt = 0.28;
+      const r2 = p / (1 + e * Math.cos(theta + dt));
+      const px2 = fx + r2 * Math.cos(theta + dt) * sc;
+      const py2 = fy - r2 * Math.sin(theta + dt) * sc;
+      ctx.beginPath();
+      ctx.moveTo(fx, fy); ctx.lineTo(px, py); ctx.lineTo(px2, py2); ctx.closePath();
+      ctx.fillStyle = 'rgba(21,101,192,0.12)'; ctx.fill();
+      ctx.strokeStyle = '#1565c0'; ctx.lineWidth = 1; ctx.stroke();
+
+      // r arrow
+      arrow(ctx, fx, fy, px, py, '#888', 1.5);
+      label(ctx, 'r', (fx+px)/2 - 12, (fy+py)/2 + 3, '#888', 10, true);
+
+      // v arrow
+      const gam = Math.atan2(e * Math.sin(theta), 1 + e * Math.cos(theta));
+      const vMag = 34;
+      const th_x = -Math.sin(theta), th_y = -Math.cos(theta);
+      const r_x  =  Math.cos(theta), r_y  = -Math.sin(theta);
+      const vx = (Math.cos(gam) * th_x + Math.sin(gam) * r_x) * vMag;
+      const vy = (Math.cos(gam) * th_y + Math.sin(gam) * r_y) * vMag;
+      arrow(ctx, px, py, px + vx, py + vy, '#e65100', 2);
+      label(ctx, 'v', px + vx + 3, py + vy - 2, '#e65100', 11, true);
+
+      // equal area label
+      label(ctx, '½ h δt', (fx+px+px2)/3 - 4, (fy+py+py2)/3 + 14, '#1565c0', 9);
+
+      dot(ctx, fx, fy, 4, '#888');
+      dot(ctx, px, py, 4, '#e65100');
+    });
+
+    // ── 5. p — semi-latus rectum ──────────────────────────────────────────────
+    draw('c-p', (ctx, W, H) => {
+      const fx = W*0.30, fy = H*0.60, sc = 46;
+      const e = 0.5, p = 1.5;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      drawOrbit(ctx, fx, fy, p, e, sc, '#1565c0', 2);
+
+      // Semi-latus rectum: r at θ=90° = p
+      const pPx = fx; // x stays at focus for θ=90°
+      const pPy = fy - p * sc; // y goes up by p
+
+      dashedLine(ctx, fx, fy, fx + 2, pPy, '#aaa', 1.2);
+      dot(ctx, fx, pPy, 4, '#c62828');
+
+      // p label with brace
+      ctx.beginPath();
+      ctx.strokeStyle = '#c62828'; ctx.lineWidth = 1.5;
+      ctx.moveTo(fx - 8, fy);
+      ctx.lineTo(fx - 12, fy);
+      ctx.lineTo(fx - 12, pPy);
+      ctx.lineTo(fx - 8, pPy);
+      ctx.stroke();
+      label(ctx, 'p', fx - 26, (fy + pPy)/2 + 4, '#c62828', 12, true);
+
+      // Focus
+      dot(ctx, fx, fy, 4, '#888');
+      label(ctx, 'F', fx + 5, fy + 12, '#888', 10, true);
+
+      // θ=90° arc
+      ctx.beginPath();
+      ctx.arc(fx, fy, 18, -Math.PI/2, 0, true);
+      ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1; ctx.stroke();
+      label(ctx, '90°', fx + 4, fy - 22, '#aaa', 9);
+
+      // Apse line
+      dashedLine(ctx, fx - 12, fy, fx + p/(1-e)*sc + 10, fy, '#eee', 1);
+    });
+
+    // ── 6. e — eccentricity types ─────────────────────────────────────────────
+    draw('c-e', (ctx, W, H) => {
+      const fx = W*0.22, fy = H*0.55, sc = 30;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      drawOrbit(ctx, fx, fy, 1.0, 0.0,  sc, '#2e7d32', 1.5);
+      drawOrbit(ctx, fx, fy, 1.0, 0.55, sc, '#1565c0', 1.5);
+      drawOrbit(ctx, fx, fy, 1.0, 0.99, sc, '#e65100', 1.5);
+      // Hyperbola
+      const eH = 1.5, pH = 1.0;
+      const tH = Math.acos(-1/eH) - 0.1;
+      drawOrbit(ctx, fx, fy, pH, eH, sc, '#7b1fa2', 1.5, -tH, tH);
+
+      dot(ctx, fx, fy, 3, '#888');
+
+      // Labels on right side
+      label(ctx, 'e=0', W*0.58, H*0.20, '#2e7d32', 10);
+      label(ctx, 'e=0.55', W*0.58, H*0.32, '#1565c0', 10);
+      label(ctx, 'e≈1', W*0.58, H*0.44, '#e65100', 10);
+      label(ctx, 'e=1.5', W*0.58, H*0.56, '#7b1fa2', 10);
+    });
+
+    // ── 7. θ — true anomaly ───────────────────────────────────────────────────
+    draw('c-theta', (ctx, W, H) => {
+      const fx = W*0.30, fy = H*0.60, sc = 44;
+      const e = 0.45, p = 1.5;
+      const theta0 = 62 * Math.PI / 180;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      drawOrbit(ctx, fx, fy, p, e, sc, '#1565c0', 2);
+
+      // Perigee on apse line
+      const rp = p / (1 + e);
+      const ppx = fx + rp * sc;
+
+      // Apse line
+      dashedLine(ctx, fx - 8, fy, ppx + 20, fy, '#ddd', 1);
+
+      // Satellite at θ₀
+      const r0 = p / (1 + e * Math.cos(theta0));
+      const sx = fx + r0 * Math.cos(theta0) * sc;
+      const sy = fy - r0 * Math.sin(theta0) * sc;
+
+      // Radius line
+      dashedLine(ctx, fx, fy, sx, sy, '#aaa', 1.2);
+
+      // θ₀ arc
+      ctx.beginPath();
+      ctx.arc(fx, fy, 26, 0, -theta0, true);
+      ctx.strokeStyle = '#e65100'; ctx.lineWidth = 1.5; ctx.stroke();
+      label(ctx, 'θ₀', fx + 18, fy - 18, '#e65100', 11, true);
+
+      dot(ctx, fx, fy, 4, '#888');
+      dot(ctx, ppx, fy, 4, '#c62828');
+      dot(ctx, sx, sy, 5, '#e65100');
+      label(ctx, 'perigee', ppx + 4, fy + 13, '#c62828', 9);
+      label(ctx, 'injection', sx + 5, sy - 4, '#e65100', 9);
+    });
+
+    // ── 8. rₚ, rₐ, a ─────────────────────────────────────────────────────────
+    draw('c-axes', (ctx, W, H) => {
+      const e = 0.5, p = 1.3;
+      const rp = p / (1 + e), ra = p / (1 - e);
+      const a = p / (1 - e*e);
+      const cX = (ra - rp) / 2; // centre offset from focus
+
+      // Centre canvas so the ellipse fits nicely
+      const sc = 36;
+      // Focus at fx, fy
+      const fx = W*0.26, fy = H*0.53;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      drawOrbit(ctx, fx, fy, p, e, sc, '#1565c0', 2);
+
+      const ppx = fx + rp*sc, pax = fx - ra*sc;
+      const ecx = fx + cX*sc; // ellipse centre
+
+      // Perigee dot
+      dot(ctx, ppx, fy, 4, '#c62828');
+      label(ctx, 'rₚ', ppx + 3, fy + 13, '#c62828', 10, true);
+
+      // Apogee dot
+      dot(ctx, pax, fy, 4, '#2e7d32');
+      label(ctx, 'rₐ', pax - 22, fy + 13, '#2e7d32', 10, true);
+
+      // Semi-major axis bar
+      ctx.beginPath();
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 3]);
+      ctx.moveTo(pax, fy - 16); ctx.lineTo(ppx, fy - 16); ctx.stroke();
+      ctx.setLineDash([]);
+      // End ticks
+      ctx.beginPath(); ctx.strokeStyle = '#888'; ctx.lineWidth = 1.2;
+      ctx.moveTo(pax, fy-19); ctx.lineTo(pax, fy-13);
+      ctx.moveTo(ppx, fy-19); ctx.lineTo(ppx, fy-13);
+      ctx.stroke();
+      label(ctx, '2a', (pax+ppx)/2 - 8, fy - 20, '#888', 9, true);
+
+      // a from centre to perigee
+      ctx.beginPath();
+      ctx.strokeStyle = '#555'; ctx.lineWidth = 1.5;
+      ctx.moveTo(ecx, fy); ctx.lineTo(ppx, fy); ctx.stroke();
+      label(ctx, 'a', (ecx+ppx)/2 - 2, fy + 13, '#555', 10, true);
+
+      // Focus
+      dot(ctx, fx, fy, 4, '#888');
+      label(ctx, 'F', fx - 3, fy + 13, '#888', 9, true);
+    });
+
+    // ── 9. Δv, Δvₜ, Δvₙ ──────────────────────────────────────────────────────
+    draw('c-dv', (ctx, W, H) => {
+      const ox = W*0.25, oy = H*0.62;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      dot(ctx, ox, oy, 5, '#e65100');
+
+      // v₁ — orbit 1 velocity (mostly upward, slight right)
+      const v1x = 18, v1y = -62;
+      arrow(ctx, ox, oy, ox + v1x, oy + v1y, '#1565c0', 2);
+      label(ctx, 'v₁', ox + v1x + 4, oy + v1y - 2, '#1565c0', 12, true);
+
+      // v₂ — orbit 2 velocity (more rightward)
+      const v2x = 68, v2y = -52;
+      arrow(ctx, ox, oy, ox + v2x, oy + v2y, '#c62828', 2);
+      label(ctx, 'v₂', ox + v2x + 4, oy + v2y - 2, '#c62828', 12, true);
+
+      // Δv = v₂ − v₁  (from tip of v₁ to tip of v₂)
+      arrow(ctx, ox + v1x, oy + v1y, ox + v2x, oy + v2y, '#e65100', 2);
+      label(ctx, 'Δv', ox + (v1x+v2x)/2 + 4, oy + (v1y+v2y)/2 - 6, '#e65100', 12);
+
+      // Δvₜ (tangential — horizontal component here)
+      const dvtx = v2x - v1x, dvty = 0;
+      arrow(ctx, ox + v1x, oy + v1y, ox + v1x + dvtx, oy + v1y + dvty, '#2e7d32', 1.5);
+      label(ctx, 'Δvₜ', ox + v1x + dvtx*0.4 + 2, oy + v1y + 14, '#2e7d32', 10);
+
+      // Δvₙ (normal — vertical component here)
+      const dvnx = 0, dvny = v2y - v1y;
+      arrow(ctx, ox + v1x + dvtx, oy + v1y, ox + v1x + dvtx + dvnx, oy + v1y + dvny, '#7b1fa2', 1.5);
+      label(ctx, 'Δvₙ', ox + v1x + dvtx + 4, oy + v1y + dvny*0.5, '#7b1fa2', 10);
+
+      // right angle mark
+      const sqS = 8;
+      ctx.beginPath(); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+      ctx.moveTo(ox + v1x + dvtx - sqS, oy + v1y);
+      ctx.lineTo(ox + v1x + dvtx - sqS, oy + v1y + sqS);
+      ctx.lineTo(ox + v1x + dvtx, oy + v1y + sqS);
+      ctx.stroke();
+    });
+
+    // ── 10. Apse line ─────────────────────────────────────────────────────────
+    draw('c-apse', (ctx, W, H) => {
+      const fx = W*0.30, fy = H*0.53, sc = 38;
+      const e = 0.5, p = 1.4;
+
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+      drawOrbit(ctx, fx, fy, p, e, sc, '#1565c0', 2);
+
+      const rp = p / (1 + e), ra = p / (1 - e);
+      // Apse line extended
+      ctx.beginPath();
+      ctx.strokeStyle = '#c62828'; ctx.lineWidth = 1.8;
+      ctx.setLineDash([5, 3]);
+      ctx.moveTo(fx - ra*sc - 10, fy); ctx.lineTo(fx + rp*sc + 10, fy); ctx.stroke();
+      ctx.setLineDash([]);
+
+      dot(ctx, fx + rp*sc, fy, 5, '#c62828');
+      dot(ctx, fx - ra*sc, fy, 5, '#c62828');
+      label(ctx, 'perigee', fx + rp*sc + 4, fy + 14, '#c62828', 9);
+      label(ctx, 'apogee', fx - ra*sc - 38, fy + 14, '#c62828', 9);
+
+      // Label
+      label(ctx, 'apse line', fx - ra*sc + 4, fy - 8, '#c62828', 10);
+      dot(ctx, fx, fy, 4, '#888');
+      label(ctx, 'F', fx + 4, fy + 13, '#888', 9, true);
+    });
+  </script>
+</body>
+</html>
