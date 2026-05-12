@@ -178,7 +178,7 @@
 
       <div class="shared-diagram">
         <div class="term-diagram">
-          <canvas id="c-local-frame" width="196" height="200"></canvas>
+          <canvas id="c-local-frame" width="196" height="260"></canvas>
         </div>
         <div class="term-list">
           <div class="term-body">
@@ -200,7 +200,12 @@
               <span class="term-symbol">r₀</span>
               <span class="term-name">Injection radius</span>
             </div>
-            <div class="term-def">Distance from Earth's centre to the satellite at the moment of engine cutoff. In units of Earth radius R, the example has r₀/R = 2.0.</div>
+            <div class="term-def">
+              <strong>"Injection"</strong> is the moment the rocket engine cuts off. Up to that point the rocket is thrusting — not in a natural orbit. The instant the engine stops, the satellite becomes a free-falling body governed only by gravity. That moment of "injection into orbit" fixes r₀, v₀, and β₀ as the three starting conditions.
+            </div>
+            <div class="term-def" style="margin-top:6px">
+              r₀ is measured from <strong>Earth's centre</strong>, not its surface, because gravity acts as if all of Earth's mass is concentrated at the centre (shell theorem). So r₀ = R + altitude, where R ≈ 6,371 km. In the textbook example r₀/R = 2, meaning the satellite is one Earth-radius above the surface.
+            </div>
           </div>
         </div>
       </div>
@@ -544,52 +549,91 @@
 
     // ── 1. Local frame (r̂, θ̂, r₀) ───────────────────────────────────────────
     draw('c-local-frame', (ctx, W, H) => {
-      const cx = W*0.42, cy = H*0.58, sc = 55;
-      const EARTH_R = 0.32 * sc;
+      const cx = W*0.40, cy = H*0.62;
+      const EARTH_R = 30;   // px — represents Earth's surface
+      const sc = 46;        // px per unit (1 unit = Earth radius)
+      const r0Units = 2.0;  // r₀/R = 2 (one radius above surface)
+      const r0 = r0Units * EARTH_R; // px from centre to satellite
 
       // grid
       ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
-      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-      // Earth
-      circle(ctx, cx, cy, EARTH_R, null, '#1565c0');
-      ctx.fillStyle = '#fff'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('Earth', cx, cy + 4); ctx.textAlign = 'left';
+      // Orbit arc (ellipse, starting at injection point)
+      // Simple arc to suggest the orbit path
+      const e = 0.35, p = r0 * (1 + e); // so r at θ=0 = r0
+      ctx.beginPath();
+      ctx.strokeStyle = '#bbd'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+      const nPts = 120;
+      for (let i = 0; i <= nPts; i++) {
+        const t = (i/nPts) * Math.PI * 1.7 - Math.PI * 0.1;
+        const d = 1 + e * Math.cos(t);
+        if (Math.abs(d) < 0.05) continue;
+        const rr = p / d;
+        if (rr > 300) continue;
+        const px2 = cx + rr * Math.cos(t);
+        const py2 = cy - rr * Math.sin(t);
+        i === 0 ? ctx.moveTo(px2, py2) : ctx.lineTo(px2, py2);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
 
-      // Satellite position at ~45°
-      const theta = Math.PI * 0.28;
-      const r0 = 1.55 * sc;
+      // Earth — filled circle (the body, with surface visible)
+      circle(ctx, cx, cy, EARTH_R, '#1a6bb5', '#1565c0', 2);
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('Earth', cx, cy + 3); ctx.textAlign = 'left';
+
+      // Altitude gap annotation (surface to satellite)
+      const theta = 0; // satellite is directly to the right for clarity
       const sx = cx + r0 * Math.cos(theta);
       const sy = cy - r0 * Math.sin(theta);
+      const surfX = cx + EARTH_R * Math.cos(theta);
+      const surfY = cy - EARTH_R * Math.sin(theta);
 
-      // r₀ dashed line
-      dashedLine(ctx, cx, cy, sx, sy, '#aaa', 1.2);
-      dot(ctx, sx, sy, 5, '#e65100');
+      // Brace: R (centre to surface)
+      ctx.beginPath(); ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1;
+      ctx.moveTo(cx, cy - 6);
+      ctx.lineTo(cx, cy - 12);
+      ctx.lineTo(surfX, surfY - 12);
+      ctx.lineTo(surfX, surfY - 6);
+      ctx.stroke();
+      label(ctx, 'R', (cx + surfX)/2 - 4, cy - 16, '#aaa', 9, true);
 
-      // mid-label r₀
-      const mx = cx + r0*0.48*Math.cos(theta), my = cy - r0*0.48*Math.sin(theta);
-      label(ctx, 'r₀', mx + 4, my - 4, '#888', 11, true);
+      // Brace: r₀ (centre to satellite) — on the line
+      dashedLine(ctx, cx, cy, sx, sy, '#e65100', 1.5);
+      // r₀ label along the line
+      label(ctx, 'r₀ = 2R', cx + r0*0.38 + 4, cy - r0*0.0 - 8, '#e65100', 10, true);
 
-      // r̂ arrow (along r direction)
-      const rL = 38;
-      const rx = Math.cos(theta), ry = -Math.sin(theta);
-      arrow(ctx, sx, sy, sx + rx*rL, sy + ry*rL, '#c62828', 2);
-      label(ctx, 'r̂', sx + rx*rL + 4, sy + ry*rL + 4, '#c62828', 12, true);
+      // Satellite dot
+      dot(ctx, sx, sy, 6, '#e65100');
 
-      // θ̂ arrow (perpendicular to r, in direction of motion)
+      // "engine cutoff" annotation
+      ctx.fillStyle = '#e65100'; ctx.font = '9px system-ui';
+      ctx.fillText('engine cutoff', sx + 8, sy - 5);
+      ctx.fillText('→ orbit begins here', sx + 8, sy + 8);
+
+      // r̂ arrow
+      const rL = 34;
+      const rx2 = Math.cos(theta), ry2 = -Math.sin(theta);
+      arrow(ctx, sx, sy, sx + rx2*rL, sy + ry2*rL, '#c62828', 2);
+      label(ctx, 'r̂', sx + rx2*rL + 3, sy + ry2*rL + 4, '#c62828', 11, true);
+
+      // θ̂ arrow
       const tx = -Math.sin(theta), ty = -Math.cos(theta);
       arrow(ctx, sx, sy, sx + tx*rL, sy + ty*rL, '#1565c0', 2);
-      label(ctx, 'θ̂', sx + tx*rL + 4, sy + ty*rL - 2, '#1565c0', 12, true);
+      label(ctx, 'θ̂', sx + tx*rL + 3, sy + ty*rL, '#1565c0', 11, true);
 
-      // 90° mark
+      // 90° corner mark
       const sqS = 8;
-      ctx.beginPath();
-      ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
       ctx.moveTo(sx + tx*sqS, sy + ty*sqS);
-      ctx.lineTo(sx + tx*sqS + rx*sqS, sy + ty*sqS + ry*sqS);
-      ctx.lineTo(sx + rx*sqS, sy + ry*sqS);
+      ctx.lineTo(sx + tx*sqS + rx2*sqS, sy + ty*sqS + ry2*sqS);
+      ctx.lineTo(sx + rx2*sqS, sy + ry2*sqS);
       ctx.stroke();
+
+      // Centre dot
+      dot(ctx, cx, cy, 3, '#555');
+      label(ctx, 'O', cx + 4, cy + 12, '#555', 9, true);
     });
 
     // ── 2. Velocity (v₀, β₀, γ) ──────────────────────────────────────────────
