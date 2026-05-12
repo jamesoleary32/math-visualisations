@@ -251,23 +251,39 @@
     <h2>Energy Parameter</h2>
     <div class="terms">
 
-      <div class="term">
+      <div class="shared-diagram">
         <div class="term-diagram">
-          <canvas id="c-chi" width="196" height="200"></canvas>
+          <canvas id="c-chi" width="196" height="280"></canvas>
         </div>
-        <div class="term-body">
-          <div class="term-header">
-            <span class="term-symbol">χ</span>
-            <span class="term-name">Dimensionless energy parameter (chi)</span>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol">χ</span>
+              <span class="term-name">Dimensionless energy parameter (chi)</span>
+            </div>
+            <div class="term-formula" id="eq-chi"></div>
+            <div class="term-def">
+              The simplest way to read χ: it is <strong>the square of your speed relative to circular orbit speed at r₀</strong>.
+            </div>
+            <div class="term-formula" id="eq-chi2"></div>
+            <div class="term-def">
+              Because a circular orbit at r₀ requires exactly v² = K/r₀, you get χ = 1 for free if you launch at that speed. Faster than that → bigger orbit. Twice the kinetic energy (χ = 2) → escape.
+            </div>
+            <div class="term-note">
+              The four orbits in the diagram are launched from the same point (orange) with increasing speed — only χ changes, β₀ = 0 throughout.
+            </div>
           </div>
-          <div class="term-formula" id="eq-chi"></div>
-          <div class="term-def">Encodes the orbit type from burnout conditions alone (when β₀ = 0). The diagram shows three orbits launched from the same r₀ with increasing χ.</div>
-          <div class="term-note">
-            χ &lt; 1 — subcircular ellipse &nbsp;·&nbsp;
-            χ = 1 — circle &nbsp;·&nbsp;
-            1 &lt; χ &lt; 2 — ellipse &nbsp;·&nbsp;
-            χ = 2 — parabola (escape) &nbsp;·&nbsp;
-            χ &gt; 2 — hyperbola
+          <div class="term-body">
+            <div class="term-header" style="gap:6px">
+              <span class="term-symbol" style="font-size:16px;min-width:auto"></span>
+            </div>
+            <div class="term-def" style="font-size:12px;line-height:2">
+              <span style="color:#888">χ &lt; 1</span> — slower than circular → subcircular ellipse (falls back)<br>
+              <span style="color:#2e7d32">χ = 1</span> — exactly circular speed → <strong>circle</strong><br>
+              <span style="color:#1565c0">1 &lt; χ &lt; 2</span> — faster than circular but not escape → <strong>ellipse</strong><br>
+              <span style="color:#e65100">χ = 2</span> — escape velocity (v = √2 · v<sub>circ</sub>) → <strong>parabola</strong><br>
+              <span style="color:#7b1fa2">χ &gt; 2</span> — faster than escape → <strong>hyperbola</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -442,7 +458,8 @@
   <script>
     // ── KaTeX formulas ────────────────────────────────────────────────────────
     const eqs = {
-      'eq-chi': '\\chi = \\dfrac{r_0 v_0^2}{K}',
+      'eq-chi':  '\\chi = \\dfrac{r_0 v_0^2}{K}',
+      'eq-chi2': '\\chi = \\left(\\dfrac{v_0}{v_{\\text{circ}}}\\right)^2, \\quad v_{\\text{circ}} = \\sqrt{\\dfrac{K}{r_0}}',
       'eq-h':   'h = r^2\\dot{\\theta} = r_0 v_0 \\cos\\beta_0',
       'eq-p':   'p = \\dfrac{h^2}{K}',
       'eq-e':   'e = \\sqrt{(\\chi-1)^2\\cos^2\\!\\beta_0 + \\sin^2\\!\\beta_0}',
@@ -616,33 +633,58 @@
       label(ctx, 'β₀', sx + 8, sy - arcR + 6, '#7b1fa2', 11, true);
     });
 
-    // ── 3. Chi — three orbits ─────────────────────────────────────────────────
+    // ── 3. Chi — four orbits from same injection point ────────────────────────
+    // All orbits share the same injection point at (r₀, 0) from focus.
+    // r₀ = 1 (normalised). For β₀=0: e = |χ−1|, p = χ·r₀ (from χcos²0−1=χ−1=e·cosθ₀, θ₀=0)
+    // So perigee is at r₀ for χ≤1, and r₀ is perigee for χ≥1 only when θ₀=0.
+    // Actually: injection at θ=0 from focus means r₀ = p/(1+e), so p = r₀(1+e) = r₀·χ
     draw('c-chi', (ctx, W, H) => {
-      const fx = W*0.22, fy = H*0.60, sc = 40;
+      // Injection point fixed at right side; focus to its left
+      const r0 = 1.0;
+      const sc = 52;
+      // Place injection point near right side, focus to the left
+      const injectX = W * 0.78, injectY = H * 0.52;
+      const fx = injectX - r0 * sc;  // focus x
+      const fy = injectY;
 
       ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
       for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
       for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-      circle(ctx, fx, fy, 10, null, '#1565c0');
-      ctx.fillStyle = '#fff'; ctx.font = 'bold 8px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('E', fx, fy + 3); ctx.textAlign = 'left';
+      // χ<1 → subcircular ellipse (e=0.35, θ₀=π so injection is at apogee)
+      // For χ=0.65, β₀=0: e=1−χ=0.35, p=χ·r₀=0.65, injection at apogee (θ=π)
+      // drawOrbit draws r=p/(1+e cosθ) centred on focus
+      drawOrbit(ctx, fx, fy, 0.65, 0.35, sc, '#999', 1.5);
+      ctx.fillStyle='#999'; ctx.font='10px system-ui'; ctx.textAlign='right';
+      ctx.fillText('χ<1', fx - 0.65/0.65*sc - 2, fy + 18); ctx.textAlign='left';
 
-      // χ=1 → circle
-      drawOrbit(ctx, fx, fy, 1.0, 0.0, sc, '#2e7d32', 1.5);
-      label(ctx, 'χ=1', fx + 1.02*sc - 4, fy - 8, '#2e7d32', 10);
+      // χ=1 → circle, e=0, p=r₀=1
+      drawOrbit(ctx, fx, fy, 1.0, 0.0, sc, '#2e7d32', 2);
+      ctx.fillStyle='#2e7d32'; ctx.font='bold 10px system-ui'; ctx.textAlign='right';
+      ctx.fillText('χ=1', fx - r0*sc - 4, fy + 4); ctx.textAlign='left';
 
-      // χ=1.5 → ellipse (e ≈ 0.5 for β₀=0)
-      drawOrbit(ctx, fx, fy, 1.5, 0.5, sc, '#1565c0', 1.8);
-      label(ctx, 'χ=1.5', fx + 1.5*sc/1.5 + 2, fy - 15, '#1565c0', 10);
+      // χ=1.6 → ellipse, e=0.6, p=1.6·r₀
+      drawOrbit(ctx, fx, fy, 1.6, 0.6, sc, '#1565c0', 2);
+      label(ctx, 'χ=1.6', fx - 56, fy - 58, '#1565c0', 10);
 
-      // χ=2.4 → hyperbola (e ≈ 1.4)
-      const tHalf = Math.acos(-1/1.4) - 0.08;
-      drawOrbit(ctx, fx, fy, 2.4, 1.4, sc, '#c62828', 1.8, -tHalf, tHalf);
-      label(ctx, 'χ=2.4', fx + 60, fy - 55, '#c62828', 10);
+      // χ=2 → parabola, e=1, p=2·r₀
+      const tPar = Math.PI * 0.74;
+      drawOrbit(ctx, fx, fy, 2.0, 1.0, sc, '#e65100', 2, -tPar, tPar);
+      label(ctx, 'χ=2', fx - 62, fy - 76, '#e65100', 10);
 
-      dot(ctx, fx, fy, 4, '#888');
-      label(ctx, 'F', fx + 5, fy + 12, '#888', 10, true);
+      // χ=2.8 → hyperbola, e=1.8, p=2.8·r₀
+      const eH = 1.8, tH = Math.acos(-1/eH) - 0.12;
+      drawOrbit(ctx, fx, fy, 2.8, eH, sc, '#7b1fa2', 2, -tH, tH);
+      label(ctx, 'χ=2.8', fx - 40, fy - 92, '#7b1fa2', 10);
+
+      // Earth at focus
+      circle(ctx, fx, fy, 11, null, '#1565c0');
+      ctx.fillStyle='#fff'; ctx.font='bold 8px system-ui'; ctx.textAlign='center';
+      ctx.fillText('Earth', fx, fy + 3); ctx.textAlign='left';
+
+      // Injection point
+      dot(ctx, injectX, injectY, 5, '#e65100');
+      label(ctx, 'launch', injectX + 4, injectY + 4, '#e65100', 9);
     });
 
     // ── 4. h — angular momentum ───────────────────────────────────────────────
