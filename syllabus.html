@@ -270,7 +270,7 @@
 <header>
   <h1>Self-Study Syllabus</h1>
   <div class="header-meta">
-    <p>~14 hrs/week · ~10 months · ~500 hrs total</p>
+    <p>~14 hrs/week · ~13 months · ~640 hrs total</p>
     <a href="index.html" class="nav-link">← All visualizations</a>
   </div>
 </header>
@@ -866,6 +866,116 @@
     <span class="topic-name">Markov Chains</span>
     <span class="topic-sub">Transition matrices, stationary distributions, PageRank</span>
     <span class="topic-source">B&amp;H §11</span>
+  </div>
+</section>
+
+<!-- ── Phase 7: Signal Processing & Estimation ───────────────────────────── -->
+<section class="phase" data-phase="7">
+  <div class="phase-header">
+    <span class="phase-title">Phase 7 — Signal Processing &amp; Estimation Theory</span>
+    <span class="phase-dates">Jul – Oct 2027 · ~140 hrs</span>
+    <span class="phase-progress-text" id="p7-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
+  <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing · Kay — Statistical Signal Processing · Kaplan &amp; Hegarty — Understanding GPS/GNSS</div>
+
+  <div class="topic-group-label">Discrete-time signals &amp; systems</div>
+
+  <div class="topic-row" data-id="sp-sampling">
+    <input type="checkbox" id="sp-sampling">
+    <span class="topic-name">Sampling &amp; Reconstruction</span>
+    <span class="topic-sub">Nyquist theorem, aliasing, reconstruction from samples</span>
+    <span class="topic-source">Oppenheim §1</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-convolution">
+    <input type="checkbox" id="sp-convolution">
+    <span class="topic-name">Convolution &amp; LTI Systems</span>
+    <span class="topic-sub">Impulse response, linearity, time-invariance, BIBO stability</span>
+    <span class="topic-source">Oppenheim §2</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-ztransform">
+    <input type="checkbox" id="sp-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, inverse Z-transform</span>
+    <span class="topic-source">Oppenheim §3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-dft">
+    <input type="checkbox" id="sp-dft">
+    <span class="topic-name">Discrete Fourier Transform &amp; FFT</span>
+    <span class="topic-sub">DFT as sampled spectrum; FFT algorithm; spectral leakage and windowing</span>
+    <span class="topic-source">Oppenheim §8</span>
+  </div>
+
+  <div class="topic-group-label">Statistical signal processing</div>
+
+  <div class="topic-row" data-id="sp-estimation">
+    <input type="checkbox" id="sp-estimation">
+    <span class="topic-name">Estimation Theory</span>
+    <span class="topic-sub">MVUE, Cramér–Rao bound, maximum likelihood estimation, bias vs variance</span>
+    <span class="topic-source">Kay Vol.1 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-detection">
+    <input type="checkbox" id="sp-detection">
+    <span class="topic-name">Detection Theory</span>
+    <span class="topic-sub">Hypothesis testing, Neyman–Pearson, ROC curves, matched filter</span>
+    <span class="topic-source">Kay Vol.2 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-wiener">
+    <input type="checkbox" id="sp-wiener">
+    <span class="topic-name">Wiener Filter</span>
+    <span class="topic-sub">Optimal linear filter for stationary processes; MMSE estimation</span>
+    <span class="topic-source">Kay Vol.1 §12</span>
+  </div>
+
+  <div class="topic-group-label">Kalman filtering — the core target</div>
+
+  <div class="topic-row" data-id="sp-kalman-linear">
+    <input type="checkbox" id="sp-kalman-linear">
+    <span class="topic-name">Linear Kalman Filter</span>
+    <span class="topic-sub">State-space model, predict–update cycle, optimal gain, covariance propagation</span>
+    <span class="topic-source">Kay · Welch &amp; Bishop tutorial</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-kalman-ekf">
+    <input type="checkbox" id="sp-kalman-ekf">
+    <span class="topic-name">Extended &amp; Unscented Kalman Filter</span>
+    <span class="topic-sub">Linearisation for nonlinear systems; UKF sigma-point approach; orbit determination</span>
+    <span class="topic-source">Kay · Crassidis &amp; Junkins</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-particle-filter">
+    <input type="checkbox" id="sp-particle-filter">
+    <span class="topic-name">Particle Filters</span>
+    <span class="topic-sub">Sequential Monte Carlo; non-Gaussian state estimation; tracking highly nonlinear dynamics</span>
+    <span class="topic-source">Arulampalam et al. tutorial</span>
+  </div>
+
+  <div class="topic-group-label">Navigation &amp; PNT</div>
+
+  <div class="topic-row" data-id="sp-gnss">
+    <input type="checkbox" id="sp-gnss">
+    <span class="topic-name">GNSS Architecture &amp; Signal Structure</span>
+    <span class="topic-sub">GPS/Galileo/GLONASS signal design; pseudorange, carrier phase, satellite geometry (DOP)</span>
+    <span class="topic-source">Kaplan &amp; Hegarty §1–4</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-pnt-resilience">
+    <input type="checkbox" id="sp-pnt-resilience">
+    <span class="topic-name">Spoofing, Jamming &amp; Resilient PNT</span>
+    <span class="topic-sub">Threat taxonomy; detection algorithms; alternative and complementary positioning (IMU, eLoran, LEO PNT)</span>
+    <span class="topic-source">Kaplan §9 · CISA advisories</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-orbit-determination">
+    <input type="checkbox" id="sp-orbit-determination">
+    <span class="topic-name">Orbit Determination &amp; SSA</span>
+    <span class="topic-sub">Batch least squares, sequential estimation, conjunction analysis — Thomson dynamics + Kalman estimation combined</span>
+    <span class="topic-source">Vallado · Crassidis &amp; Junkins</span>
   </div>
 </section>
 
