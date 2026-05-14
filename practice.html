@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Practice Problems — Learning Visualizations</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header { margin-bottom: 48px; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .header-meta p { font-size: 14px; color: #999; }
+
+    .nav-link {
+      font-size: 12px;
+      color: #aaa;
+      text-decoration: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 3px 10px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .nav-link:hover { border-color: #bbb; color: #555; }
+
+    /* Course sections */
+    .course { margin-bottom: 48px; }
+
+    .course-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .course-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      font-weight: 600;
+    }
+
+    .course-progress-text {
+      font-size: 11px;
+      color: #bbb;
+      margin-left: auto;
+    }
+
+    .course-bar-wrap {
+      height: 3px;
+      background: #efefef;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .course-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: #1565c0;
+      transition: width 0.3s ease;
+    }
+
+    .course-meta {
+      font-size: 12px;
+      color: #bbb;
+      margin-bottom: 16px;
+    }
+
+    .course-meta a {
+      color: #bbb;
+      text-decoration: none;
+      border-bottom: 1px solid #e0e0e0;
+      transition: color 0.15s;
+    }
+    .course-meta a:hover { color: #555; }
+
+    /* Group labels */
+    .group-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #ccc;
+      padding: 14px 0 6px 0;
+    }
+
+    /* Problem rows */
+    .problem-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 7px;
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    .problem-row:hover { background: #f0f0f0; }
+
+    .problem-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid #d0d0d0;
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .problem-row input[type="checkbox"]:checked {
+      background: #2e7d32;
+      border-color: #2e7d32;
+    }
+
+    .problem-row input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 1px;
+      width: 7px;
+      height: 5px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg);
+    }
+
+    .problem-name {
+      font-size: 14px;
+      color: #1a1a1a;
+      flex: 1;
+      user-select: none;
+      transition: color 0.15s;
+    }
+
+    .problem-row.checked .problem-name {
+      color: #aaa;
+      text-decoration: line-through;
+      text-decoration-color: #ccc;
+    }
+
+    .problem-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .problem-link {
+      font-size: 11px;
+      color: #1565c0;
+      text-decoration: none;
+      opacity: 0.7;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .problem-link:hover { opacity: 1; }
+    .problem-row.checked .problem-link { color: #aaa; }
+
+    .problem-link.solutions { color: #2e7d32; }
+    .problem-link.formula   { color: #6a1b9a; }
+
+    /* Exam card — groups problem + solutions + formula sheet */
+    .exam-card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .exam-card .problem-row {
+      border-radius: 0;
+    }
+
+    .exam-card .problem-row:not(:last-child) {
+      border-bottom: 1px solid #f4f4f4;
+    }
+
+    .exam-card .problem-row.sub {
+      padding-left: 40px;
+      background: #fafafa;
+    }
+
+    .exam-card .problem-row.sub:hover { background: #f0f0f0; }
+
+    .exam-card .problem-row.sub .problem-name {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #ebebeb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer p { font-size: 12px; color: #ccc; }
+
+    .reset-btn {
+      font-size: 12px;
+      color: #ccc;
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .reset-btn:hover { border-color: #c62828; color: #c62828; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Practice Problems</h1>
+  <div class="header-meta">
+    <p>Exams and problem sets from open courseware</p>
+    <a href="index.html" class="nav-link">← All visualizations</a>
+    <a href="syllabus.html" class="nav-link">Syllabus →</a>
+  </div>
+</header>
+
+<!-- ── MIT 8.01SC — Classical Mechanics (Fall 2016) ──────────────────────── -->
+<section class="course" data-course="8-01sc">
+  <div class="course-header">
+    <span class="course-title">Classical Mechanics — Problem Sets</span>
+    <span class="course-progress-text" id="c1-text"></span>
+  </div>
+  <div class="course-bar-wrap"><div class="course-bar-fill" id="c1-bar"></div></div>
+  <div class="course-meta">
+    MIT 8.01SC · Fall 2016 ·
+    <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/pages/assignments/" target="_blank" rel="noopener">course page →</a>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps1">
+    <input type="checkbox" id="8sc-ps1">
+    <span class="problem-name">Problem Set 1</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset1_new/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps2">
+    <input type="checkbox" id="8sc-ps2">
+    <span class="problem-name">Problem Set 2</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset2/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps3">
+    <input type="checkbox" id="8sc-ps3">
+    <span class="problem-name">Problem Set 3</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset3/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps4">
+    <input type="checkbox" id="8sc-ps4">
+    <span class="problem-name">Problem Set 4</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset4/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps5">
+    <input type="checkbox" id="8sc-ps5">
+    <span class="problem-name">Problem Set 5</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset5/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps6">
+    <input type="checkbox" id="8sc-ps6">
+    <span class="problem-name">Problem Set 6</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset6/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps7">
+    <input type="checkbox" id="8sc-ps7">
+    <span class="problem-name">Problem Set 7</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset7/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps8">
+    <input type="checkbox" id="8sc-ps8">
+    <span class="problem-name">Problem Set 8</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset8/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps9">
+    <input type="checkbox" id="8sc-ps9">
+    <span class="problem-name">Problem Set 9</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset9/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps10">
+    <input type="checkbox" id="8sc-ps10">
+    <span class="problem-name">Problem Set 10</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset10/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps11">
+    <input type="checkbox" id="8sc-ps11">
+    <span class="problem-name">Problem Set 11</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset11/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+
+  <div class="problem-row" data-id="8sc-ps12">
+    <input type="checkbox" id="8sc-ps12">
+    <span class="problem-name">Problem Set 12</span>
+    <div class="problem-links">
+      <a href="https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/resources/mit8_01f16_pset12/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">problems →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── MIT 8.01L — Physics I: Classical Mechanics (Fall 2005) ─────────────── -->
+<section class="course" data-course="8-01l">
+  <div class="course-header">
+    <span class="course-title">Classical Mechanics — Practice Exams</span>
+    <span class="course-progress-text" id="c2-text"></span>
+  </div>
+  <div class="course-bar-wrap"><div class="course-bar-fill" id="c2-bar"></div></div>
+  <div class="course-meta">
+    MIT 8.01L · Fall 2005 ·
+    <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/pages/exams/" target="_blank" rel="noopener">course page →</a>
+    · Each exam is 1 hour, 3–4 problems
+  </div>
+
+  <div class="exam-card">
+    <div class="problem-row" data-id="8l-e1">
+      <input type="checkbox" id="8l-e1">
+      <span class="problem-name">Practice Exam 1</span>
+      <div class="problem-links">
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_exam1/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">exam →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_1_solut/" class="problem-link solutions" target="_blank" rel="noopener" onclick="event.stopPropagation()">solutions →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/exam1_formulas/" class="problem-link formula" target="_blank" rel="noopener" onclick="event.stopPropagation()">formula sheet →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="problem-row" data-id="8l-e2">
+      <input type="checkbox" id="8l-e2">
+      <span class="problem-name">Practice Exam 2</span>
+      <div class="problem-links">
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_exam2/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">exam →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_2_solut/" class="problem-link solutions" target="_blank" rel="noopener" onclick="event.stopPropagation()">solutions →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/exam2_formulas/" class="problem-link formula" target="_blank" rel="noopener" onclick="event.stopPropagation()">formula sheet →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="problem-row" data-id="8l-e3">
+      <input type="checkbox" id="8l-e3">
+      <span class="problem-name">Practice Exam 3</span>
+      <div class="problem-links">
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_exam3/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">exam →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_3_solut/" class="problem-link solutions" target="_blank" rel="noopener" onclick="event.stopPropagation()">solutions →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/exam3_formulas/" class="problem-link formula" target="_blank" rel="noopener" onclick="event.stopPropagation()">formula sheet →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="exam-card">
+    <div class="problem-row" data-id="8l-final">
+      <input type="checkbox" id="8l-final">
+      <span class="problem-name">Practice Final Exam</span>
+      <div class="problem-links">
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/practice_final/" class="problem-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">exam →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/prac_final_solut/" class="problem-link solutions" target="_blank" rel="noopener" onclick="event.stopPropagation()">solutions →</a>
+        <a href="https://ocw.mit.edu/courses/8-01l-physics-i-classical-mechanics-fall-2005/resources/final_exam_formu/" class="problem-link formula" target="_blank" rel="noopener" onclick="event.stopPropagation()">formula sheet →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <p>Progress saved automatically in your browser.</p>
+  <button class="reset-btn" id="reset-btn">Reset progress</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'practice-v1';
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch { return {}; }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function updateCourseProgress(course) {
+    const id = course.dataset.course;
+    const idMap = { '8-01sc': 'c1', '8-01l': 'c2' };
+    const prefix = idMap[id];
+    if (!prefix) return;
+
+    const rows = course.querySelectorAll('.problem-row[data-id]');
+    let total = 0, done = 0;
+    rows.forEach(row => {
+      const cb = row.querySelector('input[type="checkbox"]');
+      if (!cb) return;
+      total++;
+      if (cb.checked) done++;
+    });
+
+    const pct = total > 0 ? (done / total) * 100 : 0;
+    const bar = document.getElementById(`${prefix}-bar`);
+    const txt = document.getElementById(`${prefix}-text`);
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = `${done} / ${total}`;
+  }
+
+  function init() {
+    const saved = loadState();
+    const rows = document.querySelectorAll('.problem-row[data-id]');
+
+    rows.forEach(row => {
+      const id = row.dataset.id;
+      const cb = row.querySelector('input[type="checkbox"]');
+      if (!cb) return;
+
+      cb.checked = saved[id] === true;
+      row.classList.toggle('checked', cb.checked);
+
+      row.addEventListener('click', e => {
+        if (e.target.tagName === 'A') return;
+        cb.checked = !cb.checked;
+        row.classList.toggle('checked', cb.checked);
+        const s = loadState();
+        s[id] = cb.checked;
+        saveState(s);
+        const course = row.closest('.course');
+        if (course) updateCourseProgress(course);
+      });
+    });
+
+    document.querySelectorAll('.course').forEach(updateCourseProgress);
+  }
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  });
+
+  init();
+</script>
+</body>
+</html>
