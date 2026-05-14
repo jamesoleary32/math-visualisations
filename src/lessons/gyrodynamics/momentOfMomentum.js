@@ -93,6 +93,36 @@ function iDiscrete(nRings) {
 // Exact: I = ½MR² for a uniform disk
 const I_EXACT = 0.5 * DISK_M * DISK_R * DISK_R;
 
+// ── Inertia tensor demo ────────────────────────────────────────────────────────
+// Four masses in 3D — chosen so products of inertia are non-zero
+const BODY_3D = [
+  { x:  1, y:  2, z:  0, m: 1, color: '#c62828' },
+  { x:  2, y:  1, z:  0, m: 1, color: '#1565c0' },
+  { x:  1, y:  0, z:  1, m: 1, color: '#2e7d32' },
+  { x: -1, y:  1, z:  0, m: 1, color: '#6a1b9a' },
+];
+
+// Standard inertia tensor J (symmetric 3×3)
+// J[i][j] = ∫(r²δᵢⱼ − xᵢxⱼ) dm
+function buildJ(body) {
+  let Ixx=0, Iyy=0, Izz=0, Ixy=0, Ixz=0, Iyz=0;
+  for (const {x,y,z,m} of body) {
+    Ixx += m*(y*y + z*z);
+    Iyy += m*(x*x + z*z);
+    Izz += m*(x*x + y*y);
+    Ixy -= m*x*y;
+    Ixz -= m*x*z;
+    Iyz -= m*y*z;
+  }
+  return [[Ixx,Ixy,Ixz],[Ixy,Iyy,Iyz],[Ixz,Iyz,Izz]];
+}
+
+const J_BODY = buildJ(BODY_3D);
+
+function matVec3(J, w) {
+  return J.map(row => row[0]*w[0] + row[1]*w[1] + row[2]*w[2]);
+}
+
 // ── Drawing helpers ────────────────────────────────────────────────────────────
 
 // Draw the rigid body structure (spokes + outer boundary)
@@ -179,7 +209,7 @@ export default {
   title:   'Moment of Momentum',
   subject: 'Gyrodynamics',
 
-  initState: () => ({ theta: 0, nRings: 6, _controls: null }),
+  initState: () => ({ theta: 0, nRings: 6, omegaDeg: 20, _controls: null }),
 
   init(c2d, state, panelEl) {
     c2d.scale = 60;
@@ -448,6 +478,85 @@ export default {
 
         c2d.addPoint(0, 0, { radius: 5, color: '#333' });
         c2d.addText('O', 0.15, -0.3, { color: '#333', size: 12 });
+      },
+    },
+
+    // ── Step 6: Inertia Dyadic — h = J·ω ─────────────────────────────────────
+    {
+      title: 'The Inertia Dyadic — h = J·ω',
+      description: 'In 3D, the scalar I becomes a 3×3 inertia tensor J. Diagonal entries (blue) are moments of inertia Iₓₓ = ∫(y²+z²)dm etc. Off-diagonal entries (red) are products of inertia −∫xy dm etc., arising from mass sitting off the coordinate planes. In general, h and ω point in different directions.',
+      equation: '\\mathbf{h} = \\mathcal{J}\\,\\boldsymbol{\\omega}, \\qquad \\mathcal{J} = \\begin{pmatrix} I_{xx} & I_{xy} & I_{xz} \\\\ I_{xy} & I_{yy} & I_{yz} \\\\ I_{xz} & I_{yz} & I_{zz}\\end{pmatrix}',
+      notes: 'Drag the slider to rotate ω in the xy plane. Watch how h (red arrow) swings to a different angle — that deviation is caused by the off-diagonal products of inertia. h ∥ ω only when ω aligns with a principal axis, i.e. an eigenvector of J.',
+      setup(c2d, state) {
+        clearControls(state);
+        addSlider(state._controls, 'ω direction  (degrees)', 0, 360, 1, state.omegaDeg,
+          v => `${Math.round(v)}°`, v => state.omegaDeg = v);
+      },
+      update(c2d, state, dt) {
+        c2d.clearPersistent();
+        c2d.addGrid({ spacing: 1, color: '#f5f5f5' });
+        c2d.addAxes({ color: '#ebebeb' });
+
+        const angRad = state.omegaDeg * Math.PI / 180;
+        const omega  = [Math.cos(angRad), Math.sin(angRad), 0];
+        const h      = matVec3(J_BODY, omega);
+        const hMag   = Math.sqrt(h[0]*h[0] + h[1]*h[1] + h[2]*h[2]);
+        const hScale = 2.5 / Math.max(hMag, 0.01);
+
+        // Body masses — projected onto xy plane
+        BODY_3D.forEach(p => {
+          c2d.addLine([[0,0],[p.x,p.y]], { color: '#e8e8e8', width: 1 });
+          c2d.addPoint(p.x, p.y, { radius: 6, color: p.color });
+          // z label (shows it's a 3D body)
+          if (p.z !== 0) c2d.addText(`z=${p.z}`, p.x+0.12, p.y+0.18, { color: p.color, size: 9 });
+        });
+
+        // ω arrow (unit vector, scaled for display)
+        const ws = 2.5;
+        c2d.addArrow(0, 0, omega[0]*ws, omega[1]*ws, { color: '#1565c0', width: 3 });
+        c2d.addText('ω', omega[0]*ws + 0.15, omega[1]*ws + 0.12, { color: '#1565c0', size: 14, italic: true });
+
+        // h = J·ω arrow (scaled to same display length)
+        c2d.addArrow(0, 0, h[0]*hScale, h[1]*hScale, { color: '#c62828', width: 3 });
+        c2d.addText('h', h[0]*hScale + 0.15, h[1]*hScale + 0.12, { color: '#c62828', size: 14, italic: true });
+
+        // Angle between ω and h
+        const dotOH  = omega[0]*h[0] + omega[1]*h[1] + omega[2]*h[2];
+        const cosA   = dotOH / Math.max(hMag, 0.01);
+        const angDeg = Math.acos(Math.max(-1, Math.min(1, cosA))) * 180 / Math.PI;
+
+        c2d.addPoint(0, 0, { radius: 4, color: '#333' });
+        c2d.addText('O', 0.12, -0.28, { color: '#333', size: 11 });
+
+        // J matrix as colour-coded text
+        c2d.raw((ctx, cam) => {
+          const x0 = cam.wx(-5.5), y0 = cam.wy(4.5);
+          ctx.font = '11px system-ui';
+          ctx.fillStyle = '#888';
+          ctx.fillText('J =', x0, y0);
+
+          const cw = 32, rh = 16;
+          J_BODY.forEach((row, i) => {
+            row.forEach((v, j) => {
+              ctx.fillStyle = (i === j) ? '#1565c0' : '#c62828';
+              ctx.font = (i === j) ? 'bold 11px system-ui' : '11px system-ui';
+              ctx.fillText(v.toFixed(1), x0 + 28 + j*cw, y0 + i*rh);
+            });
+          });
+
+          // bracket lines
+          ctx.strokeStyle = '#bbb';
+          ctx.lineWidth = 1.5;
+          const mx = x0 + 24, my = y0 - 12, mw = 3*cw + 4, mh = 3*rh;
+          // left bracket
+          ctx.beginPath(); ctx.moveTo(mx+4, my); ctx.lineTo(mx, my); ctx.lineTo(mx, my+mh); ctx.lineTo(mx+4, my+mh); ctx.stroke();
+          // right bracket
+          ctx.beginPath(); ctx.moveTo(mx+mw-4, my); ctx.lineTo(mx+mw, my); ctx.lineTo(mx+mw, my+mh); ctx.lineTo(mx+mw-4, my+mh); ctx.stroke();
+        });
+
+        const col = angDeg < 5 ? '#2e7d32' : angDeg < 20 ? '#e65100' : '#c62828';
+        c2d.addText(`angle between ω and h: ${angDeg.toFixed(1)}°`, -5.5, 2.95, { color: col, size: 12 });
+        c2d.addText('blue masses: z=0   green mass: z=1 (out of plane)', -5.5, 2.5, { color: '#888', size: 10 });
       },
     },
 
