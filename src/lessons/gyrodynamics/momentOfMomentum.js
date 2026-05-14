@@ -12,6 +12,31 @@
 //   H = Σ r_i × m_i v_i = I ω   (when v_0 = 0 or O = centre of mass)
 // Thomson §5.2
 
+// ── Controls ──────────────────────────────────────────────────────────────────
+
+function clearControls(state) { if (state._controls) state._controls.innerHTML = ''; }
+
+function addSlider(container, label, min, max, step, value, fmt, onChange) {
+  const id = `mom-${Math.random().toString(36).slice(2)}`;
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
+  wrap.innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;font-family:system-ui">
+      <span>${label}</span><span id="${id}-v" style="font-family:Georgia,serif">${fmt(value)}</span>
+    </div>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}"
+           style="width:100%;accent-color:#1565c0">
+  `;
+  container.appendChild(wrap);
+  const inp = wrap.querySelector('input');
+  const vel = wrap.querySelector(`[id="${id}-v"]`);
+  inp.addEventListener('input', () => {
+    const v = parseFloat(inp.value);
+    vel.textContent = fmt(v);
+    onChange(v);
+  });
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const OMEGA   = 0.5;   // rad/s — angular velocity of the body
@@ -43,6 +68,30 @@ function hi(p) { return p.m * p.r * p.r * OMEGA; }
 
 // Total moment of inertia I = Σ m_i r_i²
 const I_TOTAL = PARTICLES.reduce((s, p) => s + p.m * p.r * p.r, 0);
+
+// ── Disk particle generator (for sum → integral step) ─────────────────────────
+// Uniform disk, radius DISK_R, mass DISK_M. Places particles on concentric rings.
+const DISK_R = 2.2, DISK_M = 3.0;
+
+function diskParticles(nRings) {
+  const pts = [];
+  for (let k = 1; k <= nRings; k++) {
+    const r   = k * DISK_R / nRings;
+    const n   = Math.max(1, Math.round(2 * Math.PI * k));
+    for (let j = 0; j < n; j++) {
+      pts.push({ r, phi: (2 * Math.PI * j) / n });
+    }
+  }
+  const m = DISK_M / pts.length;
+  return pts.map(p => ({ ...p, m }));
+}
+
+function iDiscrete(nRings) {
+  return diskParticles(nRings).reduce((s, p) => s + p.m * p.r * p.r, 0);
+}
+
+// Exact: I = ½MR² for a uniform disk
+const I_EXACT = 0.5 * DISK_M * DISK_R * DISK_R;
 
 // ── Drawing helpers ────────────────────────────────────────────────────────────
 
@@ -130,9 +179,16 @@ export default {
   title:   'Moment of Momentum',
   subject: 'Gyrodynamics',
 
-  initState: () => ({ theta: 0 }),
+  initState: () => ({ theta: 0, nRings: 6, _controls: null }),
 
-  init(c2d) { c2d.scale = 60; },
+  init(c2d, state, panelEl) {
+    c2d.scale = 60;
+    const nav = panelEl.querySelector('#nav');
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;flex-direction:column;gap:10px;border-top:1px solid #eee;padding-top:16px;';
+    panelEl.insertBefore(div, nav);
+    state._controls = div;
+  },
 
   steps: [
 
@@ -142,7 +198,7 @@ export default {
       description: 'Body axes are attached to the body with origin O. The velocity of any point P_i has two parts: v_0 — the velocity of O itself — plus ω × r_i from the rotation about O. For a fixed point O, v_0 = 0 and v_i = ω × r_i.',
       equation: '\\mathbf{v}_i = \\mathbf{v}_0 + \\boldsymbol{\\omega} \\times \\mathbf{r}_i',
       notes: 'O can be any point fixed in the body — a fixed pivot, or the moving centre of mass. The choice of O affects v_0 but not the total v_i. If O is a fixed point in space, v_0 = 0 and the velocity is purely rotational.',
-      setup(c2d, state) {},
+      setup(c2d, state) { clearControls(state); },
       update(c2d, state, dt) {
         state.theta += OMEGA * dt;
         c2d.clearPersistent();
@@ -193,7 +249,7 @@ export default {
       description: 'The moment of momentum of particle P_i about O is h_i = r_i × m_i v_i. Because v_i ⊥ r_i (angle = 90°), the cross product simplifies to a scalar: |h_i| = m_i r_i v_i = m_i r_i² ω. It points out of the plane.',
       equation: '\\mathbf{h}_i = \\mathbf{r}_i \\times m_i \\mathbf{v}_i \\implies |h_i| = m_i r_i^2 \\omega',
       notes: 'The r² dependence is key — a particle twice as far contributes four times as much angular momentum. Distance from the axis matters quadratically.',
-      setup(c2d, state) {},
+      setup(c2d, state) { clearControls(state); },
       update(c2d, state, dt) {
         state.theta += OMEGA * dt;
         c2d.clearPersistent();
@@ -245,7 +301,7 @@ export default {
       description: 'The total moment of momentum H is the sum of each particle\'s contribution. Since ω is the same for every point on the rigid body, it factors out of the sum.',
       equation: 'H = \\sum_i \\mathbf{r}_i \\times m_i\\mathbf{v}_i = \\omega \\sum_i m_i r_i^2',
       notes: 'Every particle contributes proportionally to m_i r_i². Particles far from O dominate — which is why mass distribution matters so much in rotating systems.',
-      setup(c2d, state) {},
+      setup(c2d, state) { clearControls(state); },
       update(c2d, state, dt) {
         state.theta += OMEGA * dt;
         c2d.clearPersistent();
@@ -280,13 +336,71 @@ export default {
       },
     },
 
-    // ── Step 4: H = Iω — the moment of inertia ───────────────────────────────
+    // ── Step 4: From Σ to ∫ — discrete → continuous ─────────────────────────
+    {
+      title: 'From Sum to Integral',
+      description: 'A real rigid body is not N point masses — it is a continuous distribution of matter. As N → ∞ and each mᵢ → dm, the sum becomes an integral over the body. The two expressions are exactly equivalent in the limit.',
+      equation: 'h_0 = \\sum_i m_i\\, r_i^2\\,\\omega \\;\\xrightarrow{N\\to\\infty}\\; \\int r^2\\,dm\\cdot\\omega',
+      notes: 'This is the same move as going from a Riemann sum to a Riemann integral. Each dm can be written as ρ(r) dV, turning it into a volume integral over the body\'s geometry. Use the slider to see the discrete approximation converge to ½MR².',
+      setup(c2d, state) {
+        clearControls(state);
+        addSlider(state._controls, 'number of rings  N', 1, 24, 1, state.nRings,
+          v => Math.round(v), v => state.nRings = Math.round(v));
+      },
+      update(c2d, state, dt) {
+        state.theta += OMEGA * dt;
+        c2d.clearPersistent();
+        c2d.addGrid({ spacing: 1, color: '#f5f5f5' });
+        c2d.addAxes({ color: '#ebebeb' });
+
+        const N      = state.nRings;
+        const pts    = diskParticles(N);
+        const iDisc  = iDiscrete(N);
+        const errPct = Math.abs((iDisc - I_EXACT) / I_EXACT * 100);
+
+        // Draw disk outline
+        c2d.raw((ctx, cam) => {
+          ctx.beginPath();
+          ctx.arc(cam.wx(0), cam.wy(0), cam.ws(DISK_R), 0, Math.PI * 2);
+          ctx.strokeStyle = '#ddd';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(21,101,192,0.04)';
+          ctx.fill();
+        });
+
+        // Draw each particle dot, coloured by r²
+        pts.forEach(p => {
+          const x = p.r * Math.cos(p.phi + state.theta);
+          const y = p.r * Math.sin(p.phi + state.theta);
+          // Colour: blue (centre) → red (edge) by r/R
+          const t = p.r / DISK_R;
+          const r = Math.round(21 + t * (198 - 21));
+          const g = Math.round(101 + t * (40 - 101));
+          const b = Math.round(192 + t * (40 - 192));
+          c2d.addPoint(x, y, { radius: 3, color: `rgb(${r},${g},${b})` });
+        });
+
+        // Origin
+        c2d.addPoint(0, 0, { radius: 4, color: '#333' });
+        c2d.addText('O', 0.12, -0.28, { color: '#333', size: 11 });
+
+        // Stats panel
+        c2d.addText(`particles: ${pts.length}`, -5.5, 4.2, { color: '#555', size: 12 });
+        c2d.addText(`I_discrete = Σ mᵢrᵢ² = ${iDisc.toFixed(3)}`, -5.5, 3.75, { color: '#1565c0', size: 12 });
+        c2d.addText(`I_exact    = ½MR²    = ${I_EXACT.toFixed(3)}`, -5.5, 3.3,  { color: '#2e7d32', size: 12 });
+        c2d.addText(`error: ${errPct.toFixed(1)}%`, -5.5, 2.85,
+          { color: errPct < 2 ? '#2e7d32' : errPct < 10 ? '#e65100' : '#c62828', size: 12 });
+      },
+    },
+
+    // ── Step 5: H = Iω — the moment of inertia ───────────────────────────────
     {
       title: 'H = Iω — The Moment of Inertia',
       description: 'The coefficient of ω in the sum is called the moment of inertia I. It captures how mass is distributed relative to the rotation axis. A larger I means more angular momentum for the same ω.',
       equation: 'H = I\\omega \\qquad I = \\sum_i m_i r_i^2 = \\int r^2 \\, dm',
       notes: 'I is a property of the body and axis — not of the motion. Changing the rotation axis changes I. For a continuous body, the sum becomes an integral over the mass distribution.',
-      setup(c2d, state) {},
+      setup(c2d, state) { clearControls(state); },
       update(c2d, state, dt) {
         state.theta += OMEGA * dt;
         c2d.clearPersistent();
