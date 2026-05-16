@@ -270,7 +270,7 @@
 <header>
   <h1>Self-Study Syllabus</h1>
   <div class="header-meta">
-    <p>~14 hrs/week · ~13 months · ~640 hrs total</p>
+    <p>~14 hrs/week · ~15 months · ~760 hrs total</p>
     <a href="index.html" class="nav-link">← All visualizations</a>
   </div>
 </header>
@@ -976,6 +976,153 @@
     <span class="topic-name">Orbit Determination &amp; SSA</span>
     <span class="topic-sub">Batch least squares, sequential estimation, conjunction analysis — Thomson dynamics + Kalman estimation combined</span>
     <span class="topic-source">Vallado · Crassidis &amp; Junkins</span>
+  </div>
+</section>
+
+<!-- ── Phase 8: Prince — Understanding Deep Learning ──────────────────────── -->
+<section class="phase" data-phase="8">
+  <div class="phase-header">
+    <span class="phase-title">Phase 8 — Prince: Understanding Deep Learning</span>
+    <span class="phase-dates">Oct 2027+ · ~120 hrs</span>
+    <span class="phase-progress-text" id="p8-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
+  <div class="phase-sources">Prince — Understanding Deep Learning (MIT Press, 2024) · free PDF at udlbook.github.io</div>
+
+  <div class="topic-group-label">Foundations</div>
+
+  <div class="topic-row" data-id="dl-supervised">
+    <input type="checkbox" id="dl-supervised">
+    <span class="topic-name">Supervised Learning</span>
+    <span class="topic-sub">Input–output mappings, loss functions, empirical risk minimisation</span>
+    <span class="topic-source">Prince §2</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-shallow">
+    <input type="checkbox" id="dl-shallow">
+    <span class="topic-name">Shallow Neural Networks</span>
+    <span class="topic-sub">One hidden layer, activation functions, universal approximation</span>
+    <span class="topic-source">Prince §3</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-deep">
+    <input type="checkbox" id="dl-deep">
+    <span class="topic-name">Deep Neural Networks</span>
+    <span class="topic-sub">Composing layers, depth vs width, piecewise linear regions</span>
+    <span class="topic-source">Prince §4</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-loss">
+    <input type="checkbox" id="dl-loss">
+    <span class="topic-name">Loss Functions</span>
+    <span class="topic-sub">MSE, cross-entropy, maximum likelihood perspective</span>
+    <span class="topic-source">Prince §5</span>
+  </div>
+
+  <div class="topic-group-label">Training</div>
+
+  <div class="topic-row" data-id="dl-gradient-descent">
+    <input type="checkbox" id="dl-gradient-descent">
+    <span class="topic-name">Gradient Descent &amp; Backpropagation</span>
+    <span class="topic-sub">SGD, mini-batch, chain rule through computation graphs</span>
+    <span class="topic-source">Prince §6</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-init-grad">
+    <input type="checkbox" id="dl-init-grad">
+    <span class="topic-name">Gradients &amp; Initialisation</span>
+    <span class="topic-sub">Vanishing/exploding gradients, He/Xavier init, batch norm</span>
+    <span class="topic-source">Prince §7</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-performance">
+    <input type="checkbox" id="dl-performance">
+    <span class="topic-name">Measuring Performance</span>
+    <span class="topic-sub">Bias–variance tradeoff, train/val/test split, double descent</span>
+    <span class="topic-source">Prince §8</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-regularisation">
+    <input type="checkbox" id="dl-regularisation">
+    <span class="topic-name">Regularisation</span>
+    <span class="topic-sub">L1/L2, dropout, data augmentation, early stopping</span>
+    <span class="topic-source">Prince §9</span>
+  </div>
+
+  <div class="topic-group-label">Architectures</div>
+
+  <div class="topic-row" data-id="dl-convnets">
+    <input type="checkbox" id="dl-convnets">
+    <span class="topic-name">Convolutional Networks</span>
+    <span class="topic-sub">Convolution, pooling, receptive field, translation equivariance</span>
+    <span class="topic-source">Prince §10</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-resnets">
+    <input type="checkbox" id="dl-resnets">
+    <span class="topic-name">Residual Networks</span>
+    <span class="topic-sub">Skip connections, batch norm, modern CNN architectures</span>
+    <span class="topic-source">Prince §11</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-transformers">
+    <input type="checkbox" id="dl-transformers">
+    <span class="topic-name">Transformers</span>
+    <span class="topic-sub">Self-attention, multi-head attention, positional encoding, encoder–decoder</span>
+    <span class="topic-source">Prince §12</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-gnns">
+    <input type="checkbox" id="dl-gnns">
+    <span class="topic-name">Graph Neural Networks</span>
+    <span class="topic-sub">Message passing, node/edge/graph classification, relational inductive bias</span>
+    <span class="topic-source">Prince §13</span>
+  </div>
+
+  <div class="topic-group-label">Generative models</div>
+
+  <div class="topic-row" data-id="dl-unsupervised">
+    <input type="checkbox" id="dl-unsupervised">
+    <span class="topic-name">Unsupervised Learning</span>
+    <span class="topic-sub">Clustering, dimensionality reduction, self-supervised pretraining</span>
+    <span class="topic-source">Prince §14</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-gans">
+    <input type="checkbox" id="dl-gans">
+    <span class="topic-name">Generative Adversarial Networks</span>
+    <span class="topic-sub">Minimax game, training instability, mode collapse, Wasserstein GAN</span>
+    <span class="topic-source">Prince §15</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-normalizing-flows">
+    <input type="checkbox" id="dl-normalizing-flows">
+    <span class="topic-name">Normalizing Flows</span>
+    <span class="topic-sub">Bijective mappings, change-of-variables formula, exact likelihood</span>
+    <span class="topic-source">Prince §16</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-vaes">
+    <input type="checkbox" id="dl-vaes">
+    <span class="topic-name">Variational Autoencoders</span>
+    <span class="topic-sub">Latent variable models, ELBO, reparameterisation trick</span>
+    <span class="topic-source">Prince §17</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-diffusion">
+    <input type="checkbox" id="dl-diffusion">
+    <span class="topic-name">Diffusion Models</span>
+    <span class="topic-sub">Forward noising process, denoising score matching, DDPM</span>
+    <span class="topic-source">Prince §18</span>
+  </div>
+
+  <div class="topic-group-label">Reinforcement learning</div>
+
+  <div class="topic-row" data-id="dl-rl">
+    <input type="checkbox" id="dl-rl">
+    <span class="topic-name">Reinforcement Learning</span>
+    <span class="topic-sub">MDP, policy/value functions, Q-learning, policy gradient, RLHF</span>
+    <span class="topic-source">Prince §19</span>
   </div>
 </section>
 
