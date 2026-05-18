@@ -270,7 +270,7 @@
 <header>
   <h1>Self-Study Syllabus</h1>
   <div class="header-meta">
-    <p>~14 hrs/week · ~15 months · ~760 hrs total</p>
+    <p>~14 hrs/week · ~22 months · ~1,000 hrs total</p>
     <a href="index.html" class="nav-link">← All visualizations</a>
   </div>
 </header>
@@ -675,14 +675,184 @@
   </div>
 </section>
 
-<!-- ── Phase 4: Abbott ─────────────────────────────────────────────────────── -->
+<!-- ── Phase 4: Signals & Systems ────────────────────────────────────────── -->
 <section class="phase" data-phase="4">
   <div class="phase-header">
-    <span class="phase-title">Phase 4 — Abbott: Understanding Analysis</span>
-    <span class="phase-dates">Oct – Dec 2026 · ~90 hrs</span>
+    <span class="phase-title">Phase 4 — Oppenheim &amp; Willsky: Signals and Systems</span>
+    <span class="phase-dates">Oct – Dec 2026 · ~80 hrs</span>
     <span class="phase-progress-text" id="p4-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p4-bar"></div></div>
+  <div class="phase-sources">Oppenheim &amp; Willsky — Signals and Systems (2nd ed.)</div>
+
+  <div class="topic-group-label">Continuous-time signals &amp; systems</div>
+
+  <div class="topic-row" data-id="ss-signals-systems">
+    <input type="checkbox" id="ss-signals-systems">
+    <span class="topic-name">Signals &amp; Systems — Classification</span>
+    <span class="topic-sub">Memory, causality, stability, invertibility; continuous vs discrete; energy and power signals</span>
+    <span class="topic-source">O&amp;W §1</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-lti-ct">
+    <input type="checkbox" id="ss-lti-ct">
+    <span class="topic-name">CT LTI Systems &amp; Convolution</span>
+    <span class="topic-sub">Convolution integral, impulse response, BIBO stability, causality from h(t)</span>
+    <span class="topic-source">O&amp;W §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-fourier-series">
+    <input type="checkbox" id="ss-fourier-series">
+    <span class="topic-name">Fourier Series (CT)</span>
+    <span class="topic-sub">Orthogonality, synthesis and analysis equations, Gibbs phenomenon, Parseval's theorem</span>
+    <span class="topic-source">O&amp;W §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ctft">
+    <input type="checkbox" id="ss-ctft">
+    <span class="topic-name">Continuous-Time Fourier Transform</span>
+    <span class="topic-sub">CTFT pair, convolution theorem, Parseval, duality; spectrum of standard signals</span>
+    <span class="topic-source">O&amp;W §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ctft-lti">
+    <input type="checkbox" id="ss-ctft-lti">
+    <span class="topic-name">Frequency Response of CT LTI Systems</span>
+    <span class="topic-sub">H(jω), ideal filters, first- and second-order system frequency response</span>
+    <span class="topic-source">O&amp;W §3–4</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-sampling">
+    <input type="checkbox" id="ss-sampling">
+    <span class="topic-name">Sampling Theorem</span>
+    <span class="topic-sub">Nyquist rate, aliasing, reconstruction; the bridge from CT to DT</span>
+    <span class="topic-source">O&amp;W §7</span>
+  </div>
+
+  <div class="topic-group-label">Laplace &amp; Z-transforms (system perspective)</div>
+
+  <div class="topic-row" data-id="ss-laplace">
+    <input type="checkbox" id="ss-laplace">
+    <span class="topic-name">Laplace Transform &amp; Transfer Functions</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, partial fractions, system stability from pole locations</span>
+    <span class="topic-source">O&amp;W §9</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-block-diagrams">
+    <input type="checkbox" id="ss-block-diagrams">
+    <span class="topic-name">Block Diagrams &amp; System Interconnections</span>
+    <span class="topic-sub">Series, parallel, feedback; unilateral Laplace for IVPs; signal flow graphs</span>
+    <span class="topic-source">O&amp;W §9–10</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ztransform">
+    <input type="checkbox" id="ss-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">ROC, poles and zeros, inverse Z-transform; DT system stability</span>
+    <span class="topic-source">O&amp;W §10</span>
+  </div>
+</section>
+
+<!-- ── Phase 5: Control Systems ──────────────────────────────────────────── -->
+<section class="phase" data-phase="5">
+  <div class="phase-header">
+    <span class="phase-title">Phase 5 — Control Systems</span>
+    <span class="phase-dates">Dec 2026 – Feb 2027 · ~80 hrs</span>
+    <span class="phase-progress-text" id="p5-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p5-bar"></div></div>
+  <div class="phase-sources">Ogata — Modern Control Engineering (5th ed.) · Franklin — Feedback Control of Dynamic Systems</div>
+
+  <div class="topic-group-label">Classical control</div>
+
+  <div class="topic-row" data-id="ctrl-models">
+    <input type="checkbox" id="ctrl-models">
+    <span class="topic-name">Mathematical Models of Systems</span>
+    <span class="topic-sub">Transfer functions from ODEs; block diagram algebra; linearisation around operating points</span>
+    <span class="topic-source">Ogata §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-transient">
+    <input type="checkbox" id="ctrl-transient">
+    <span class="topic-name">Time-Domain Response</span>
+    <span class="topic-sub">First- and second-order step response; damping ratio, natural frequency, settling time, overshoot</span>
+    <span class="topic-source">Ogata §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-root-locus">
+    <input type="checkbox" id="ctrl-root-locus">
+    <span class="topic-name">Root Locus</span>
+    <span class="topic-sub">Closed-loop poles as gain varies; construction rules; designing for desired transient specs</span>
+    <span class="topic-source">Ogata §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-frequency-response">
+    <input type="checkbox" id="ctrl-frequency-response">
+    <span class="topic-name">Frequency Response &amp; Bode Plots</span>
+    <span class="topic-sub">Magnitude and phase vs frequency; asymptotic Bode construction; gain and phase margins</span>
+    <span class="topic-source">Ogata §7</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-nyquist">
+    <input type="checkbox" id="ctrl-nyquist">
+    <span class="topic-name">Nyquist Stability Criterion</span>
+    <span class="topic-sub">Encirclement condition; stability margins in the frequency domain; robustness</span>
+    <span class="topic-source">Ogata §8</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-pid">
+    <input type="checkbox" id="ctrl-pid">
+    <span class="topic-name">PID Controllers</span>
+    <span class="topic-sub">Proportional, integral, derivative action; Ziegler–Nichols tuning; practical limitations</span>
+    <span class="topic-source">Ogata §8</span>
+  </div>
+
+  <div class="topic-group-label">Modern (state-space) control</div>
+
+  <div class="topic-row" data-id="ctrl-state-space">
+    <input type="checkbox" id="ctrl-state-space">
+    <span class="topic-name">State-Space Representation</span>
+    <span class="topic-sub">ẋ = Ax + Bu, y = Cx + Du; eigenvalues as poles; solution via matrix exponential</span>
+    <span class="topic-source">Ogata §9</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-controllability">
+    <input type="checkbox" id="ctrl-controllability">
+    <span class="topic-name">Controllability &amp; Observability</span>
+    <span class="topic-sub">Controllability matrix rank; observability matrix rank; duality theorem</span>
+    <span class="topic-source">Ogata §10</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-state-feedback">
+    <input type="checkbox" id="ctrl-state-feedback">
+    <span class="topic-name">State Feedback &amp; Pole Placement</span>
+    <span class="topic-sub">Full-state feedback u = −Kx; placing closed-loop poles; integral action for zero steady-state error</span>
+    <span class="topic-source">Ogata §10</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-observer">
+    <input type="checkbox" id="ctrl-observer">
+    <span class="topic-name">State Observers (Luenberger)</span>
+    <span class="topic-sub">Estimating states from outputs; observer gain; separation principle — direct precursor to Kalman filter</span>
+    <span class="topic-source">Ogata §10 · Franklin §7</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-lqr">
+    <input type="checkbox" id="ctrl-lqr">
+    <span class="topic-name">LQR &amp; Optimal Control</span>
+    <span class="topic-sub">Quadratic cost minimisation; Riccati equation; relationship between LQR and Kalman filtering (LQG)</span>
+    <span class="topic-source">Franklin §9</span>
+  </div>
+</section>
+
+<!-- ── Phase 6: Abbott ─────────────────────────────────────────────────────── -->
+<section class="phase" data-phase="6">
+  <div class="phase-header">
+    <span class="phase-title">Phase 6 — Abbott: Understanding Analysis</span>
+    <span class="phase-dates">Feb – Apr 2027 · ~90 hrs</span>
+    <span class="phase-progress-text" id="p6-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p6-bar"></div></div>
   <div class="phase-sources">Abbott — Understanding Analysis (Springer UTM, 2nd ed.)</div>
 
   <div class="topic-row" data-id="ra-real-numbers">
@@ -735,14 +905,14 @@
   </div>
 </section>
 
-<!-- ── Phase 5: Armstrong ─────────────────────────────────────────────────── -->
-<section class="phase" data-phase="5">
+<!-- ── Phase 7: Armstrong ─────────────────────────────────────────────────── -->
+<section class="phase" data-phase="7">
   <div class="phase-header">
-    <span class="phase-title">Phase 5 — Armstrong: Basic Topology</span>
-    <span class="phase-dates">Jan – Apr 2027 · ~160 hrs</span>
-    <span class="phase-progress-text" id="p5-text"></span>
+    <span class="phase-title">Phase 7 — Armstrong: Basic Topology</span>
+    <span class="phase-dates">Apr – Sep 2027 · ~160 hrs</span>
+    <span class="phase-progress-text" id="p7-text"></span>
   </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p5-bar"></div></div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
   <div class="phase-sources">Armstrong — Basic Topology (Springer UTM) · Abbott §3 provides the ℝ warm-up</div>
 
   <div class="topic-row" data-id="top-spaces">
@@ -802,14 +972,14 @@
   </div>
 </section>
 
-<!-- ── Probability ────────────────────────────────────────────────────────── -->
-<section class="phase" data-phase="6">
+<!-- ── Phase 8: Probability ───────────────────────────────────────────────── -->
+<section class="phase" data-phase="8">
   <div class="phase-header">
-    <span class="phase-title">Phase 6 — Blitzstein &amp; Hwang: Introduction to Probability</span>
-    <span class="phase-dates">Apr 2027+ · ~90 hrs</span>
-    <span class="phase-progress-text" id="p6-text"></span>
+    <span class="phase-title">Phase 8 — Blitzstein &amp; Hwang: Introduction to Probability</span>
+    <span class="phase-dates">Sep – Nov 2027 · ~90 hrs</span>
+    <span class="phase-progress-text" id="p8-text"></span>
   </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p6-bar"></div></div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
   <div class="phase-sources">Blitzstein &amp; Hwang — Introduction to Probability (CRC Press) · Stat 110 Harvard lectures (YouTube)</div>
 
   <div class="topic-row" data-id="prob-counting">
@@ -869,14 +1039,87 @@
   </div>
 </section>
 
-<!-- ── Phase 7: Signal Processing & Estimation ───────────────────────────── -->
-<section class="phase" data-phase="7">
+<!-- ── Phase 9: RF & Communications ──────────────────────────────────────── -->
+<section class="phase" data-phase="9">
   <div class="phase-header">
-    <span class="phase-title">Phase 7 — Signal Processing &amp; Estimation Theory</span>
-    <span class="phase-dates">Jul – Oct 2027 · ~140 hrs</span>
-    <span class="phase-progress-text" id="p7-text"></span>
+    <span class="phase-title">Phase 9 — RF &amp; Communications Fundamentals</span>
+    <span class="phase-dates">Nov 2027 – Jan 2028 · ~70 hrs</span>
+    <span class="phase-progress-text" id="p9-text"></span>
   </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p9-bar"></div></div>
+  <div class="phase-sources">Proakis &amp; Salehi — Communication Systems Engineering (2nd ed.) · Haykin — Communication Systems</div>
+
+  <div class="topic-group-label">Foundations</div>
+
+  <div class="topic-row" data-id="rf-channel-models">
+    <input type="checkbox" id="rf-channel-models">
+    <span class="topic-name">Channel Models &amp; Noise</span>
+    <span class="topic-sub">AWGN channel, SNR, noise power spectral density; thermal noise and N₀/2</span>
+    <span class="topic-source">Proakis §3</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-analog-mod">
+    <input type="checkbox" id="rf-analog-mod">
+    <span class="topic-name">Analog Modulation</span>
+    <span class="topic-sub">AM, DSB-SC, SSB, FM, PM; bandwidth and power tradeoffs; coherent vs envelope detection</span>
+    <span class="topic-source">Proakis §3</span>
+  </div>
+
+  <div class="topic-group-label">Digital communications</div>
+
+  <div class="topic-row" data-id="rf-digital-mod">
+    <input type="checkbox" id="rf-digital-mod">
+    <span class="topic-name">Digital Modulation — BPSK, QPSK, QAM</span>
+    <span class="topic-sub">Signal constellations, decision regions, BER vs Eb/N₀; matched filter receiver</span>
+    <span class="topic-source">Proakis §5</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-spread-spectrum">
+    <input type="checkbox" id="rf-spread-spectrum">
+    <span class="topic-name">Spread Spectrum — DSSS &amp; FHSS</span>
+    <span class="topic-sub">PN sequences, processing gain, jamming margin; CDMA; GPS L1 C/A signal structure</span>
+    <span class="topic-source">Proakis §9</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-channel-coding">
+    <input type="checkbox" id="rf-channel-coding">
+    <span class="topic-name">Channel Coding &amp; Shannon Capacity</span>
+    <span class="topic-sub">Shannon's theorem, capacity–bandwidth tradeoff; Hamming codes; convolutional codes and Viterbi</span>
+    <span class="topic-source">Proakis §8</span>
+  </div>
+
+  <div class="topic-group-label">RF propagation &amp; link budgets</div>
+
+  <div class="topic-row" data-id="rf-antennas">
+    <input type="checkbox" id="rf-antennas">
+    <span class="topic-name">Antenna Fundamentals</span>
+    <span class="topic-sub">Gain, directivity, effective aperture, beam pattern; dipole and patch antennas for GNSS receivers</span>
+    <span class="topic-source">Proakis §2 · Balanis §1–2</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-link-budget">
+    <input type="checkbox" id="rf-link-budget">
+    <span class="topic-name">Link Budget &amp; Friis Equation</span>
+    <span class="topic-sub">EIRP, path loss, receiver sensitivity, C/N₀; computing GPS received power from 20,200 km</span>
+    <span class="topic-source">Proakis §2</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-multipath">
+    <input type="checkbox" id="rf-multipath">
+    <span class="topic-name">Multipath &amp; Ionospheric Effects</span>
+    <span class="topic-sub">Rayleigh fading, Doppler shift, ionospheric delay model; how these degrade GNSS pseudorange</span>
+    <span class="topic-source">Proakis §13 · Kaplan §7</span>
+  </div>
+</section>
+
+<!-- ── Phase 10: Signal Processing & Estimation ──────────────────────────── -->
+<section class="phase" data-phase="10">
+  <div class="phase-header">
+    <span class="phase-title">Phase 10 — Signal Processing &amp; Estimation Theory</span>
+    <span class="phase-dates">Dec 2027 – Mar 2028 · ~140 hrs</span>
+    <span class="phase-progress-text" id="p10-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
   <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing · Kay — Statistical Signal Processing · Kaplan &amp; Hegarty — Understanding GPS/GNSS</div>
 
   <div class="topic-group-label">Discrete-time signals &amp; systems</div>
@@ -979,14 +1222,14 @@
   </div>
 </section>
 
-<!-- ── Phase 8: Prince — Understanding Deep Learning ──────────────────────── -->
-<section class="phase" data-phase="8">
+<!-- ── Phase 11: Prince — Understanding Deep Learning ────────────────────── -->
+<section class="phase" data-phase="11">
   <div class="phase-header">
-    <span class="phase-title">Phase 8 — Prince: Understanding Deep Learning</span>
-    <span class="phase-dates">Oct 2027+ · ~120 hrs</span>
-    <span class="phase-progress-text" id="p8-text"></span>
+    <span class="phase-title">Phase 11 — Prince: Understanding Deep Learning</span>
+    <span class="phase-dates">Mar 2028+ · ~120 hrs</span>
+    <span class="phase-progress-text" id="p11-text"></span>
   </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p11-bar"></div></div>
   <div class="phase-sources">Prince — Understanding Deep Learning (MIT Press, 2024) · free PDF at udlbook.github.io</div>
 
   <div class="topic-group-label">Foundations</div>
