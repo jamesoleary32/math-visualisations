@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bar Inertia &amp; Angular Momentum – Gyrodynamics</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../src/styles/layout.css">
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container"><canvas id="canvas"></canvas></div>
+    <div id="panel">
+      <a href="../index.html" id="back">← All visualizations</a>
+      <div id="subject"></div>
+      <h1 id="step-title"></h1>
+      <p id="step-description"></p>
+      <div id="equation"></div>
+      <p id="step-notes"></p>
+      <div id="nav">
+        <button id="prev">← Prev</button>
+        <span id="counter"></span>
+        <button id="next">Next →</button>
+      </div>
+    </div>
+  </div>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="module">
+    import { run }    from '../src/main.js';
+    import lesson     from '../src/lessons/gyrodynamics/barInertia.js';
+    run(lesson);
+
+    try {
+    } catch (e) {
+      document.body.insertAdjacentHTML('beforeend',
+        `<pre style="position:fixed;bottom:0;left:0;right:0;background:#c62828;color:#fff;
+          padding:12px;font-size:12px;z-index:9999;white-space:pre-wrap;">${e.stack || e}</pre>`);
+    }
+    window.addEventListener('unhandledrejection', e => {
+      document.body.insertAdjacentHTML('beforeend',
+        `<pre style="position:fixed;bottom:0;left:0;right:0;background:#c62828;color:#fff;
+          padding:12px;font-size:12px;z-index:9999;white-space:pre-wrap;">${e.reason?.stack || e.reason}</pre>`);
+    });
+  </script>
+</body>
+</html>
