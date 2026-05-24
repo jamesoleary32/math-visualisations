@@ -27,7 +27,7 @@ export default {
   title: 'Inner Product',
   subject: 'Linear Algebra',
 
-  initState: () => ({ w1: 1.0, _controls: null }),
+  initState: () => ({ w1: 1.0, w2: 1.0, _controls: null }),
 
   init(c2d, state, panelEl) {
     c2d.scale = 55;
@@ -79,13 +79,16 @@ export default {
     // ── Step 3: Weighted inner product (interactive) ───────────────────────────
     {
       title: 'Example: Weighted Inner Product on ℝ²',
-      description: 'Scale each component pair by a positive weight before summing. All three axioms still hold — but the geometry changes. Two vectors that are not orthogonal under the dot product can be orthogonal here.',
-      equation: '\\langle \\mathbf{u},\\,\\mathbf{v}\\rangle_{W} = w_1\\,u_1 v_1 + w_2\\,u_2 v_2 \\qquad (w_1,\\,w_2 > 0)',
-      notes: 'v = (−1, 4)  fixed.   w₂ = 1.\n⟨u, v⟩_W = w₁·(2)(−1) + 1·(1)(4) = −2w₁ + 4\n\nDrag the slider to w₁ = 2: u = (2, 1) becomes exactly orthogonal to v.\nThe dashed green line shows all vectors orthogonal to v under the current weights.',
+      description: 'When your two dimensions have different scales or importance — price vs. quantity, a noisy variable vs. a precise one — the standard dot product gives misleading geometry. A weighted inner product lets you control how much each dimension contributes. The axioms still hold, but the notion of orthogonality changes.',
+      equation: '\\langle \\mathbf{u},\\,\\mathbf{v}\\rangle_{W} = w_1\\,u_1 v_1 + w_2\\,u_2 v_2',
+      notes: 'u = (2, 1) and v = (−1, 4) are fixed.\n⟨u, v⟩_W = w₁·(2)(−1) + w₂·(1)(4) = −2w₁ + 4w₂\n\nThe dashed green line is the orthogonal complement of v — every vector d satisfying ⟨d, v⟩_W = 0. Solving: w₁·(−1)·d₁ + w₂·4·d₂ = 0, so d points in direction (4w₂, w₁). This line rotates as you adjust the weights.\n\nWhen u lands on that line, ⟨u, v⟩_W = 0: u and v are orthogonal under this inner product even though they are not Euclidean-perpendicular.\n\nOrthogonality is not an absolute fact — it is a choice. Two vectors are "unrelated" only relative to a specific inner product. The Mahalanobis distance in statistics is exactly this: weight each dimension by 1/σ², so variables with high variance count for less. Points "equally statistically surprising" then sit on a circle in the weighted geometry, not an ellipse.',
       setup(c2d, state) {
         clearControls(state);
+        state.w2 = state.w2 ?? 1.0;
         addSlider(state._controls, 'weight  w₁', 0.5, 4, 0.05, state.w1,
           v => v.toFixed(2), v => { state.w1 = v; });
+        addSlider(state._controls, 'weight  w₂', 0.5, 4, 0.05, state.w2,
+          v => v.toFixed(2), v => { state.w2 = v; });
       },
       update(c2d, state) {
         c2d.clearPersistent();
@@ -93,34 +96,35 @@ export default {
         c2d.addAxes({ color: '#d0d0d0' });
 
         const w1 = state.w1;
+        const w2 = state.w2 ?? 1.0;
 
         // v = (-1, 4) — fixed, red
         c2d.addArrow(0, 0, -1, 4, { color: '#c62828', width: 2.5 });
         c2d.addText('v', -1.45, 4.15, { color: '#c62828', size: 14, italic: true });
 
         // orthogonal complement of v under ⟨·,·⟩_W:
-        // w1·(-1)·d1 + 1·4·d2 = 0  →  d1 = 4d2/w1  →  direction [4, w1]
-        const dx = 4, dy = w1;
+        // w1·(-1)·d1 + w2·4·d2 = 0  →  direction (4w2, w1)
+        const dx = 4 * w2, dy = w1;
         const dLen = Math.sqrt(dx * dx + dy * dy);
         const ext = 5.2;
         c2d.addLine([
           [-dx / dLen * ext, -dy / dLen * ext],
           [ dx / dLen * ext,  dy / dLen * ext],
         ], { color: '#2e7d3268', width: 1.5, dash: [6, 4] });
-        c2d.addText('vectors ⊥ to v',
-          dx / dLen * ext * 0.72 + 0.15,
-          dy / dLen * ext * 0.72 + 0.25,
+        c2d.addText('vectors ⊥ to v  (⟨d, v⟩_W = 0)',
+          dx / dLen * ext * 0.55 + 0.1,
+          dy / dLen * ext * 0.55 + 0.28,
           { color: '#2e7d32', size: 11 });
 
         // u = (2, 1) — blue
         c2d.addArrow(0, 0, 2, 1, { color: '#1565c0', width: 2.5 });
         c2d.addText('u', 2.15, 0.85, { color: '#1565c0', size: 14, italic: true });
 
-        // inner product value: -2w1 + 4
-        const ip = -2 * w1 + 4;
+        // inner product value: -2w1 + 4w2
+        const ip = -2 * w1 + 4 * w2;
         const isZero = Math.abs(ip) < 0.15;
         c2d.addText(
-          `⟨u, v⟩_W  =  −2·${w1.toFixed(2)} + 4  =  ${ip.toFixed(2)}`,
+          `⟨u, v⟩_W  =  −2·${w1.toFixed(2)} + 4·${w2.toFixed(2)}  =  ${ip.toFixed(2)}`,
           -5.5, -3.5, { color: isZero ? '#2e7d32' : '#555', size: 12 }
         );
         if (isZero) {
