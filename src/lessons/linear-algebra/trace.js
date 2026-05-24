@@ -71,7 +71,7 @@ export default {
       title: 'The Diagonal Sum',
       description: 'The trace of a square matrix is the sum of its diagonal entries. Drag all four sliders — only a and d affect it. The off-diagonal entries b and c are completely invisible to the trace.',
       equation: '\\operatorname{tr}\\!\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix} = a + d',
-      notes: 'The trace depends only on the "self-interaction" of each basis direction, not on how the directions mix. This hints at why it is basis-independent: changing coordinates mixes directions, but the trace looks past that.',
+      notes: 'The off-diagonal entries b and c play no role — only the diagonal a and d appear.\n\nThis does not by itself explain why the trace is basis-independent. When you rotate the coordinate system, each individual diagonal entry changes — a₁₁ in the rotated basis is completely different from a₁₁ in the standard basis. What stays fixed is their sum.\n\nThe real reason: tr(A) equals the sum of eigenvalues (see Step 3), and eigenvalues do not depend on coordinates at all. Basis-independence of the trace is a consequence of basis-independence of eigenvalues.',
       setup(c2d, state) {
         clearControls(state);
         addSlider(state._controls, 'a', -3, 3, 0.1, state.a, v => v.toFixed(1), v => { state.a = v; });
