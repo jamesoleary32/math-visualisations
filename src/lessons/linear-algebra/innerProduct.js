@@ -27,7 +27,7 @@ export default {
   title: 'Inner Product',
   subject: 'Linear Algebra',
 
-  initState: () => ({ w1: 1.0, w2: 1.0, _controls: null }),
+  initState: () => ({ w1: 1.0, w2: 1.0, alpha: 1.5, _controls: null }),
 
   init(c2d, state, panelEl) {
     c2d.scale = 55;
@@ -40,7 +40,166 @@ export default {
 
   steps: [
 
-    // ── Step 1: Dot product as a specific case ────────────────────────────────
+    // ── Step 1: Polynomials as vectors ────────────────────────────────────────
+    {
+      title: 'Polynomials Are Vectors',
+      description: 'The set of all polynomials of degree ≤ 2 is a vector space. You can add any two and get another; you can scale any one by a number and stay in the space. No notion of length or angle is needed — just closure under addition and scaling.',
+      equation: '(p_1 + p_2)(x) = p_1(x) + p_2(x) \\qquad (\\alpha\\, p)(x) = \\alpha\\,p(x)',
+      notes: 'p₁(x) = x  (orange)\np₂(x) = 1 − x²  (red)\np₁ + p₂ = x + 1 − x²  (blue)\nα · p₁  (dashed — drag slider)\n\nThe basis is {1, x, x²}: every degree-≤-2 polynomial is a + bx + cx² for some a, b, c ∈ ℝ. This is a 3-dimensional vector space — each polynomial is really just a triple (a, b, c) in disguise.\n\nThe question the rest of this lesson answers: can we measure "angle" between two polynomials? That needs something the vector space axioms alone do not provide.',
+      setup(c2d, state) {
+        clearControls(state);
+        addSlider(state._controls, 'scalar  α', 0.5, 2.5, 0.05, state.alpha,
+          v => v.toFixed(2), v => { state.alpha = v; });
+      },
+      update(c2d, state) {
+        c2d.clearPersistent();
+
+        const xL = -4.5, xR = 4.5, yS = 2.2;
+        const toWX = t => xL + t * (xR - xL);
+        const toWY = y => y * yS;
+
+        // axes
+        c2d.addLine([[xL - 0.3, 0], [xR + 0.3, 0]], { color: '#ccc', width: 1 });
+        c2d.addLine([[xL, -0.12], [xL, 0.12]], { color: '#aaa', width: 1 });
+        c2d.addLine([[0,   -0.12], [0,  0.12]], { color: '#aaa', width: 1 });
+        c2d.addLine([[xR, -0.12], [xR, 0.12]], { color: '#aaa', width: 1 });
+        c2d.addText('0', xL - 0.1, -0.38, { color: '#aaa', size: 11 });
+        c2d.addText('0.5', -0.25, -0.38, { color: '#aaa', size: 11 });
+        c2d.addText('1', xR - 0.12, -0.38, { color: '#aaa', size: 11 });
+
+        function sample(fn) {
+          const pts = [];
+          for (let i = 0; i <= 200; i++) {
+            const t = i / 200;
+            pts.push([toWX(t), toWY(fn(t))]);
+          }
+          return pts;
+        }
+
+        const p1 = t => t;
+        const p2 = t => 1 - t * t;
+        const sum = t => p1(t) + p2(t);
+        const scaled = t => state.alpha * p1(t);
+
+        // α·p₁ dashed first (behind)
+        c2d.addLine(sample(scaled), { color: '#e6510088', width: 1.5, dash: [5, 3] });
+
+        // p₁, p₂, sum
+        c2d.addLine(sample(p1),  { color: '#e65100', width: 2 });
+        c2d.addLine(sample(p2),  { color: '#c62828', width: 2 });
+        c2d.addLine(sample(sum), { color: '#1565c0', width: 2.5 });
+
+        c2d.addText('p₁(x) = x',             xR + 0.15, toWY(p1(1)),  { color: '#e65100', size: 12 });
+        c2d.addText('p₂(x) = 1−x²',           xR + 0.15, toWY(p2(1)) + 0.3, { color: '#c62828', size: 12 });
+        c2d.addText('p₁+p₂',                  xR + 0.15, toWY(sum(1)), { color: '#1565c0', size: 12 });
+        c2d.addText(`α·p₁  (α=${state.alpha.toFixed(2)})`,
+          xR + 0.15, toWY(scaled(1)) - 0.35, { color: '#e65100aa', size: 11 });
+      },
+    },
+
+    // ── Step 2: Matrices as vectors ───────────────────────────────────────────
+    {
+      title: '2×2 Matrices Are Vectors',
+      description: 'The set of all 2×2 matrices is a vector space. Matrices can be added entry-by-entry and scaled by a number. The result is always another 2×2 matrix. This is a 4-dimensional vector space — each matrix is really four numbers.',
+      equation: 'A + B = \\begin{pmatrix}a_{11}+b_{11}&a_{12}+b_{12}\\\\a_{21}+b_{21}&a_{22}+b_{22}\\end{pmatrix}',
+      notes: 'The canvas shows how each matrix transforms the unit square (blue = A, red = B, green = A+B).\n\nA = [[1.5, 0.5], [0, 1]]\nB = [[0.5, 0], [0.5, 1]]\nA+B = [[2, 0.5], [0.5, 2]]\n\nThe four entries (a₁₁, a₁₂, a₂₁, a₂₂) are the "coordinates". The standard basis is the four matrices with a single 1 and zeros elsewhere — E₁₁, E₁₂, E₂₁, E₂₂.\n\nAgain: no length or angle yet. Can we say two matrices are "perpendicular"? That is an extra structure — an inner product — that we will add later.',
+      setup(c2d, state) {
+        clearControls(state);
+
+        c2d.addGrid({ spacing: 1, color: '#f0f0f0' });
+        c2d.addAxes({ color: '#d0d0d0' });
+
+        const A = [1.5, 0.5, 0, 1];
+        const B = [0.5, 0,   0.5, 1];
+        const C = [A[0]+B[0], A[1]+B[1], A[2]+B[2], A[3]+B[3]];
+
+        function txPts(M) {
+          const tx = (x, y) => [M[0]*x + M[1]*y, M[2]*x + M[3]*y];
+          const p = [[0,0],[1,0],[1,1],[0,1]];
+          return p.map(([x,y]) => tx(x, y));
+        }
+
+        function drawQuad(pts, fill, stroke) {
+          c2d.raw((ctx, cam) => {
+            ctx.beginPath();
+            ctx.moveTo(cam.wx(pts[0][0]), cam.wy(pts[0][1]));
+            pts.forEach(([x,y]) => ctx.lineTo(cam.wx(x), cam.wy(y)));
+            ctx.closePath();
+            ctx.fillStyle = fill;   ctx.fill();
+            ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke();
+          });
+        }
+
+        // Unit square (faint)
+        drawQuad([[0,0],[1,0],[1,1],[0,1]], 'rgba(0,0,0,0.03)', '#ddd');
+
+        drawQuad(txPts(A), 'rgba(21,101,192,0.12)', '#1565c0');
+        drawQuad(txPts(B), 'rgba(198,40,40,0.12)',  '#c62828');
+        drawQuad(txPts(C), 'rgba(46,125,50,0.15)',  '#2e7d32');
+
+        c2d.addText('A  (blue)',     -5.5, 4.2, { color: '#1565c0', size: 12 });
+        c2d.addText('B  (red)',      -5.5, 3.7, { color: '#c62828', size: 12 });
+        c2d.addText('A+B  (green)', -5.5, 3.2, { color: '#2e7d32', size: 12 });
+        c2d.addText('unit square (faint)', -5.5, 2.7, { color: '#bbb', size: 11 });
+      },
+    },
+
+    // ── Step 3: Continuous functions as vectors ───────────────────────────────
+    {
+      title: 'Continuous Functions Are Vectors',
+      description: 'The set of all continuous functions on an interval — written C[a, b] — is a vector space. Functions can be added pointwise and scaled. Unlike polynomials or matrices, this space is infinite-dimensional: no finite list of basis functions spans it.',
+      equation: '(f + g)(x) = f(x) + g(x) \\qquad (\\alpha f)(x) = \\alpha\\,f(x)',
+      notes: 'f(x) = sin(x)  (blue)\ng(x) = sin(2x)/2  (red)\nf + g  (green)\nα · f  (dashed — drag slider)\n\nInfinite-dimensional means: to describe an arbitrary function in C[0, 2π] you generally need infinitely many "coordinates". The Fourier basis {1, sin x, cos x, sin 2x, cos 2x, …} is one such infinite basis.\n\nThis is the space where the inner product ⟨f, g⟩ = ∫f·g dx lives — the foundation of Fourier analysis, signal processing, and quantum mechanics.',
+      setup(c2d, state) {
+        clearControls(state);
+        addSlider(state._controls, 'scalar  α', 0.5, 2.5, 0.05, state.alpha,
+          v => v.toFixed(2), v => { state.alpha = v; });
+      },
+      update(c2d, state) {
+        c2d.clearPersistent();
+
+        const N = 300, xMax = 2 * Math.PI;
+        const wXL = -5.0, wXR = 5.0;
+        const toWX = t => wXL + (t / xMax) * (wXR - wXL);
+        const toWY = y => y * 2.0;
+        const wXPi = toWX(Math.PI);
+
+        c2d.addLine([[wXL, 0], [wXR, 0]], { color: '#ccc', width: 1 });
+        c2d.addLine([[wXL, -0.1],[wXL, 0.1]], { color: '#aaa', width: 1 });
+        c2d.addLine([[wXPi,-0.1],[wXPi,0.1]], { color: '#aaa', width: 1 });
+        c2d.addLine([[wXR, -0.1],[wXR, 0.1]], { color: '#aaa', width: 1 });
+        c2d.addText('0',  wXL + 0.05, -0.38, { color: '#aaa', size: 11 });
+        c2d.addText('π',  wXPi - 0.1, -0.38, { color: '#aaa', size: 11 });
+        c2d.addText('2π', wXR - 0.42, -0.38, { color: '#aaa', size: 11 });
+
+        function sample(fn) {
+          const pts = [];
+          for (let i = 0; i <= N; i++) {
+            const t = (i / N) * xMax;
+            pts.push([toWX(t), toWY(fn(t))]);
+          }
+          return pts;
+        }
+
+        const f   = t => Math.sin(t);
+        const g   = t => Math.sin(2 * t) / 2;
+        const sum = t => f(t) + g(t);
+        const sc  = t => state.alpha * f(t);
+
+        c2d.addLine(sample(sc),  { color: '#1565c088', width: 1.5, dash: [5, 3] });
+        c2d.addLine(sample(f),   { color: '#1565c0', width: 2 });
+        c2d.addLine(sample(g),   { color: '#c62828', width: 2 });
+        c2d.addLine(sample(sum), { color: '#2e7d32', width: 2.5 });
+
+        c2d.addText('f(x) = sin(x)',     wXPi + 0.2, toWY(1) + 0.3,  { color: '#1565c0', size: 12 });
+        c2d.addText('g(x) = sin(2x)/2', wXL + 0.1,  toWY(-0.5) - 0.3, { color: '#c62828', size: 12 });
+        c2d.addText('f + g',            wXR - 1.2,  toWY(sum(5)) + 0.3, { color: '#2e7d32', size: 12 });
+        c2d.addText(`α·f  (α=${state.alpha.toFixed(2)})`,
+          wXPi - 1.0, toWY(sc(Math.PI / 2)) + 0.3, { color: '#1565c088', size: 11 });
+      },
+    },
+
+    // ── Step 4: Dot product as a specific case ────────────────────────────────
     {
       title: 'The Dot Product — A Specific Case',
       description: 'The dot product assigns a scalar to any two vectors in ℝⁿ. It satisfies three special properties — symmetry, linearity, and positive-definiteness — that are the seed of a far more general idea.',
