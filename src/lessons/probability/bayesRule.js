@@ -22,12 +22,12 @@ const J     = 1; // index of the column we invert for in step 2 (B2)
 
 // ── Rare-disease test numbers (step 3) ──────────────────────────────────────
 const P_D    = 0.01;            // prevalence (base rate)
-const P_pos_D  = 0.90;          // sensitivity  P(+|D)
-const P_pos_Dc = 0.05;          // false-positive rate P(+|Dᶜ)
-const J_Dpos = P_pos_D  * P_D;        // P(+ ∩ D)  = 0.009
-const J_Dcpos = P_pos_Dc * (1 - P_D); // P(+ ∩ Dᶜ) = 0.0495
-const P_pos  = J_Dpos + J_Dcpos;      // P(+)      = 0.0585
-const P_D_pos = J_Dpos / P_pos;       // P(D|+)    ≈ 0.1538
+const P_pos_D  = 0.95;          // sensitivity  P(T|D)   ("95% accurate")
+const P_pos_Dc = 0.05;          // false-positive rate P(T|Dᶜ)  (specificity 0.95)
+const J_Dpos = P_pos_D  * P_D;        // P(T ∩ D)  = 0.0095
+const J_Dcpos = P_pos_Dc * (1 - P_D); // P(T ∩ Dᶜ) = 0.0495
+const P_pos  = J_Dpos + J_Dcpos;      // P(T)      = 0.0590
+const P_D_pos = J_Dpos / P_pos;       // P(D|T)    ≈ 0.1610
 
 // ── Chain-rule cascade numbers (step 4) ─────────────────────────────────────
 const CHAIN = [0.60, 0.50, 0.40];          // P(A1), P(A2|A1), P(A3|A1∩A2)
@@ -149,9 +149,9 @@ export default {
     // ── Step 3: The rare-disease test ────────────────────────────────────────
     {
       title:       'Worked Example — A Rare-Disease Test',
-      description: 'A disease affects 1% of people. The test catches 90% of true cases (P(+|D)=0.90) but also flags 5% of healthy people (P(+|Dᶜ)=0.05). You test positive — what is P(D|+)? The tree multiplies along each path to get joint probabilities; the two "+" leaves are the only ways to test positive, so their sum is P(+). Bayes divides the true-positive path by that total.',
-      equation:    "P(D \\mid +) = \\dfrac{P(+\\mid D)P(D)}{P(+\\mid D)P(D) + P(+\\mid D^c)P(D^c)} = \\dfrac{0.009}{0.0585} \\approx 0.154",
-      notes:       'Despite a "90% accurate" test, a positive result means only a ~15% chance of disease. The base rate dominates: healthy people are so much more numerous that their 5% false positives (0.0495) swamp the true positives (0.009).\n\nThis is the base-rate fallacy from the last lesson, now resolved: P(+|D)=0.90 is large, yet P(D|+)≈0.15 is small. They differ because P(D) ≪ P(+).',
+      description: 'A patient (Fred) is tested for a disease that afflicts 1% of the population. Let D be the event he has the disease and T the event he tests positive. The test is "95% accurate": sensitivity P(T|D)=0.95 (true positives) and specificity P(Tᶜ|Dᶜ)=0.95, so it flags 5% of healthy people, P(T|Dᶜ)=0.05. Fred tests positive — what is P(D|T)? The tree multiplies along each path to get joint probabilities; the two T leaves are the only ways to test positive, so their sum is P(T). Bayes divides the true-positive path by that total.',
+      equation:    "P(D \\mid T) = \\dfrac{P(T\\mid D)P(D)}{P(T\\mid D)P(D) + P(T\\mid D^c)P(D^c)} = \\dfrac{0.95 \\cdot 0.01}{0.95 \\cdot 0.01 + 0.05 \\cdot 0.99} \\approx 0.16",
+      notes:       'Despite a "95% accurate" test, a positive result means only a ~16% chance of disease. The base rate dominates: healthy people are so much more numerous that their 5% false positives (0.0495) swamp the true positives (0.0095).\n\nThis is the base-rate fallacy from the last lesson, now resolved: P(T|D)=0.95 is large, yet P(D|T)≈0.16 is small. They differ because P(D) ≪ P(T).',
 
       setup(c2d) {},
       update(c2d) {
@@ -164,29 +164,29 @@ export default {
 
           edge(ctx, cam, root[0], root[1], D[0],  D[1],  'P(D)=0.01');
           edge(ctx, cam, root[0], root[1], Dc[0], Dc[1], 'P(Dᶜ)=0.99');
-          edge(ctx, cam, D[0],  D[1],  Dp[0],  Dp[1],  '+ : 0.90', { });
-          edge(ctx, cam, D[0],  D[1],  Dm[0],  Dm[1],  '− : 0.10');
-          edge(ctx, cam, Dc[0], Dc[1], Dcp[0], Dcp[1], '+ : 0.05');
-          edge(ctx, cam, Dc[0], Dc[1], Dcm[0], Dcm[1], '− : 0.95');
+          edge(ctx, cam, D[0],  D[1],  Dp[0],  Dp[1],  `T : ${P_pos_D.toFixed(2)}`, { });
+          edge(ctx, cam, D[0],  D[1],  Dm[0],  Dm[1],  `Tᶜ : ${(1 - P_pos_D).toFixed(2)}`);
+          edge(ctx, cam, Dc[0], Dc[1], Dcp[0], Dcp[1], `T : ${P_pos_Dc.toFixed(2)}`);
+          edge(ctx, cam, Dc[0], Dc[1], Dcm[0], Dcm[1], `Tᶜ : ${(1 - P_pos_Dc).toFixed(2)}`);
 
           node(ctx, cam, root[0], root[1], 5, '#333');
           node(ctx, cam, D[0],  D[1],  5, '#1565c0');
           node(ctx, cam, Dc[0], Dc[1], 5, '#777');
-          // Highlight the two "+" leaves.
+          // Highlight the two T (positive) leaves.
           node(ctx, cam, Dp[0],  Dp[1],  6, '#c62828');
           node(ctx, cam, Dm[0],  Dm[1],  4, '#bbb');
           node(ctx, cam, Dcp[0], Dcp[1], 6, '#c62828');
           node(ctx, cam, Dcm[0], Dcm[1], 4, '#bbb');
 
           // Leaf joint-probability annotations.
-          label(ctx, cam.wx(Dp[0]) + 14,  cam.wy(Dp[1]) + 4,  `D , +   →  ${J_Dpos.toFixed(4)}`,  { color: '#c62828', size: 12, align: 'left', bold: true });
-          label(ctx, cam.wx(Dm[0]) + 14,  cam.wy(Dm[1]) + 4,  `D , −   →  ${(P_D - J_Dpos).toFixed(4)}`, { color: '#aaa', size: 11, align: 'left' });
-          label(ctx, cam.wx(Dcp[0]) + 14, cam.wy(Dcp[1]) + 4, `Dᶜ, +  →  ${J_Dcpos.toFixed(4)}`, { color: '#c62828', size: 12, align: 'left', bold: true });
-          label(ctx, cam.wx(Dcm[0]) + 14, cam.wy(Dcm[1]) + 4, `Dᶜ, −  →  ${((1 - P_D) - J_Dcpos).toFixed(4)}`, { color: '#aaa', size: 11, align: 'left' });
+          label(ctx, cam.wx(Dp[0]) + 14,  cam.wy(Dp[1]) + 4,  `D , T    →  ${J_Dpos.toFixed(4)}`,  { color: '#c62828', size: 12, align: 'left', bold: true });
+          label(ctx, cam.wx(Dm[0]) + 14,  cam.wy(Dm[1]) + 4,  `D , Tᶜ  →  ${(P_D - J_Dpos).toFixed(4)}`, { color: '#aaa', size: 11, align: 'left' });
+          label(ctx, cam.wx(Dcp[0]) + 14, cam.wy(Dcp[1]) + 4, `Dᶜ, T   →  ${J_Dcpos.toFixed(4)}`, { color: '#c62828', size: 12, align: 'left', bold: true });
+          label(ctx, cam.wx(Dcm[0]) + 14, cam.wy(Dcm[1]) + 4, `Dᶜ, Tᶜ →  ${((1 - P_D) - J_Dcpos).toFixed(4)}`, { color: '#aaa', size: 11, align: 'left' });
 
           // Result box on the right.
-          label(ctx, cam.wx(3.9), cam.wy(0.7),  `P(+) = ${J_Dpos.toFixed(4)} + ${J_Dcpos.toFixed(4)} = ${P_pos.toFixed(4)}`, { color: '#333', size: 13, align: 'center' });
-          label(ctx, cam.wx(3.9), cam.wy(0.0),  `P(D | +) = ${J_Dpos.toFixed(4)} / ${P_pos.toFixed(4)}`, { color: '#c62828', size: 14, align: 'center', bold: true });
+          label(ctx, cam.wx(3.9), cam.wy(0.7),  `P(T) = ${J_Dpos.toFixed(4)} + ${J_Dcpos.toFixed(4)} = ${P_pos.toFixed(4)}`, { color: '#333', size: 13, align: 'center' });
+          label(ctx, cam.wx(3.9), cam.wy(0.0),  `P(D | T) = ${J_Dpos.toFixed(4)} / ${P_pos.toFixed(4)}`, { color: '#c62828', size: 14, align: 'center', bold: true });
           label(ctx, cam.wx(3.9), cam.wy(-0.6), `≈ ${(P_D_pos * 100).toFixed(1)} %`, { color: '#c62828', size: 18, align: 'center', bold: true });
         });
       },
