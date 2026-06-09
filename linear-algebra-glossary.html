@@ -349,6 +349,28 @@
     <h2>Kernel &amp; Range</h2>
     <div class="terms">
 
+      <div class="shared-diagram">
+        <div class="term-diagram"><canvas id="c-domain" width="248" height="200"></canvas></div>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol" style="font-size:15px">V</span>
+              <span class="term-name">Domain</span>
+            </div>
+            <div class="term-formula" id="eq-map"></div>
+            <div class="term-def">The space the transformation takes its <strong>inputs</strong> from — every vector x that can be fed in. The kernel is the part of the domain that maps to zero.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol" style="font-size:15px">W</span>
+              <span class="term-name">Codomain</span>
+            </div>
+            <div class="term-def">The space the <strong>outputs</strong> are allowed to land in. The range is the part of the codomain actually reached — it can be smaller than W. The map is <em>onto</em> (surjective) exactly when range = W.</div>
+            <div class="term-note">For an m×n matrix: domain = ℝⁿ, codomain = ℝᵐ. Domain ≠ codomain in general.</div>
+          </div>
+        </div>
+      </div>
+
       <div class="term">
         <div class="term-diagram"><canvas id="c-kernel" width="196" height="180"></canvas></div>
         <div class="term-body">
@@ -430,6 +452,7 @@
       'eq-angle':   '\\cos\\theta = \\dfrac{\\mathbf{v}\\cdot\\mathbf{w}}{\\|\\mathbf{v}\\|\\,\\|\\mathbf{w}\\|}',
       'eq-det':     '\\det\\begin{psmallmatrix}a&b\\\\c&d\\end{psmallmatrix} = ad - bc',
       'eq-trace':   '\\operatorname{tr}A = a_{11}+a_{22} = \\textstyle\\sum_i \\lambda_i',
+      'eq-map':     'T : V \\to W',
       'eq-kernel':  '\\ker A = \\{\\,\\mathbf{x} : A\\mathbf{x} = \\mathbf{0}\\,\\}',
       'eq-range':   '\\operatorname{range}A = \\{\\,A\\mathbf{x}\\,\\},\\quad \\operatorname{rank} = \\dim',
       'eq-eigen':   'A\\mathbf{v} = \\lambda\\mathbf{v}',
@@ -740,6 +763,42 @@
       });
       ctx.textAlign = 'left';
       label(ctx, 'tr = 2 + 3 = 5', cx - 44, y1 + 36, '#1565c0', 11);
+    });
+
+    // ── Domain → Codomain (set picture) ──────────────────────────────────────────
+    draw('c-domain', (ctx, W, H) => {
+      const lcx = 58, rcx = 190, cy = 100, rx = 44, ry = 74;
+      // domain ellipse (V)
+      ctx.strokeStyle = '#2e7d32'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.ellipse(lcx, cy, rx, ry, 0, 0, Math.PI*2); ctx.stroke();
+      // codomain ellipse (W)
+      ctx.strokeStyle = '#c62828'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.ellipse(rcx, cy, rx, ry, 0, 0, Math.PI*2); ctx.stroke();
+      // range — a subset inside the codomain
+      ctx.fillStyle = 'rgba(21,101,192,0.14)';
+      ctx.strokeStyle = '#1565c0'; ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.ellipse(rcx, cy + 14, 25, 42, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+      // x in domain → T(x) in range
+      const x0 = lcx + 4, y0 = cy - 26;
+      const x1 = rcx - 6, y1 = cy + 10;
+      arrow(ctx, x0, y0, x1, y1, '#888', 1.8);
+      dot(ctx, x0, y0, 4, '#2e7d32');
+      dot(ctx, x1, y1, 4, '#1565c0');
+
+      ctx.textAlign = 'center';
+      label(ctx, 'T', (x0 + x1)/2, cy - 30, '#888', 12, true);
+      label(ctx, 'x', x0, y0 - 7, '#2e7d32', 11, true);
+      label(ctx, 'T(x)', x1 + 2, y1 + 16, '#1565c0', 10, true);
+      // space labels
+      ctx.fillStyle = '#2e7d32'; ctx.font = 'italic 15px Georgia, serif';
+      ctx.fillText('V', lcx, cy - ry - 6);
+      ctx.fillStyle = '#c62828'; ctx.fillText('W', rcx, cy - ry - 6);
+      ctx.fillStyle = '#888'; ctx.font = '10px system-ui';
+      ctx.fillText('domain', lcx, cy + ry + 16);
+      ctx.fillText('codomain', rcx, cy + ry + 16);
+      ctx.fillStyle = '#1565c0'; ctx.fillText('range', rcx, cy + 40);
+      ctx.textAlign = 'left';
     });
 
     // ── 12. Kernel ───────────────────────────────────────────────────────────────
