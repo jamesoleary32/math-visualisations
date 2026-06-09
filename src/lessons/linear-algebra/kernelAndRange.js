@@ -277,5 +277,3 @@ export default {
 
   ],
 };
-</content>
-</invoke>
