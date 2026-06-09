@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Linear Algebra Glossary</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header { margin-bottom: 48px; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .back {
+      display: inline-block;
+      font-size: 13px;
+      color: #aaa;
+      text-decoration: none;
+      margin-bottom: 24px;
+    }
+    .back:hover { color: #555; }
+
+    section { margin-bottom: 48px; }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .terms { display: flex; flex-direction: column; gap: 1px; }
+
+    .term {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      overflow: hidden;
+      gap: 0;
+    }
+
+    .term-diagram {
+      flex-shrink: 0;
+      width: 220px;
+      border-right: 1px solid #f0f0f0;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .term-diagram canvas {
+      display: block;
+    }
+
+    .term-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .term-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .term-symbol {
+      font-size: 22px;
+      font-weight: 600;
+      color: #111;
+      font-family: Georgia, serif;
+      font-style: italic;
+      min-width: 40px;
+    }
+
+    .term-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      font-style: normal;
+      font-family: system-ui, sans-serif;
+    }
+
+    .term-def {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .term-formula {
+      font-size: 13px;
+      color: #888;
+      background: #f8f8f8;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #efefef;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .term-note {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.5;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 8px;
+      margin-top: 2px;
+    }
+
+    /* shared diagram canvas row — spans two terms */
+    .shared-diagram {
+      background: #fafafa;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .shared-diagram .term-diagram {
+      width: 260px;
+    }
+
+    .shared-diagram .term-list {
+      flex: 1;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .shared-diagram .term-body {
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .shared-diagram .term-body:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back">← All visualizations</a>
+
+  <header>
+    <h1>Linear Algebra Glossary</h1>
+    <p>Core terms with their geometric pictures — the vocabulary behind the linear-algebra visualizations.</p>
+  </header>
+
+  <!-- ── Section 1: Vectors ── -->
+  <section>
+    <h2>Vectors</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-vector" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">v</span>
+            <span class="term-name">Vector</span>
+          </div>
+          <div class="term-def">An arrow with both a <strong>magnitude</strong> and a <strong>direction</strong>, written by its components. Equivalently, a point in space reached from the origin. Vectors add tip-to-tail and scale by stretching.</div>
+          <div class="term-note">Components: v = (vₓ, v_y). The same arrow is "the displacement from the origin to that point."</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-norm" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">‖v‖</span>
+            <span class="term-name">Norm (magnitude)</span>
+          </div>
+          <div class="term-formula" id="eq-norm"></div>
+          <div class="term-def">The length of the vector — the hypotenuse of its components, by Pythagoras. It is the square root of the dot product of the vector with itself.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-unit" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">v̂</span>
+            <span class="term-name">Unit vector</span>
+          </div>
+          <div class="term-formula" id="eq-unit"></div>
+          <div class="term-def">A vector of length 1 pointing the same way as v — direction stripped of magnitude. Obtained by dividing a vector by its own norm ("normalising"). Every unit vector lies on the unit circle.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 2: Span, Independence & Basis ── -->
+  <section>
+    <h2>Span, Independence &amp; Basis</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-lincomb" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">Σ cᵢvᵢ</span>
+            <span class="term-name">Linear combination</span>
+          </div>
+          <div class="term-def">Scale some vectors and add them. Every output you can build from a set of vectors is a linear combination of them — the single most important operation in linear algebra.</div>
+          <div class="term-note">The dashed parallelogram shows 1.4·u + 1.0·w reached by stretching then adding tip-to-tail.</div>
+        </div>
+      </div>
+
+      <div class="shared-diagram">
+        <div class="term-diagram"><canvas id="c-span" width="232" height="200"></canvas></div>
+        <div class="term-list">
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol" style="font-size:16px">span</span>
+              <span class="term-name">Span</span>
+            </div>
+            <div class="term-def">The set of <em>all</em> linear combinations of a collection of vectors. Two independent vectors span the whole plane (blue); if they are parallel the span collapses to a single line.</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <span class="term-symbol" style="font-size:15px">indep.</span>
+              <span class="term-name">Linear independence</span>
+            </div>
+            <div class="term-def">No vector in the set is a linear combination of the others — none is redundant. Independent vectors point in genuinely different directions, so they enlarge the span.</div>
+            <div class="term-note">Dependent ⇔ they lie on one line ⇔ the parallelogram they form has zero area.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-basis" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">basis</span>
+            <span class="term-name">Basis &amp; dimension</span>
+          </div>
+          <div class="term-def">A minimal set of vectors that is both <strong>independent</strong> and <strong>spanning</strong>. Every vector then has unique coordinates in that basis. The <strong>dimension</strong> is the number of basis vectors.</div>
+          <div class="term-note">Here p = 2e₁ + 1·e₂ — its coordinates (2, 1) read off the e₁, e₂ basis.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 3: Dot Product & Angle ── -->
+  <section>
+    <h2>Dot Product &amp; Angle</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-dot" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">v·w</span>
+            <span class="term-name">Dot product</span>
+          </div>
+          <div class="term-formula" id="eq-dot"></div>
+          <div class="term-def">Multiply matching components and sum — a single number. Geometrically it measures how much of one vector points along the other (its projection, in orange). Zero means perpendicular.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-angle" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">θ</span>
+            <span class="term-name">Angle between vectors</span>
+          </div>
+          <div class="term-formula" id="eq-angle"></div>
+          <div class="term-def">The dot product, divided by the two lengths, gives the cosine of the angle between the vectors. This is how length-and-angle geometry falls out of pure component arithmetic.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 4: Linear Transformations ── -->
+  <section>
+    <h2>Linear Transformations</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-transform" width="196" height="190"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">A</span>
+            <span class="term-name">Matrix / linear map</span>
+          </div>
+          <div class="term-def">A transformation that sends grid lines to grid lines, keeping the origin fixed and preserving evenly-spaced parallels. Its columns are where the basis vectors e₁, e₂ land — those two arrows fully determine the map.</div>
+          <div class="term-note">Faint = original unit square; solid = its image. The columns of A are the edges of the transformed square.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-det" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">det A</span>
+            <span class="term-name">Determinant</span>
+          </div>
+          <div class="term-formula" id="eq-det"></div>
+          <div class="term-def">The factor by which the map scales area (volume in higher dimensions). A negative determinant flips orientation; a zero determinant squashes space onto a line — the map is then non-invertible.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-trace" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">tr A</span>
+            <span class="term-name">Trace</span>
+          </div>
+          <div class="term-formula" id="eq-trace"></div>
+          <div class="term-def">The sum of the diagonal entries. It is basis-independent and equals the <strong>sum of the eigenvalues</strong>. Geometrically it is the rate at which area grows under the flow generated by A.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 5: Kernel & Range ── -->
+  <section>
+    <h2>Kernel &amp; Range</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-kernel" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">ker A</span>
+            <span class="term-name">Kernel (null space)</span>
+          </div>
+          <div class="term-formula" id="eq-kernel"></div>
+          <div class="term-def">All inputs the map sends to the zero vector — what the transformation "forgets". For a rank-deficient map this is a whole line (or plane) of vectors collapsing to the origin. Lives in the <em>input</em> space.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-range" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:15px">range</span>
+            <span class="term-name">Range (image / column space)</span>
+          </div>
+          <div class="term-formula" id="eq-range"></div>
+          <div class="term-def">Every output the map can produce — the span of its columns. Its dimension is the <strong>rank</strong>. Lives in the <em>output</em> space. Rank–nullity ties the two together: dim ker + rank = number of input dimensions.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 6: Eigenvectors & Orthogonality ── -->
+  <section>
+    <h2>Eigenvectors &amp; Orthogonality</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-eigen" width="196" height="190"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">λ, v</span>
+            <span class="term-name">Eigenvalue &amp; eigenvector</span>
+          </div>
+          <div class="term-formula" id="eq-eigen"></div>
+          <div class="term-def">An eigenvector is a special direction the map only <strong>stretches</strong>, never rotates; the eigenvalue λ is the stretch factor. The blue vector stays on its own line (eigenvector); the grey one is knocked off its line.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-inverse" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">A⁻¹</span>
+            <span class="term-name">Inverse</span>
+          </div>
+          <div class="term-formula" id="eq-inverse"></div>
+          <div class="term-def">The map that undoes A — applying A then A⁻¹ returns every vector to where it started. It exists only when det A ≠ 0; a singular matrix has collapsed information that cannot be recovered.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-ortho" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">Q</span>
+            <span class="term-name">Orthogonal matrix</span>
+          </div>
+          <div class="term-formula" id="eq-ortho"></div>
+          <div class="term-def">A transformation whose columns are orthonormal — a rotation or reflection. It preserves all lengths and angles, so the unit circle maps to itself. Its transpose is its inverse.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script>
+    // ── KaTeX formulas ──────────────────────────────────────────────────────────
+    const eqs = {
+      'eq-norm':    '\\|\\mathbf{v}\\| = \\sqrt{v_x^2 + v_y^2} = \\sqrt{\\mathbf{v}\\cdot\\mathbf{v}}',
+      'eq-unit':    '\\hat{\\mathbf{v}} = \\dfrac{\\mathbf{v}}{\\|\\mathbf{v}\\|}',
+      'eq-dot':     '\\mathbf{v}\\cdot\\mathbf{w} = v_x w_x + v_y w_y = \\|\\mathbf{v}\\|\\,\\|\\mathbf{w}\\|\\cos\\theta',
+      'eq-angle':   '\\cos\\theta = \\dfrac{\\mathbf{v}\\cdot\\mathbf{w}}{\\|\\mathbf{v}\\|\\,\\|\\mathbf{w}\\|}',
+      'eq-det':     '\\det\\begin{psmallmatrix}a&b\\\\c&d\\end{psmallmatrix} = ad - bc',
+      'eq-trace':   '\\operatorname{tr}A = a_{11}+a_{22} = \\textstyle\\sum_i \\lambda_i',
+      'eq-kernel':  '\\ker A = \\{\\,\\mathbf{x} : A\\mathbf{x} = \\mathbf{0}\\,\\}',
+      'eq-range':   '\\operatorname{range}A = \\{\\,A\\mathbf{x}\\,\\},\\quad \\operatorname{rank} = \\dim',
+      'eq-eigen':   'A\\mathbf{v} = \\lambda\\mathbf{v}',
+      'eq-inverse': 'A^{-1}A = I,\\qquad A^{-1}\\text{ exists} \\iff \\det A \\neq 0',
+      'eq-ortho':   'Q^{\\top}Q = I \\iff Q^{\\top} = Q^{-1}',
+    };
+    for (const [id, tex] of Object.entries(eqs)) {
+      const el = document.getElementById(id);
+      if (el) katex.render(tex, el, { displayMode: false, throwOnError: false });
+    }
+
+    // ── Drawing helpers ──────────────────────────────────────────────────────────
+    function draw(id, fn) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      fn(ctx, W, H);
+    }
+
+    function bg(ctx, W, H) {
+      ctx.strokeStyle = '#f5f5f5'; ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    }
+
+    function arrow(ctx, x0, y0, x1, y1, color = '#333', width = 1.5) {
+      const dx = x1 - x0, dy = y1 - y0;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      if (len < 1) return;
+      const ux = dx/len, uy = dy/len;
+      const head = Math.min(10, len * 0.35);
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 - ux*head - uy*head*0.4, y1 - uy*head + ux*head*0.4);
+      ctx.lineTo(x1 - ux*head + uy*head*0.4, y1 - uy*head - ux*head*0.4);
+      ctx.closePath(); ctx.fill();
+    }
+
+    function label(ctx, text, x, y, color = '#555', size = 11, italic = false) {
+      ctx.fillStyle = color;
+      ctx.font = `${italic ? 'italic ' : ''}${size}px Georgia, serif`;
+      ctx.fillText(text, x, y);
+    }
+
+    function dashedLine(ctx, x0, y0, x1, y1, color = '#ccc', width = 1) {
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.setLineDash([4, 3]);
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function solidLine(ctx, x0, y0, x1, y1, color = '#999', width = 1.5) {
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    }
+
+    function circle(ctx, cx, cy, r, stroke, fill, lw = 1.5) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+    }
+
+    function dot(ctx, x, y, r, color) { circle(ctx, x, y, r, null, color); }
+
+    // World→screen factory: origin at (cx,cy) px, y-up, `s` px per unit.
+    function frame(cx, cy, s) {
+      return { x: (wx) => cx + wx*s, y: (wy) => cy - wy*s };
+    }
+
+    function axes(ctx, P, W, H, color = '#e2e2e2') {
+      solidLine(ctx, 0, P.y(0), W, P.y(0), color, 1);
+      solidLine(ctx, P.x(0), 0, P.x(0), H, color, 1);
+    }
+
+    // ── 1. Vector ────────────────────────────────────────────────────────────────
+    draw('c-vector', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.30, H*0.72, 40);
+      axes(ctx, P, W, H);
+      const v = [2.4, 1.6];
+      // components
+      dashedLine(ctx, P.x(v[0]), P.y(0), P.x(v[0]), P.y(v[1]), '#cbb', 1);
+      dashedLine(ctx, P.x(0), P.y(v[1]), P.x(v[0]), P.y(v[1]), '#cbb', 1);
+      label(ctx, 'vₓ', P.x(v[0]/2) - 6, P.y(0) + 14, '#bbb', 10, true);
+      label(ctx, 'v_y', P.x(v[0]) + 4, P.y(v[1]/2), '#bbb', 10, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(v[0]), P.y(v[1]), '#1565c0', 2.2);
+      label(ctx, 'v', P.x(v[0]) + 4, P.y(v[1]) - 4, '#1565c0', 14, true);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 2. Norm ────────────────────────────────────────────────────────────────
+    draw('c-norm', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.28, H*0.74, 40);
+      axes(ctx, P, W, H);
+      const v = [2.4, 1.6];
+      // right triangle
+      ctx.beginPath();
+      ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1;
+      ctx.moveTo(P.x(0), P.y(0)); ctx.lineTo(P.x(v[0]), P.y(0)); ctx.lineTo(P.x(v[0]), P.y(v[1]));
+      ctx.stroke();
+      // right-angle mark
+      ctx.strokeStyle = '#ccc';
+      ctx.strokeRect(P.x(v[0]) - 7, P.y(0) - 7, 7, 7);
+      arrow(ctx, P.x(0), P.y(0), P.x(v[0]), P.y(v[1]), '#1565c0', 2.2);
+      label(ctx, '‖v‖', P.x(v[0]/2) - 18, P.y(v[1]/2) - 6, '#1565c0', 12, true);
+      label(ctx, 'vₓ', P.x(v[0]/2) - 6, P.y(0) + 14, '#aaa', 10, true);
+      label(ctx, 'v_y', P.x(v[0]) + 4, P.y(v[1]/2), '#aaa', 10, true);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 3. Unit vector ───────────────────────────────────────────────────────────
+    draw('c-unit', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.46, H*0.56, 42);
+      axes(ctx, P, W, H);
+      circle(ctx, P.x(0), P.y(0), 42, '#ddd', null, 1.2);   // unit circle (r = 1 unit)
+      const v = [1.7, 1.25];
+      const n = Math.hypot(v[0], v[1]);
+      const u = [v[0]/n, v[1]/n];
+      arrow(ctx, P.x(0), P.y(0), P.x(v[0]), P.y(v[1]), '#bbb', 1.8);
+      label(ctx, 'v', P.x(v[0]) + 3, P.y(v[1]) - 3, '#bbb', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(u[0]), P.y(u[1]), '#1565c0', 2.4);
+      label(ctx, 'v̂', P.x(u[0]) - 16, P.y(u[1]) - 4, '#1565c0', 13, true);
+      label(ctx, '‖v̂‖ = 1', P.x(0) - 8, P.y(0) + 56, '#aaa', 10, true);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 4. Linear combination ──────────────────────────────────────────────────
+    draw('c-lincomb', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.24, H*0.72, 34);
+      axes(ctx, P, W, H);
+      const u = [1.8, 0.5], w = [0.6, 1.7];
+      const a = 1.4, b = 1.0;
+      const au = [u[0]*a, u[1]*a];
+      const sum = [au[0] + w[0]*b, au[1] + w[1]*b];
+      // parallelogram guides
+      dashedLine(ctx, P.x(au[0]), P.y(au[1]), P.x(sum[0]), P.y(sum[1]), '#cdb', 1.2);
+      dashedLine(ctx, P.x(w[0]*b), P.y(w[1]*b), P.x(sum[0]), P.y(sum[1]), '#bcd', 1.2);
+      arrow(ctx, P.x(0), P.y(0), P.x(u[0]), P.y(u[1]), '#2e7d32', 1.8);
+      label(ctx, 'u', P.x(u[0]) + 3, P.y(u[1]) + 12, '#2e7d32', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(w[0]), P.y(w[1]), '#1565c0', 1.8);
+      label(ctx, 'w', P.x(w[0]) - 16, P.y(w[1]) - 2, '#1565c0', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(sum[0]), P.y(sum[1]), '#e65100', 2.2);
+      label(ctx, '1.4u + w', P.x(sum[0]) + 3, P.y(sum[1]) - 3, '#e65100', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 5. Span & independence ──────────────────────────────────────────────────
+    draw('c-span', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.5, H*0.52, 32);
+      // shade the whole plane lightly — two independent vectors span all of ℝ²
+      ctx.fillStyle = 'rgba(21,101,192,0.07)';
+      ctx.fillRect(0, 0, W, H);
+      axes(ctx, P, W, H);
+      const u = [1.9, 0.7], w = [-0.6, 1.8];
+      arrow(ctx, P.x(0), P.y(0), P.x(u[0]), P.y(u[1]), '#2e7d32', 2);
+      label(ctx, 'u', P.x(u[0]) + 3, P.y(u[1]) + 12, '#2e7d32', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(w[0]), P.y(w[1]), '#1565c0', 2);
+      label(ctx, 'w', P.x(w[0]) - 16, P.y(w[1]) - 2, '#1565c0', 12, true);
+      label(ctx, 'span(u, w) = ℝ²', P.x(0) - 60, P.y(0) + 78, '#1565c0', 11);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 6. Basis & coordinates ──────────────────────────────────────────────────
+    draw('c-basis', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.26, H*0.74, 42);
+      axes(ctx, P, W, H);
+      const p = [2, 1];
+      dashedLine(ctx, P.x(p[0]), P.y(0), P.x(p[0]), P.y(p[1]), '#ccc', 1);
+      dashedLine(ctx, P.x(0), P.y(p[1]), P.x(p[0]), P.y(p[1]), '#ccc', 1);
+      arrow(ctx, P.x(0), P.y(0), P.x(1), P.y(0), '#c62828', 2.2);
+      label(ctx, 'e₁', P.x(1) - 4, P.y(0) + 14, '#c62828', 11, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(0), P.y(1), '#2e7d32', 2.2);
+      label(ctx, 'e₂', P.x(0) - 18, P.y(1) + 2, '#2e7d32', 11, true);
+      dot(ctx, P.x(p[0]), P.y(p[1]), 5, '#1565c0');
+      label(ctx, 'p = (2, 1)', P.x(p[0]) + 6, P.y(p[1]) - 4, '#1565c0', 11);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 7. Dot product / projection ──────────────────────────────────────────────
+    draw('c-dot', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.24, H*0.70, 38);
+      axes(ctx, P, W, H);
+      const v = [1.6, 2.0], w = [2.6, 0.6];
+      const wn2 = w[0]*w[0] + w[1]*w[1];
+      const t = (v[0]*w[0] + v[1]*w[1]) / wn2;
+      const proj = [w[0]*t, w[1]*t];
+      arrow(ctx, P.x(0), P.y(0), P.x(w[0]), P.y(w[1]), '#c62828', 2);
+      label(ctx, 'w', P.x(w[0]) + 3, P.y(w[1]) + 12, '#c62828', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(v[0]), P.y(v[1]), '#1565c0', 2);
+      label(ctx, 'v', P.x(v[0]) - 4, P.y(v[1]) - 4, '#1565c0', 12, true);
+      dashedLine(ctx, P.x(v[0]), P.y(v[1]), P.x(proj[0]), P.y(proj[1]), '#bbb', 1.2);
+      arrow(ctx, P.x(0), P.y(0), P.x(proj[0]), P.y(proj[1]), '#e65100', 2.4);
+      label(ctx, 'proj', P.x(proj[0]) + 2, P.y(proj[1]) + 14, '#e65100', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 8. Angle between vectors ──────────────────────────────────────────────────
+    draw('c-angle', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.26, H*0.68, 40);
+      axes(ctx, P, W, H);
+      const v = [2.3, 0.7], w = [0.9, 2.1];
+      arrow(ctx, P.x(0), P.y(0), P.x(v[0]), P.y(v[1]), '#1565c0', 2);
+      label(ctx, 'v', P.x(v[0]) + 3, P.y(v[1]) + 4, '#1565c0', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(w[0]), P.y(w[1]), '#c62828', 2);
+      label(ctx, 'w', P.x(w[0]) - 16, P.y(w[1]) - 2, '#c62828', 12, true);
+      const av = Math.atan2(v[1], v[0]), aw = Math.atan2(w[1], w[0]);
+      ctx.beginPath();
+      ctx.arc(P.x(0), P.y(0), 30, -av, -aw, true);
+      ctx.strokeStyle = '#e65100'; ctx.lineWidth = 1.6; ctx.stroke();
+      label(ctx, 'θ', P.x(0) + 26, P.y(0) - 24, '#e65100', 13, true);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 9. Matrix transformation ──────────────────────────────────────────────────
+    draw('c-transform', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.30, H*0.70, 40);
+      axes(ctx, P, W, H);
+      // A columns: where e1, e2 land
+      const c1 = [1.4, 0.4], c2 = [0.5, 1.3];
+      // original unit square (faint)
+      ctx.fillStyle = 'rgba(120,120,120,0.06)';
+      ctx.beginPath();
+      ctx.moveTo(P.x(0), P.y(0)); ctx.lineTo(P.x(1), P.y(0));
+      ctx.lineTo(P.x(1), P.y(1)); ctx.lineTo(P.x(0), P.y(1)); ctx.closePath();
+      ctx.fill();
+      dashedLine(ctx, P.x(1), P.y(0), P.x(1), P.y(1), '#ccc', 1);
+      dashedLine(ctx, P.x(0), P.y(1), P.x(1), P.y(1), '#ccc', 1);
+      // transformed square
+      const t11 = [c1[0]+c2[0], c1[1]+c2[1]];
+      ctx.fillStyle = 'rgba(21,101,192,0.12)';
+      ctx.beginPath();
+      ctx.moveTo(P.x(0), P.y(0)); ctx.lineTo(P.x(c1[0]), P.y(c1[1]));
+      ctx.lineTo(P.x(t11[0]), P.y(t11[1])); ctx.lineTo(P.x(c2[0]), P.y(c2[1])); ctx.closePath();
+      ctx.fill();
+      arrow(ctx, P.x(0), P.y(0), P.x(c1[0]), P.y(c1[1]), '#c62828', 2.2);
+      label(ctx, 'Ae₁', P.x(c1[0]) + 3, P.y(c1[1]) + 13, '#c62828', 10);
+      arrow(ctx, P.x(0), P.y(0), P.x(c2[0]), P.y(c2[1]), '#2e7d32', 2.2);
+      label(ctx, 'Ae₂', P.x(c2[0]) - 28, P.y(c2[1]) - 2, '#2e7d32', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 10. Determinant ───────────────────────────────────────────────────────────
+    draw('c-det', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.28, H*0.72, 40);
+      axes(ctx, P, W, H);
+      const c1 = [1.5, 0.4], c2 = [0.5, 1.4];
+      const t11 = [c1[0]+c2[0], c1[1]+c2[1]];
+      const det = (c1[0]*c2[1] - c1[1]*c2[0]).toFixed(2);
+      ctx.fillStyle = 'rgba(230,81,0,0.13)';
+      ctx.beginPath();
+      ctx.moveTo(P.x(0), P.y(0)); ctx.lineTo(P.x(c1[0]), P.y(c1[1]));
+      ctx.lineTo(P.x(t11[0]), P.y(t11[1])); ctx.lineTo(P.x(c2[0]), P.y(c2[1])); ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#e65100'; ctx.lineWidth = 1.4; ctx.stroke();
+      arrow(ctx, P.x(0), P.y(0), P.x(c1[0]), P.y(c1[1]), '#c62828', 2);
+      arrow(ctx, P.x(0), P.y(0), P.x(c2[0]), P.y(c2[1]), '#2e7d32', 2);
+      label(ctx, 'area = det A', P.x(0.35), P.y(0.7), '#e65100', 10);
+      label(ctx, '≈ ' + det, P.x(0.6), P.y(0.45), '#e65100', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 11. Trace ───────────────────────────────────────────────────────────────
+    draw('c-trace', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const cx = W*0.5, cy = H*0.5, cell = 36;
+      const A = [['2','1'],['0','3']];
+      // matrix bracket box
+      const x0 = cx - cell, x1 = cx + cell, y0 = cy - cell, y1 = cy + cell;
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 1.5;
+      // left bracket
+      ctx.beginPath();
+      ctx.moveTo(x0 - 6, y0 - 10); ctx.lineTo(x0 - 12, y0 - 10);
+      ctx.lineTo(x0 - 12, y1 + 10); ctx.lineTo(x0 - 6, y1 + 10); ctx.stroke();
+      // right bracket
+      ctx.beginPath();
+      ctx.moveTo(x1 + 6, y0 - 10); ctx.lineTo(x1 + 12, y0 - 10);
+      ctx.lineTo(x1 + 12, y1 + 10); ctx.lineTo(x1 + 6, y1 + 10); ctx.stroke();
+      // diagonal highlight
+      ctx.fillStyle = 'rgba(21,101,192,0.12)';
+      ctx.beginPath(); ctx.arc(cx - cell/2, cy - cell/2, 17, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + cell/2, cy + cell/2, 17, 0, Math.PI*2); ctx.fill();
+      ctx.font = '15px Georgia, serif'; ctx.textAlign = 'center';
+      const pos = [[cx - cell/2, cy - cell/2], [cx + cell/2, cy - cell/2],
+                   [cx - cell/2, cy + cell/2], [cx + cell/2, cy + cell/2]];
+      const vals = [A[0][0], A[0][1], A[1][0], A[1][1]];
+      const diag = [true, false, false, true];
+      vals.forEach((v, i) => {
+        ctx.fillStyle = diag[i] ? '#1565c0' : '#aaa';
+        ctx.fillText(v, pos[i][0], pos[i][1] + 5);
+      });
+      ctx.textAlign = 'left';
+      label(ctx, 'tr = 2 + 3 = 5', cx - 44, y1 + 36, '#1565c0', 11);
+    });
+
+    // ── 12. Kernel ───────────────────────────────────────────────────────────────
+    draw('c-kernel', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.5, H*0.52, 40);
+      axes(ctx, P, W, H);
+      // kernel direction [2,-1]/√5
+      const k = [2/Math.sqrt(5), -1/Math.sqrt(5)];
+      solidLine(ctx, P.x(-2.2*k[0]), P.y(-2.2*k[1]), P.x(2.2*k[0]), P.y(2.2*k[1]), '#c62828', 2.2);
+      arrow(ctx, P.x(0), P.y(0), P.x(1.6*k[0]), P.y(1.6*k[1]), '#c62828', 2);
+      label(ctx, 'x', P.x(1.6*k[0]) + 4, P.y(1.6*k[1]) + 12, '#c62828', 12, true);
+      // collapse to origin
+      dot(ctx, P.x(0), P.y(0), 6, '#1565c0');
+      label(ctx, 'Ax = 0', P.x(0) + 8, P.y(0) - 8, '#1565c0', 11);
+      label(ctx, 'ker A', P.x(-2.2*k[0]) - 4, P.y(-2.2*k[1]) + 14, '#c62828', 10);
+    });
+
+    // ── 13. Range / image ──────────────────────────────────────────────────────────
+    draw('c-range', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.5, H*0.52, 40);
+      axes(ctx, P, W, H);
+      // range direction [1,2]/√5
+      const d = [1/Math.sqrt(5), 2/Math.sqrt(5)];
+      solidLine(ctx, P.x(-2.4*d[0]), P.y(-2.4*d[1]), P.x(2.4*d[0]), P.y(2.4*d[1]), '#1565c0', 2.2);
+      // column vectors landing on the line
+      arrow(ctx, P.x(0), P.y(0), P.x(1.0), P.y(2.0), '#1565c0', 2);
+      label(ctx, 'c₁', P.x(1.0) + 4, P.y(2.0), '#1565c0', 10, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(0.6), P.y(1.2), '#5a8fd0', 1.8);
+      label(ctx, 'range A', P.x(-2.4*d[0]) - 6, P.y(-2.4*d[1]) + 14, '#1565c0', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 14. Eigenvector ───────────────────────────────────────────────────────────
+    draw('c-eigen', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.30, H*0.70, 30);
+      axes(ctx, P, W, H);
+      // A = [[2,1],[1,2]] : eigenvector (1,1) λ=3 ; (1,0) -> (2,1) rotates
+      const apply = (v) => [2*v[0] + v[1], v[0] + 2*v[1]];
+      // eigendirection line
+      solidLine(ctx, P.x(-1), P.y(-1), P.x(3.4), P.y(3.4), '#cdd', 1.2);
+      // eigenvector before/after (stays on its line)
+      const ev = [1, 1], evA = apply(ev);
+      arrow(ctx, P.x(0), P.y(0), P.x(evA[0]), P.y(evA[1]), '#1565c0', 2.2);
+      label(ctx, 'Av = 3v', P.x(evA[0]) - 4, P.y(evA[1]) - 6, '#1565c0', 10);
+      arrow(ctx, P.x(0), P.y(0), P.x(ev[0]), P.y(ev[1]), '#8fb4e0', 1.8);
+      label(ctx, 'v', P.x(ev[0]) - 14, P.y(ev[1]) + 2, '#8fb4e0', 11, true);
+      // non-eigenvector knocked off its line
+      const nv = [1.6, 0], nvA = apply(nv);
+      arrow(ctx, P.x(0), P.y(0), P.x(nv[0]), P.y(nv[1]), '#bbb', 1.8);
+      label(ctx, 'u', P.x(nv[0]) + 2, P.y(nv[1]) + 13, '#aaa', 11, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(nvA[0]), P.y(nvA[1]), '#c62828', 1.8);
+      label(ctx, 'Au', P.x(nvA[0]) + 3, P.y(nvA[1]), '#c62828', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 15. Inverse ───────────────────────────────────────────────────────────────
+    draw('c-inverse', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.26, H*0.66, 34);
+      axes(ctx, P, W, H);
+      const apply = (v) => [1.3*v[0] + 0.4*v[1], 0.2*v[0] + 1.1*v[1]];
+      const v = [1.4, 1.5], Av = apply(v);
+      arrow(ctx, P.x(0), P.y(0), P.x(v[0]), P.y(v[1]), '#1565c0', 2.2);
+      label(ctx, 'v', P.x(v[0]) - 14, P.y(v[1]) - 2, '#1565c0', 12, true);
+      arrow(ctx, P.x(0), P.y(0), P.x(Av[0]), P.y(Av[1]), '#c62828', 2.2);
+      label(ctx, 'Av', P.x(Av[0]) + 3, P.y(Av[1]) - 2, '#c62828', 11, true);
+      // A forward, A⁻¹ back
+      ctx.beginPath();
+      ctx.strokeStyle = '#999'; ctx.lineWidth = 1.4; ctx.setLineDash([4,3]);
+      ctx.arc(P.x((v[0]+Av[0])/2), P.y((v[1]+Av[1])/2), 16, 0, Math.PI*2);
+      ctx.stroke(); ctx.setLineDash([]);
+      label(ctx, 'A →', P.x(v[0]) + 18, P.y(v[1]) + 26, '#c62828', 10);
+      label(ctx, '← A⁻¹', P.x(v[0]) + 12, P.y(v[1]) + 40, '#1565c0', 10);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+
+    // ── 16. Orthogonal matrix ──────────────────────────────────────────────────────
+    draw('c-ortho', (ctx, W, H) => {
+      bg(ctx, W, H);
+      const P = frame(W*0.5, H*0.52, 40);
+      axes(ctx, P, W, H);
+      circle(ctx, P.x(0), P.y(0), 40, '#ddd', null, 1.2);  // unit circle preserved
+      const a = 35 * Math.PI/180, c = Math.cos(a), s = Math.sin(a);
+      // original basis (faint)
+      arrow(ctx, P.x(0), P.y(0), P.x(1), P.y(0), '#ddd', 1.5);
+      arrow(ctx, P.x(0), P.y(0), P.x(0), P.y(1), '#ddd', 1.5);
+      // rotated basis Qe1, Qe2
+      arrow(ctx, P.x(0), P.y(0), P.x(c), P.y(s), '#c62828', 2.2);
+      label(ctx, 'Qe₁', P.x(c) + 4, P.y(s) - 2, '#c62828', 10);
+      arrow(ctx, P.x(0), P.y(0), P.x(-s), P.y(c), '#2e7d32', 2.2);
+      label(ctx, 'Qe₂', P.x(-s) - 30, P.y(c), '#2e7d32', 10);
+      // right-angle preserved
+      const m = 0.34;
+      solidLine(ctx, P.x(c*m), P.y(s*m), P.x(c*m - s*m), P.y(s*m + c*m), '#ccc', 1);
+      solidLine(ctx, P.x(-s*m), P.y(c*m), P.x(c*m - s*m), P.y(s*m + c*m), '#ccc', 1);
+      dot(ctx, P.x(0), P.y(0), 3, '#555');
+    });
+  </script>
+</body>
+</html>
