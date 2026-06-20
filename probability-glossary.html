@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Probability Glossary</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header { margin-bottom: 48px; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .back {
+      display: inline-block;
+      font-size: 13px;
+      color: #aaa;
+      text-decoration: none;
+      margin-bottom: 24px;
+    }
+    .back:hover { color: #555; }
+
+    section { margin-bottom: 48px; }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .terms { display: flex; flex-direction: column; gap: 1px; }
+
+    .term {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      overflow: hidden;
+      gap: 0;
+    }
+
+    .term-diagram {
+      flex-shrink: 0;
+      width: 220px;
+      border-right: 1px solid #f0f0f0;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .term-diagram canvas { display: block; }
+
+    .term-body {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .term-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .term-symbol {
+      font-size: 22px;
+      font-weight: 600;
+      color: #111;
+      font-family: Georgia, serif;
+      font-style: italic;
+      min-width: 40px;
+    }
+
+    .term-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      font-style: normal;
+      font-family: system-ui, sans-serif;
+    }
+
+    .term-def {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .term-formula {
+      font-size: 13px;
+      color: #888;
+      background: #f8f8f8;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #efefef;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .term-note {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.5;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 8px;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back">← All visualizations</a>
+
+  <header>
+    <h1>Probability Glossary</h1>
+    <p>The core vocabulary — sets and events, the axioms, conditioning, random variables, and the common distributions — each with a small picture.</p>
+  </header>
+
+  <!-- ── Section 1: Sample Spaces & Events ── -->
+  <section>
+    <h2>Sample Spaces &amp; Events</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-omega" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">Ω</span>
+            <span class="term-name">Sample space &amp; outcomes</span>
+          </div>
+          <div class="term-def">The set of <strong>all possible outcomes</strong> of an experiment. A single outcome ω is one point of Ω — one way the experiment can turn out. Everything else is built from this set.</div>
+          <div class="term-note">A die roll: Ω = {1,2,3,4,5,6}. A coin: Ω = {H, T}.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-event" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">A</span>
+            <span class="term-name">Event</span>
+          </div>
+          <div class="term-def">Any <strong>subset</strong> of the sample space — a collection of outcomes we care about. The event "occurs" when the realised outcome ω falls inside A.</div>
+          <div class="term-note">"Roll is even" = {2, 4, 6} ⊆ Ω.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-complement" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">Aᶜ</span>
+            <span class="term-name">Complement</span>
+          </div>
+          <div class="term-formula" id="eq-complement"></div>
+          <div class="term-def">The event that A does <strong>not</strong> occur — every outcome in Ω that is outside A. Its probability is whatever is left over after A.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-union" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">A∪B</span>
+            <span class="term-name">Union</span>
+          </div>
+          <div class="term-def">The event that <strong>at least one</strong> of A, B occurs — every outcome lying in A, in B, or in both. Read as "A <em>or</em> B".</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-intersection" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">A∩B</span>
+            <span class="term-name">Intersection</span>
+          </div>
+          <div class="term-def">The event that <strong>both</strong> A and B occur — outcomes in the overlapping lens. Read as "A <em>and</em> B".</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-disjoint" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">A∩B = ∅</span>
+            <span class="term-name">Mutually exclusive</span>
+          </div>
+          <div class="term-formula" id="eq-disjoint"></div>
+          <div class="term-def">Two events that <strong>cannot both happen</strong> — their circles never touch. Then P(A∪B) = P(A) + P(B), with no overlap to subtract.</div>
+          <div class="term-note">Disjoint ≠ independent. Disjoint events are in fact strongly dependent: if one occurs, the other cannot.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 2: Axioms & Rules ── -->
+  <section>
+    <h2>Axioms &amp; Rules</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-measure" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">P</span>
+            <span class="term-name">Probability measure</span>
+          </div>
+          <div class="term-formula" id="eq-measure"></div>
+          <div class="term-def">A rule assigning each event a number in [0, 1] — think of it as <strong>area</strong>, where the whole sample space has area 1. Probabilities of disjoint events add.</div>
+          <div class="term-note">Kolmogorov's three axioms: non-negativity, P(Ω) = 1, and countable additivity.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-addition" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:15px">A∪B</span>
+            <span class="term-name">Addition rule (inclusion–exclusion)</span>
+          </div>
+          <div class="term-formula" id="eq-addition"></div>
+          <div class="term-def">To find P(A∪B) you add the two areas, but the overlap got counted <strong>twice</strong> — so subtract it once. For disjoint events the overlap is zero.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-demorgan" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:15px">(A∪B)ᶜ</span>
+            <span class="term-name">De Morgan's laws</span>
+          </div>
+          <div class="term-formula" id="eq-demorgan"></div>
+          <div class="term-def">"Not (A or B)" is the same as "not A <strong>and</strong> not B" — the shaded region outside both circles. Complementing flips union ↔ intersection.</div>
+          <div class="term-note">Dually, (A∩B)ᶜ = Aᶜ ∪ Bᶜ.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 3: Conditioning & Independence ── -->
+  <section>
+    <h2>Conditioning &amp; Independence</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-conditional" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:18px">P(A|B)</span>
+            <span class="term-name">Conditional probability</span>
+          </div>
+          <div class="term-formula" id="eq-conditional"></div>
+          <div class="term-def">The probability of A <strong>once we know B occurred</strong>. B becomes the new sample space; we ask what fraction of B also lies in A. In general P(A|B) ≠ P(B|A).</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-independence" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">A ⫫ B</span>
+            <span class="term-name">Independence</span>
+          </div>
+          <div class="term-formula" id="eq-independence"></div>
+          <div class="term-def">Knowing B tells you <strong>nothing</strong> about A: P(A|B) = P(A). Equivalently the joint probability factorises into the product — the overlap area equals width × height.</div>
+          <div class="term-note">Independent is not the same as disjoint, and pairwise independence does not imply mutual independence.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-bayes" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">Bayes</span>
+            <span class="term-name">Bayes' rule &amp; total probability</span>
+          </div>
+          <div class="term-formula" id="eq-bayes"></div>
+          <div class="term-def">A partition B₁,…,Bₙ slices Ω into disjoint pieces. <strong>Total probability</strong> reassembles P(A) by summing A's share of each slice; <strong>Bayes</strong> then inverts a conditional to update beliefs from evidence.</div>
+          <div class="term-note">Posterior ∝ likelihood × prior.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 4: Random Variables & Moments ── -->
+  <section>
+    <h2>Random Variables &amp; Moments</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-rv" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">X</span>
+            <span class="term-name">Random variable</span>
+          </div>
+          <div class="term-formula" id="eq-rv"></div>
+          <div class="term-def">A <strong>function</strong> that attaches a number to every outcome — turning qualitative outcomes into something we can average and plot. <em>Discrete</em> takes isolated values; <em>continuous</em> takes a whole range.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-pmf" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">p(x)</span>
+            <span class="term-name">Probability mass function (PMF)</span>
+          </div>
+          <div class="term-formula" id="eq-pmf"></div>
+          <div class="term-def">For a <strong>discrete</strong> variable: the probability of each individual value, P(X = x). The spikes are genuine probabilities and must sum to 1.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-pdf" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">f(x)</span>
+            <span class="term-name">Probability density function (PDF)</span>
+          </div>
+          <div class="term-formula" id="eq-pdf"></div>
+          <div class="term-def">For a <strong>continuous</strong> variable: probability is <em>area under the curve</em>. The height f(x) is not a probability — only the area over an interval is. Total area = 1.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-cdf" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">F(x)</span>
+            <span class="term-name">Cumulative distribution (CDF)</span>
+          </div>
+          <div class="term-formula" id="eq-cdf"></div>
+          <div class="term-def">The probability of landing at or below x — it accumulates the mass/area from the left, rising monotonically from 0 to 1. Works for discrete and continuous alike.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-expectation" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">E[X]</span>
+            <span class="term-name">Expectation (mean)</span>
+          </div>
+          <div class="term-formula" id="eq-expectation"></div>
+          <div class="term-def">The probability-weighted average value — the <strong>balance point</strong> of the distribution. Place the density on a seesaw and μ is where it tips level.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-variance" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">Var(X)</span>
+            <span class="term-name">Variance &amp; standard deviation</span>
+          </div>
+          <div class="term-formula" id="eq-variance"></div>
+          <div class="term-def">The expected squared distance from the mean — how <strong>spread out</strong> the distribution is. The standard deviation σ = √Var is the spread in the variable's own units.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 5: Common Distributions ── -->
+  <section>
+    <h2>Common Distributions</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-binomial" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol" style="font-size:16px">Bin(n,p)</span>
+            <span class="term-name">Binomial</span>
+          </div>
+          <div class="term-formula" id="eq-binomial"></div>
+          <div class="term-def">The count of <strong>successes in n independent yes/no trials</strong>, each with success probability p. A single trial (n = 1) is the Bernoulli distribution. Mean np, variance np(1−p).</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-poisson" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">Pois(λ)</span>
+            <span class="term-name">Poisson</span>
+          </div>
+          <div class="term-formula" id="eq-poisson"></div>
+          <div class="term-def">The count of <strong>rare events in a fixed interval</strong> when they occur independently at average rate λ. Mean and variance are both equal to λ.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-normal" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">N(μ,σ²)</span>
+            <span class="term-name">Normal (Gaussian)</span>
+          </div>
+          <div class="term-formula" id="eq-normal"></div>
+          <div class="term-def">The symmetric bell curve centred at μ with spread σ. By the <strong>central limit theorem</strong> sums and averages of many independent effects drift toward it — which is why it appears everywhere.</div>
+          <div class="term-note">≈ 68% of mass within ±1σ, ≈ 95% within ±2σ.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-exponential" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">Exp(λ)</span>
+            <span class="term-name">Exponential</span>
+          </div>
+          <div class="term-formula" id="eq-exponential"></div>
+          <div class="term-def">The <strong>waiting time</strong> until the next Poisson event. Memoryless: the time already waited tells you nothing about the time remaining. Mean 1/λ.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <p style="font-size:12px;color:#aaa;margin-top:16px;line-height:1.6">
+      Explore any of these interactively in the
+      <a href="tools/distribution-calculator.html" style="color:#888">Distribution Calculator</a> —
+      sliders for the parameters, live PMF/PDF and CDF, and point queries.
+    </p>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script>
+    // ── KaTeX formulas ──────────────────────────────────────────────────────────
+    const eqs = {
+      'eq-complement':   'P(A^c) = 1 - P(A)',
+      'eq-disjoint':     'A \\cap B = \\varnothing',
+      'eq-measure':      '0 \\le P(A) \\le 1,\\quad P(\\Omega) = 1',
+      'eq-addition':     'P(A\\cup B) = P(A) + P(B) - P(A\\cap B)',
+      'eq-demorgan':     '(A\\cup B)^c = A^c \\cap B^c',
+      'eq-conditional':  'P(A\\mid B) = \\dfrac{P(A\\cap B)}{P(B)}',
+      'eq-independence': 'P(A\\cap B) = P(A)\\,P(B)',
+      'eq-bayes':        'P(B_i\\mid A) = \\dfrac{P(A\\mid B_i)\\,P(B_i)}{\\sum_j P(A\\mid B_j)\\,P(B_j)}',
+      'eq-rv':           'X : \\Omega \\to \\mathbb{R}',
+      'eq-pmf':          'p(x) = P(X = x),\\quad \\textstyle\\sum_x p(x) = 1',
+      'eq-pdf':          'P(a \\le X \\le b) = \\displaystyle\\int_a^b f(x)\\,dx',
+      'eq-cdf':          'F(x) = P(X \\le x)',
+      'eq-expectation':  'E[X] = \\textstyle\\sum_x x\\,p(x) = \\int x\\,f(x)\\,dx',
+      'eq-variance':     '\\operatorname{Var}(X) = E\\!\\left[(X-\\mu)^2\\right] = E[X^2] - \\mu^2',
+      'eq-binomial':     'P(X=k) = \\binom{n}{k} p^k (1-p)^{\\,n-k}',
+      'eq-poisson':      'P(X=k) = \\dfrac{\\lambda^k e^{-\\lambda}}{k!}',
+      'eq-normal':       'f(x) = \\dfrac{1}{\\sigma\\sqrt{2\\pi}}\\,e^{-(x-\\mu)^2 / 2\\sigma^2}',
+      'eq-exponential':  'f(x) = \\lambda e^{-\\lambda x},\\quad x \\ge 0',
+    };
+    for (const [id, tex] of Object.entries(eqs)) {
+      const el = document.getElementById(id);
+      if (el) katex.render(tex, el, { displayMode: false, throwOnError: false });
+    }
+
+    // ── Drawing helpers ──────────────────────────────────────────────────────────
+    function draw(id, fn) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fn(ctx, canvas.width, canvas.height);
+    }
+
+    function label(ctx, text, x, y, color = '#555', size = 11, italic = false) {
+      ctx.fillStyle = color;
+      ctx.font = `${italic ? 'italic ' : ''}${size}px Georgia, serif`;
+      ctx.fillText(text, x, y);
+    }
+
+    function arrow(ctx, x0, y0, x1, y1, color = '#333', width = 1.5) {
+      const dx = x1 - x0, dy = y1 - y0;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      if (len < 1) return;
+      const ux = dx/len, uy = dy/len;
+      const head = Math.min(9, len * 0.4);
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 - ux*head - uy*head*0.4, y1 - uy*head + ux*head*0.4);
+      ctx.lineTo(x1 - ux*head + uy*head*0.4, y1 - uy*head - ux*head*0.4);
+      ctx.closePath(); ctx.fill();
+    }
+
+    function solidLine(ctx, x0, y0, x1, y1, color = '#999', width = 1.5) {
+      ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    }
+
+    function dashedLine(ctx, x0, y0, x1, y1, color = '#ccc', width = 1) {
+      ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.setLineDash([4, 3]);
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function dot(ctx, x, y, r, color) {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fillStyle = color; ctx.fill();
+    }
+
+    function circlePath(ctx, cx, cy, r) { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); }
+
+    function strokeCircle(ctx, cx, cy, r, color, lw = 1.5) {
+      circlePath(ctx, cx, cy, r); ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.stroke();
+    }
+
+    function roundRectPath(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    // Ω box geometry + outline
+    function omegaBox(ctx, W, H) {
+      const b = { x: 12, y: 16, w: W - 24, h: H - 30 };
+      roundRectPath(ctx, b.x, b.y, b.w, b.h, 10);
+      ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1.3; ctx.stroke();
+      label(ctx, 'Ω', b.x + b.w - 20, b.y + 18, '#aaa', 14, true);
+      return b;
+    }
+
+    // two-circle Venn geometry inside the box
+    function vennGeom(W, H, sep = 0.20, r = 38) {
+      return { ax: W * (0.5 - sep), bx: W * (0.5 + sep), cy: H * 0.51, r };
+    }
+
+    const C = { blue: '#1565c0', red: '#c62828', green: '#2e7d32', orange: '#e65100', grey: '#999' };
+
+    // ── 1. Sample space ──────────────────────────────────────────────────────────
+    draw('c-omega', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const pts = [[42,54],[74,92],[112,58],[150,84],[58,128],[120,118],[158,132],[96,100],[136,46]];
+      pts.forEach(p => dot(ctx, p[0], p[1], 3.4, C.blue));
+      label(ctx, 'ω', pts[0][0] + 6, pts[0][1] - 6, '#888', 12, true);
+    });
+
+    // ── 2. Event ─────────────────────────────────────────────────────────────────
+    draw('c-event', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const cx = 84, cy = 92, r = 44;
+      circlePath(ctx, cx, cy, r); ctx.fillStyle = 'rgba(21,101,192,0.12)'; ctx.fill();
+      strokeCircle(ctx, cx, cy, r, C.blue, 1.6);
+      [[70,80],[95,100],[78,108]].forEach(p => dot(ctx, p[0], p[1], 3.4, C.blue));
+      [[150,60],[150,120],[120,140]].forEach(p => dot(ctx, p[0], p[1], 3.4, '#bbb'));
+      label(ctx, 'A', cx - 5, cy - 22, C.blue, 15, true);
+    });
+
+    // ── 3. Complement ────────────────────────────────────────────────────────────
+    draw('c-complement', (ctx, W, H) => {
+      const b = omegaBox(ctx, W, H);
+      const cx = 88, cy = 94, r = 44;
+      ctx.save();
+      roundRectPath(ctx, b.x, b.y, b.w, b.h, 10); ctx.clip();
+      ctx.fillStyle = 'rgba(198,40,40,0.10)'; ctx.fillRect(0, 0, W, H);   // shade everything
+      circlePath(ctx, cx, cy, r); ctx.fillStyle = '#fafafa'; ctx.fill();   // erase inside A
+      ctx.restore();
+      strokeCircle(ctx, cx, cy, r, '#bbb', 1.4);
+      label(ctx, 'A', cx - 5, cy + 4, '#aaa', 14, true);
+      label(ctx, 'Aᶜ', 30, 130, C.red, 14, true);
+    });
+
+    // ── 4. Union ─────────────────────────────────────────────────────────────────
+    draw('c-union', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const g = vennGeom(W, H);
+      ['fill'].forEach(() => {
+        ctx.fillStyle = 'rgba(21,101,192,0.16)';
+        circlePath(ctx, g.ax, g.cy, g.r); ctx.fill();
+        circlePath(ctx, g.bx, g.cy, g.r); ctx.fill();
+      });
+      strokeCircle(ctx, g.ax, g.cy, g.r, C.blue, 1.6);
+      strokeCircle(ctx, g.bx, g.cy, g.r, C.blue, 1.6);
+      label(ctx, 'A', g.ax - 24, g.cy + 4, C.blue, 14, true);
+      label(ctx, 'B', g.bx + 14, g.cy + 4, C.blue, 14, true);
+    });
+
+    // ── 5. Intersection ──────────────────────────────────────────────────────────
+    draw('c-intersection', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const g = vennGeom(W, H);
+      ctx.save();                                   // shade only the lens
+      circlePath(ctx, g.ax, g.cy, g.r); ctx.clip();
+      ctx.fillStyle = 'rgba(230,81,0,0.22)';
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.fill();
+      ctx.restore();
+      strokeCircle(ctx, g.ax, g.cy, g.r, '#888', 1.5);
+      strokeCircle(ctx, g.bx, g.cy, g.r, '#888', 1.5);
+      label(ctx, 'A', g.ax - 24, g.cy + 4, '#888', 14, true);
+      label(ctx, 'B', g.bx + 14, g.cy + 4, '#888', 14, true);
+      label(ctx, 'A∩B', W*0.5 - 16, g.cy + 50, C.orange, 11);
+    });
+
+    // ── 6. Mutually exclusive ─────────────────────────────────────────────────────
+    draw('c-disjoint', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const cy = H*0.51, r = 30, ax = W*0.30, bx = W*0.70;
+      circlePath(ctx, ax, cy, r); ctx.fillStyle = 'rgba(21,101,192,0.12)'; ctx.fill();
+      strokeCircle(ctx, ax, cy, r, C.blue, 1.6);
+      circlePath(ctx, bx, cy, r); ctx.fillStyle = 'rgba(198,40,40,0.12)'; ctx.fill();
+      strokeCircle(ctx, bx, cy, r, C.red, 1.6);
+      label(ctx, 'A', ax - 4, cy + 4, C.blue, 14, true);
+      label(ctx, 'B', bx - 4, cy + 4, C.red, 14, true);
+    });
+
+    // ── 7. Probability measure ────────────────────────────────────────────────────
+    draw('c-measure', (ctx, W, H) => {
+      const b = omegaBox(ctx, W, H);
+      const cx = 86, cy = 96, r = 40;
+      circlePath(ctx, cx, cy, r); ctx.fillStyle = 'rgba(21,101,192,0.20)'; ctx.fill();
+      strokeCircle(ctx, cx, cy, r, C.blue, 1.6);
+      label(ctx, 'A', cx - 5, cy + 4, C.blue, 14, true);
+      label(ctx, 'P(Ω) = 1', b.x + 8, b.y + b.h - 12, '#aaa', 11);
+      label(ctx, 'P(A) = area', cx + 30, cy - 28, C.blue, 10);
+    });
+
+    // ── 8. Addition rule ──────────────────────────────────────────────────────────
+    draw('c-addition', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const g = vennGeom(W, H);
+      ctx.fillStyle = 'rgba(21,101,192,0.13)';
+      circlePath(ctx, g.ax, g.cy, g.r); ctx.fill();
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.fill();
+      ctx.save();                                   // overlap counted twice → darker
+      circlePath(ctx, g.ax, g.cy, g.r); ctx.clip();
+      ctx.fillStyle = 'rgba(230,81,0,0.30)';
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.fill();
+      ctx.restore();
+      strokeCircle(ctx, g.ax, g.cy, g.r, C.blue, 1.5);
+      strokeCircle(ctx, g.bx, g.cy, g.r, C.blue, 1.5);
+      label(ctx, 'A', g.ax - 24, g.cy + 4, C.blue, 14, true);
+      label(ctx, 'B', g.bx + 14, g.cy + 4, C.blue, 14, true);
+      label(ctx, '− P(A∩B)', W*0.5 - 30, g.cy + 50, C.orange, 10);
+    });
+
+    // ── 9. De Morgan ──────────────────────────────────────────────────────────────
+    draw('c-demorgan', (ctx, W, H) => {
+      const b = omegaBox(ctx, W, H);
+      const g = vennGeom(W, H);
+      ctx.save();
+      roundRectPath(ctx, b.x, b.y, b.w, b.h, 10); ctx.clip();
+      ctx.fillStyle = 'rgba(198,40,40,0.11)'; ctx.fillRect(0, 0, W, H);  // outside both
+      ctx.fillStyle = '#fafafa';
+      circlePath(ctx, g.ax, g.cy, g.r); ctx.fill();
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.fill();
+      ctx.restore();
+      strokeCircle(ctx, g.ax, g.cy, g.r, '#bbb', 1.4);
+      strokeCircle(ctx, g.bx, g.cy, g.r, '#bbb', 1.4);
+      label(ctx, 'A', g.ax - 22, g.cy + 4, '#aaa', 13, true);
+      label(ctx, 'B', g.bx + 12, g.cy + 4, '#aaa', 13, true);
+      label(ctx, '(A∪B)ᶜ', b.x + 6, b.y + b.h - 10, C.red, 11);
+    });
+
+    // ── 10. Conditional probability ───────────────────────────────────────────────
+    draw('c-conditional', (ctx, W, H) => {
+      omegaBox(ctx, W, H);
+      const g = vennGeom(W, H);
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.fillStyle = 'rgba(46,125,50,0.13)'; ctx.fill();  // B = new universe
+      ctx.save();                                  // A∩B darker
+      circlePath(ctx, g.ax, g.cy, g.r); ctx.clip();
+      ctx.fillStyle = 'rgba(230,81,0,0.30)';
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.fill();
+      ctx.restore();
+      strokeCircle(ctx, g.ax, g.cy, g.r, '#bbb', 1.4);
+      circlePath(ctx, g.bx, g.cy, g.r); ctx.strokeStyle = C.green; ctx.lineWidth = 1.8;
+      ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
+      label(ctx, 'A', g.ax - 22, g.cy + 4, '#aaa', 13, true);
+      label(ctx, 'B', g.bx + 14, g.cy + 4, C.green, 14, true);
+      label(ctx, 'given B', g.bx - 6, g.cy + 52, C.green, 10);
+    });
+
+    // ── 11. Independence (area = width × height) ──────────────────────────────────
+    draw('c-independence', (ctx, W, H) => {
+      const s = 116, x0 = (W - s) / 2, y0 = (H - s) / 2 - 4;
+      const pa = 0.62, pb = 0.55;
+      ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1.2; ctx.strokeRect(x0, y0, s, s);
+      // P(A) strip (vertical), P(B) strip (horizontal), overlap = product
+      ctx.fillStyle = 'rgba(21,101,192,0.10)'; ctx.fillRect(x0, y0, s*pa, s);
+      ctx.fillStyle = 'rgba(198,40,40,0.10)'; ctx.fillRect(x0, y0, s, s*pb);
+      ctx.fillStyle = 'rgba(230,81,0,0.28)'; ctx.fillRect(x0, y0, s*pa, s*pb);
+      dashedLine(ctx, x0 + s*pa, y0, x0 + s*pa, y0 + s, '#bbb', 1);
+      dashedLine(ctx, x0, y0 + s*pb, x0 + s, y0 + s*pb, '#bbb', 1);
+      label(ctx, 'P(A)', x0 + s*pa/2 - 12, y0 - 6, C.blue, 10);
+      label(ctx, 'P(B)', x0 - 4, y0 - 6, C.red, 10);
+      label(ctx, 'P(A)P(B)', x0 + 6, y0 + s*pb/2 + 4, C.orange, 10);
+    });
+
+    // ── 12. Bayes / total probability (partition) ─────────────────────────────────
+    draw('c-bayes', (ctx, W, H) => {
+      const b = omegaBox(ctx, W, H);
+      const tints = ['rgba(21,101,192,0.10)', 'rgba(46,125,50,0.10)', 'rgba(230,81,0,0.10)'];
+      const labels = ['B₁', 'B₂', 'B₃'];
+      const cols = [C.blue, C.green, C.orange];
+      for (let i = 0; i < 3; i++) {
+        const x = b.x + b.w * i / 3;
+        ctx.fillStyle = tints[i]; ctx.fillRect(x, b.y, b.w / 3, b.h);
+        if (i) solidLine(ctx, x, b.y, x, b.y + b.h, '#ddd', 1);
+        label(ctx, labels[i], x + b.w/6 - 8, b.y + b.h - 10, cols[i], 11);
+      }
+      // event A overlapping all three slices
+      ctx.beginPath();
+      ctx.ellipse(W*0.5, H*0.46, 56, 30, 0, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(60,60,60,0.13)'; ctx.fill();
+      ctx.strokeStyle = '#555'; ctx.lineWidth = 1.5; ctx.stroke();
+      label(ctx, 'A', W*0.5 - 5, H*0.46 + 4, '#444', 13, true);
+    });
+
+    // ── chart frame for distribution plots ────────────────────────────────────────
+    function chart(ctx, W, H) {
+      const box = { x0: 26, w: W - 44, y1: H - 32, h: H - 64 };
+      box.y0 = box.y1 - box.h;
+      solidLine(ctx, box.x0, box.y1, box.x0 + box.w, box.y1, '#ccc', 1.2);  // x-axis
+      solidLine(ctx, box.x0, box.y0 - 4, box.x0, box.y1, '#ccc', 1.2);      // y-axis
+      return box;
+    }
+    function plotCurve(ctx, box, fn, color, fillColor) {
+      const N = 80, pts = [];
+      for (let i = 0; i <= N; i++) { const t = i / N; pts.push([box.x0 + t*box.w, box.y1 - fn(t)*box.h]); }
+      if (fillColor) {
+        ctx.beginPath(); ctx.moveTo(box.x0, box.y1);
+        pts.forEach(p => ctx.lineTo(p[0], p[1]));
+        ctx.lineTo(box.x0 + box.w, box.y1); ctx.closePath();
+        ctx.fillStyle = fillColor; ctx.fill();
+      }
+      ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+    }
+    function plotBars(ctx, box, ys, color) {
+      const n = ys.length, gap = box.w / n, bw = gap * 0.58, m = Math.max(...ys);
+      ys.forEach((v, i) => {
+        const h = (v / m) * box.h, x = box.x0 + gap*i + (gap - bw)/2;
+        ctx.fillStyle = color; ctx.fillRect(x, box.y1 - h, bw, h);
+      });
+    }
+    const bell = (mu, sd) => (t) => Math.exp(-Math.pow((t - mu) / sd, 2) / 2);
+
+    // ── 13. Random variable (Ω → ℝ) ───────────────────────────────────────────────
+    draw('c-rv', (ctx, W, H) => {
+      const lcx = 50, cy = H*0.46, rx = 30, ry = 56;
+      ctx.beginPath(); ctx.ellipse(lcx, cy, rx, ry, 0, 0, Math.PI*2);
+      ctx.strokeStyle = C.blue; ctx.lineWidth = 1.6; ctx.stroke();
+      label(ctx, 'Ω', lcx - 6, cy - ry - 6, C.blue, 13, true);
+      // number line
+      const nx = 150, y0 = cy - 50, y1 = cy + 50;
+      solidLine(ctx, nx, y0, nx, y1, '#888', 1.4);
+      for (let i = 0; i <= 4; i++) { const y = y0 + (y1 - y0)*i/4; solidLine(ctx, nx - 4, y, nx + 4, y, '#bbb', 1); }
+      label(ctx, 'ℝ', nx + 8, y0 + 2, '#888', 13, true);
+      // X maps outcomes to numbers
+      const src = [[44, cy - 28], [56, cy + 2], [40, cy + 30]];
+      const dst = [[nx, y0 + 14], [nx, cy + 4], [nx, y1 - 12]];
+      src.forEach((p, i) => {
+        dot(ctx, p[0], p[1], 3.4, C.blue);
+        arrow(ctx, p[0] + 8, p[1], dst[i][0] - 5, dst[i][1], '#bbb', 1.3);
+        dot(ctx, dst[i][0], dst[i][1], 3.4, C.orange);
+      });
+      label(ctx, 'X', 100, cy - 30, '#888', 13, true);
+    });
+
+    // ── 14. PMF ──────────────────────────────────────────────────────────────────
+    draw('c-pmf', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      plotBars(ctx, box, [0.10, 0.22, 0.30, 0.22, 0.12, 0.04], C.blue);
+      label(ctx, 'P(X = x)', box.x0 + 4, box.y0 - 6, '#aaa', 10);
+    });
+
+    // ── 15. PDF ──────────────────────────────────────────────────────────────────
+    draw('c-pdf', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      const f = bell(0.5, 0.17);
+      plotCurve(ctx, box, t => f(t) * 0.95, C.blue, 'rgba(21,101,192,0.14)');
+      label(ctx, 'area = 1', box.x0 + box.w*0.5 - 18, box.y1 - box.h*0.4, C.blue, 10);
+    });
+
+    // ── 16. CDF ──────────────────────────────────────────────────────────────────
+    draw('c-cdf', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      plotCurve(ctx, box, t => 1 / (1 + Math.exp(-(t - 0.5) * 11)), '#7c3aed');
+      dashedLine(ctx, box.x0, box.y1 - box.h, box.x0 + box.w, box.y1 - box.h, '#ddd', 1);
+      label(ctx, '1', box.x0 - 12, box.y1 - box.h + 4, '#bbb', 10);
+      label(ctx, '0', box.x0 - 12, box.y1 + 4, '#bbb', 10);
+    });
+
+    // ── 17. Expectation (balance point) ───────────────────────────────────────────
+    draw('c-expectation', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      const mu = 0.52, f = bell(mu, 0.18);
+      plotCurve(ctx, box, t => f(t) * 0.9, C.blue, 'rgba(21,101,192,0.12)');
+      const mx = box.x0 + mu * box.w;
+      dashedLine(ctx, mx, box.y0, mx, box.y1, C.orange, 1.2);
+      // fulcrum triangle
+      ctx.beginPath(); ctx.moveTo(mx, box.y1 + 2); ctx.lineTo(mx - 7, box.y1 + 12);
+      ctx.lineTo(mx + 7, box.y1 + 12); ctx.closePath();
+      ctx.fillStyle = C.orange; ctx.fill();
+      label(ctx, 'μ', mx - 4, box.y0 - 2, C.orange, 13, true);
+    });
+
+    // ── 18. Variance / spread ─────────────────────────────────────────────────────
+    draw('c-variance', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      const mu = 0.5, sd = 0.16, f = bell(mu, sd);
+      plotCurve(ctx, box, t => f(t) * 0.9, C.blue, 'rgba(21,101,192,0.10)');
+      const mx = box.x0 + mu*box.w;
+      const lx = box.x0 + (mu - sd)*box.w, rx = box.x0 + (mu + sd)*box.w;
+      const ay = box.y1 - box.h*0.34;
+      dashedLine(ctx, mx, box.y0, mx, box.y1, '#bbb', 1);
+      arrow(ctx, mx, ay, lx, ay, C.orange, 1.5);
+      arrow(ctx, mx, ay, rx, ay, C.orange, 1.5);
+      label(ctx, '−σ', lx - 2, ay - 6, C.orange, 10);
+      label(ctx, '+σ', rx - 12, ay - 6, C.orange, 10);
+    });
+
+    // ── 19. Binomial ──────────────────────────────────────────────────────────────
+    draw('c-binomial', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      plotBars(ctx, box, [0.02, 0.09, 0.20, 0.27, 0.22, 0.13, 0.05, 0.02], C.blue);
+    });
+
+    // ── 20. Poisson ───────────────────────────────────────────────────────────────
+    draw('c-poisson', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      plotBars(ctx, box, [0.30, 0.36, 0.22, 0.11, 0.05, 0.02, 0.01], C.green);
+    });
+
+    // ── 21. Normal ────────────────────────────────────────────────────────────────
+    draw('c-normal', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      const mu = 0.5, sd = 0.16, f = bell(mu, sd);
+      plotCurve(ctx, box, t => f(t) * 0.92, C.blue, 'rgba(21,101,192,0.13)');
+      const mx = box.x0 + mu*box.w;
+      dashedLine(ctx, mx, box.y0, mx, box.y1, '#bbb', 1);
+      label(ctx, 'μ', mx - 4, box.y1 + 14, '#999', 11, true);
+      label(ctx, 'σ', box.x0 + (mu + sd)*box.w, box.y1 - box.h*0.5, '#999', 11, true);
+    });
+
+    // ── 22. Exponential ───────────────────────────────────────────────────────────
+    draw('c-exponential', (ctx, W, H) => {
+      const box = chart(ctx, W, H);
+      plotCurve(ctx, box, t => Math.exp(-3.4 * t), C.red, 'rgba(198,40,40,0.12)');
+      label(ctx, 'λ', box.x0 + 8, box.y0 + 6, C.red, 12, true);
+    });
+  </script>
+</body>
+</html>
