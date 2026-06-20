@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Distribution Calculator – Tools</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../src/styles/tools.css">
+</head>
+<body>
+  <div id="app">
+    <div id="main">
+      <div class="tool-head">
+        <a href="../index.html" id="back">← All visualizations</a>
+        <h1>Distribution Calculator</h1>
+        <nav class="tool-tabs">
+          <a href="distribution-calculator.html" class="active">Distributions</a>
+          <a href="statistical-tests.html">Tests</a>
+        </nav>
+      </div>
+
+      <div class="plot-wrap">
+        <h3>Probability density / mass</h3>
+        <canvas id="densityPlot" class="plot"></canvas>
+      </div>
+      <div class="plot-wrap">
+        <h3>Cumulative distribution — P(X ≤ x)</h3>
+        <canvas id="cdfPlot" class="plot"></canvas>
+      </div>
+    </div>
+
+    <div id="panel">
+      <div class="panel-title">Distribution</div>
+      <select id="dist"></select>
+      <div id="params"></div>
+      <div class="formula" id="formula"></div>
+
+      <div class="panel-title">Evaluate at a point</div>
+      <label class="field" for="xval">x value</label>
+      <input type="number" id="xval" step="any">
+      <div class="readout" id="pointReadout"></div>
+
+      <div class="panel-title">Inverse — find x from a probability</div>
+      <label class="field" for="qval">q = P(X ≤ x) <span class="val" id="qShown"></span></label>
+      <input type="range" id="qval" min="0.001" max="0.999" step="0.001" value="0.5">
+      <div class="readout" id="quantileReadout"></div>
+
+      <div class="panel-title">Moments</div>
+      <div class="readout" id="moments"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="module">
+    import { distributions, byKey, defaults, densityData, cdfData } from '../src/tools/stats.js';
+    import { render } from '../src/tools/plot.js';
+
+    const $ = id => document.getElementById(id);
+    let dist = distributions[0];
+    let params = defaults(dist);
+    let xval = 0;
+
+    // --- distribution selector ---
+    const sel = $('dist');
+    for (const d of distributions) {
+      const opt = document.createElement('option');
+      opt.value = d.key;
+      opt.textContent = `${d.name}${d.discrete ? '  (discrete)' : ''}`;
+      sel.appendChild(opt);
+    }
+    sel.addEventListener('change', () => selectDist(byKey[sel.value]));
+
+    function selectDist(d) {
+      dist = d;
+      params = defaults(d);
+      buildParams();
+      // sensible default evaluation point: the median
+      xval = round(d.quantile(0.5, params), d.discrete);
+      $('xval').step = d.discrete ? '1' : 'any';
+      katex.render(d.tex, $('formula'), { throwOnError: false, displayMode: true });
+      refresh();
+    }
+
+    function buildParams() {
+      const box = $('params');
+      box.innerHTML = '';
+      for (const pr of dist.params) {
+        const wrap = document.createElement('div');
+        wrap.className = 'param';
+        const lab = document.createElement('label');
+        lab.className = 'field';
+        lab.innerHTML = `${pr.label} <span class="val"></span>`;
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = pr.min; slider.max = pr.max; slider.step = pr.step;
+        slider.value = params[pr.key];
+        const valSpan = lab.querySelector('.val');
+        valSpan.textContent = params[pr.key];
+        slider.addEventListener('input', () => {
+          params[pr.key] = pr.integer ? Math.round(+slider.value) : +slider.value;
+          valSpan.textContent = params[pr.key];
+          refresh();
+        });
+        wrap.appendChild(lab);
+        wrap.appendChild(slider);
+        box.appendChild(wrap);
+      }
+    }
+
+    // --- point + quantile inputs ---
+    $('xval').addEventListener('input', e => {
+      const v = parseFloat(e.target.value);
+      if (Number.isFinite(v)) { xval = dist.discrete ? Math.round(v) : v; refresh(); }
+    });
+    $('qval').addEventListener('input', e => {
+      const q = +e.target.value;
+      $('qShown').textContent = q.toFixed(3);
+      const x = dist.quantile(q, params);
+      $('quantileReadout').innerHTML = rows([
+        [`x such that P(X ≤ x) = ${q.toFixed(3)}`, fmt(x), true],
+      ]);
+    });
+
+    function refresh() {
+      const dd = densityData(dist, params);
+      const cd = cdfData(dist, params);
+
+      render($('densityPlot'), dd.discrete
+        ? { type: 'bars', bars: dd.bars, domain: dd.domain, marker: xval,
+            shade: { from: -Infinity, to: xval }, color: '#2563eb', yLabel: 'P(X = k)' }
+        : { type: 'line', points: dd.points, domain: dd.domain, marker: xval,
+            shade: { from: -Infinity, to: xval }, color: '#2563eb', yLabel: 'f(x)' });
+
+      render($('cdfPlot'), {
+        type: 'line',
+        points: cd.discrete ? stepify(cd.points) : cd.points,
+        domain: cd.domain, range: [0, 1], marker: xval,
+        color: '#7c3aed', yLabel: 'F(x)',
+      });
+
+      $('xval').value = xval;
+      renderPoint();
+      renderMoments();
+      // refresh quantile readout for current slider position
+      $('qval').dispatchEvent(new Event('input'));
+    }
+
+    function renderPoint() {
+      const cdf = dist.cdf(xval, params);
+      const out = [];
+      if (dist.discrete) {
+        const pmf = dist.dens(xval, params);
+        out.push([`P(X = ${xval})`, fmt(pmf), true]);
+        out.push([`P(X ≤ ${xval})`, fmt(cdf)]);
+        out.push([`P(X < ${xval})`, fmt(cdf - pmf)]);
+        out.push([`P(X ≥ ${xval})`, fmt(1 - cdf + pmf)]);
+        out.push([`P(X > ${xval})`, fmt(1 - cdf)]);
+      } else {
+        out.push([`f(${fmt(xval)})  density`, fmt(dist.dens(xval, params)), true]);
+        out.push([`P(X ≤ ${fmt(xval)})`, fmt(cdf)]);
+        out.push([`P(X > ${fmt(xval)})`, fmt(1 - cdf)]);
+      }
+      $('pointReadout').innerHTML = rows(out);
+    }
+
+    function renderMoments() {
+      const mean = dist.mean(params);
+      const varc = dist.variance(params);
+      $('moments').innerHTML = rows([
+        ['mean', mean == null ? '—' : fmt(mean)],
+        ['variance', varc == null ? '—' : fmt(varc)],
+        ['std. dev.', varc == null ? '—' : fmt(Math.sqrt(varc))],
+        ['median', fmt(dist.quantile(0.5, params))],
+      ]);
+    }
+
+    // --- helpers ---
+    function stepify(pts) {
+      // draw a discrete cdf as a right-continuous staircase
+      const out = [];
+      for (let i = 0; i < pts.length; i++) {
+        if (i > 0) out.push({ x: pts[i].x, y: pts[i - 1].y });
+        out.push(pts[i]);
+      }
+      return out;
+    }
+    const round = (v, discrete) => (discrete ? Math.round(v) : v);
+    function fmt(v) {
+      if (v == null || Number.isNaN(v)) return '—';
+      if (v !== 0 && (Math.abs(v) < 1e-4 || Math.abs(v) >= 1e5)) return v.toExponential(3);
+      return String(Math.round(v * 1e5) / 1e5);
+    }
+    function rows(items) {
+      return items.map(([k, v, hi]) =>
+        `<div class="row${hi ? ' hi' : ''}"><span class="k">${k}</span><span class="v">${v}</span></div>`
+      ).join('');
+    }
+
+    window.addEventListener('resize', refresh);
+    selectDist(dist);
+  </script>
+</body>
+</html>

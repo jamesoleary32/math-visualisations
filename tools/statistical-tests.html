@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistical Tests – Tools</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../src/styles/tools.css">
+</head>
+<body>
+  <div id="app">
+    <div id="main">
+      <div class="tool-head">
+        <a href="../index.html" id="back">← All visualizations</a>
+        <h1>Statistical Tests</h1>
+        <nav class="tool-tabs">
+          <a href="distribution-calculator.html">Distributions</a>
+          <a href="statistical-tests.html" class="active">Tests</a>
+        </nav>
+      </div>
+
+      <p class="hint" style="max-width:640px">
+        Enter numbers separated by spaces, commas, or new lines. p-values are two-sided.
+        Significance level α is applied to the verdict only.
+      </p>
+
+      <div id="result"></div>
+    </div>
+
+    <div id="panel">
+      <div class="panel-title">Test</div>
+      <select id="test">
+        <option value="oneSampleT">One-sample t-test</option>
+        <option value="welchT">Two-sample t-test (Welch)</option>
+        <option value="pairedT">Paired t-test</option>
+        <option value="chiSquareGoF">Chi-square goodness-of-fit</option>
+      </select>
+
+      <div id="inputs" class="group"></div>
+
+      <label class="field" for="alpha">α (significance) <span class="val" id="alphaShown">0.05</span></label>
+      <input type="range" id="alpha" min="0.001" max="0.2" step="0.001" value="0.05">
+
+      <button class="btn" id="run">Run test</button>
+      <div id="err" class="error"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+  <script type="module">
+    import { parseData, oneSampleT, welchT, pairedT, chiSquareGoF } from '../src/tools/tests.js';
+
+    const $ = id => document.getElementById(id);
+
+    // Input layout per test: list of fields to render.
+    const SPECS = {
+      oneSampleT: {
+        fields: [
+          { key: 'data', kind: 'area', label: 'Sample data', ph: '5.1, 4.8, 5.4, 5.0, 4.6, 5.3' },
+          { key: 'mu0', kind: 'num', label: 'Hypothesised mean μ₀', val: '5' },
+        ],
+      },
+      welchT: {
+        fields: [
+          { key: 'a', kind: 'area', label: 'Sample 1', ph: '23, 21, 25, 22, 26' },
+          { key: 'b', kind: 'area', label: 'Sample 2', ph: '19, 20, 18, 22, 17' },
+        ],
+      },
+      pairedT: {
+        fields: [
+          { key: 'a', kind: 'area', label: 'Before', ph: '88, 92, 79, 85, 90' },
+          { key: 'b', kind: 'area', label: 'After', ph: '85, 90, 78, 80, 86' },
+        ],
+      },
+      chiSquareGoF: {
+        fields: [
+          { key: 'observed', kind: 'area', label: 'Observed counts', ph: '18, 22, 20, 16, 24, 20' },
+          { key: 'expected', kind: 'area', label: 'Expected counts (blank = uniform)', ph: '' },
+        ],
+      },
+    };
+
+    function buildInputs() {
+      const spec = SPECS[$('test').value];
+      const box = $('inputs');
+      box.innerHTML = '';
+      for (const f of spec.fields) {
+        const lab = document.createElement('label');
+        lab.className = 'field';
+        lab.textContent = f.label;
+        const el = f.kind === 'area' ? document.createElement('textarea') : document.createElement('input');
+        if (f.kind === 'num') el.type = 'number';
+        el.id = `f_${f.key}`;
+        if (f.ph != null) el.placeholder = f.ph;
+        if (f.val != null) el.value = f.val;
+        box.appendChild(lab);
+        box.appendChild(el);
+      }
+    }
+
+    function run() {
+      $('err').textContent = '';
+      const t = $('test').value;
+      const alpha = +$('alpha').value;
+      const v = key => $(`f_${key}`).value;
+      try {
+        let res;
+        if (t === 'oneSampleT') res = oneSampleT(parseData(v('data')), parseFloat(v('mu0')));
+        else if (t === 'welchT') res = welchT(parseData(v('a')), parseData(v('b')));
+        else if (t === 'pairedT') res = pairedT(parseData(v('a')), parseData(v('b')));
+        else res = chiSquareGoF(parseData(v('observed')), parseData(v('expected')));
+        renderResult(res, alpha);
+      } catch (e) {
+        $('result').innerHTML = '';
+        $('err').textContent = e.message;
+      }
+    }
+
+    function renderResult(res, alpha) {
+      const sig = res.p < alpha;
+      const statName = res.title.startsWith('Chi') ? 'χ²' : 't';
+      const rows = [
+        [statName, fmt(res.stat)],
+        ['degrees of freedom', fmt(res.df)],
+        ['p-value', fmt(res.p)],
+        ...res.rows.map(([k, val]) => [k, typeof val === 'number' ? fmt(val) : val]),
+      ];
+      $('result').innerHTML = `
+        <div class="result-card" style="max-width:520px">
+          <div class="panel-title">${res.title}</div>
+          <div class="readout" style="margin-top:10px">
+            ${rows.map(([k, val], i) =>
+              `<div class="row${i === 2 ? ' hi' : ''}"><span class="k">${k}</span><span class="v">${val}</span></div>`
+            ).join('')}
+          </div>
+          <div class="verdict ${sig ? 'sig' : 'ns'}">
+            ${sig
+              ? `Reject H₀ at α = ${alpha} (p = ${fmt(res.p)} < α)`
+              : `Fail to reject H₀ at α = ${alpha} (p = ${fmt(res.p)} ≥ α)`}
+          </div>
+        </div>`;
+    }
+
+    function fmt(v) {
+      if (typeof v !== 'number' || Number.isNaN(v)) return '—';
+      if (v !== 0 && (Math.abs(v) < 1e-4 || Math.abs(v) >= 1e5)) return v.toExponential(3);
+      return String(Math.round(v * 1e5) / 1e5);
+    }
+
+    $('test').addEventListener('change', () => { buildInputs(); $('result').innerHTML = ''; $('err').textContent = ''; });
+    $('alpha').addEventListener('input', e => $('alphaShown').textContent = (+e.target.value).toFixed(3));
+    $('run').addEventListener('click', run);
+
+    buildInputs();
+  </script>
+</body>
+</html>
