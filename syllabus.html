@@ -88,7 +88,66 @@
       transition: width 0.3s ease;
     }
 
-    /* Phase sections */
+    /* Floating table of contents (Notion-style, right edge) */
+    .toc {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+    .toc:hover {
+      background: #ffffff;
+      border-color: #e8e8e8;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #bbb;
+      padding: 3px 2px;
+      transition: color 0.15s;
+    }
+    .toc-tick {
+      display: block;
+      height: 2px;
+      width: 16px;
+      border-radius: 2px;
+      background: #d3d3d3;
+      flex-shrink: 0;
+      transition: width 0.18s, background 0.18s;
+      margin-left: auto;
+    }
+    .toc-label {
+      font-size: 12px;
+      white-space: nowrap;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-width 0.18s, opacity 0.18s;
+    }
+    .toc:hover .toc-label { max-width: 240px; opacity: 1; }
+    .toc-item:hover { color: #555; }
+    .toc-item:hover .toc-tick { background: #999; }
+    /* Active section */
+    .toc-item.active { color: #1565c0; }
+    .toc-item.active .toc-tick { width: 26px; background: #1565c0; }
+    .toc:hover .toc-item.active .toc-tick { width: 16px; }
+    @media (max-width: 1100px) { .toc { display: none; } }
+
+    /* Subject sections */
     .phase {
       margin-bottom: 40px;
     }
@@ -226,16 +285,78 @@
       user-select: none;
     }
 
-    .viz-link {
+    /* Resource links appended to a topic row: viz, glossary */
+    .viz-link, .gloss-link {
       font-size: 11px;
-      color: #1565c0;
       text-decoration: none;
       white-space: nowrap;
       opacity: 0.7;
       transition: opacity 0.15s;
     }
-    .viz-link:hover { opacity: 1; }
-    .topic-row.checked .viz-link { color: #aaa; }
+    .viz-link { color: #1565c0; }
+    .gloss-link { color: #00897b; }
+    .viz-link:hover, .gloss-link:hover { opacity: 1; }
+    .topic-row.checked .viz-link,
+    .topic-row.checked .gloss-link { color: #aaa; }
+
+    /* Subject-level resources bar (glossary + practice for the whole subject) */
+    .phase-resources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: 11px;
+      color: #bbb;
+      margin: 4px 0 14px 0;
+    }
+    .phase-resources a {
+      text-decoration: none;
+      color: #1565c0;
+      opacity: 0.75;
+      transition: opacity 0.15s;
+    }
+    .phase-resources a:hover { opacity: 1; }
+    .phase-resources .res-label {
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 10px;
+      color: #ccc;
+      margin-right: 6px;
+    }
+
+    /* Visualisations nested hierarchically under a topic */
+    .topic-viz {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin: -2px 0 8px 42px;
+    }
+    .topic-viz a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #666;
+      text-decoration: none;
+      transition: background 0.1s, color 0.1s;
+    }
+    .topic-viz a::before {
+      content: '↳';
+      color: #d0d0d0;
+    }
+    .topic-viz a:hover { background: #eef4fb; color: #1565c0; }
+    .topic-viz .viz-tag {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #aaa;
+      border: 1px solid #e4e4e4;
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    .topic-row.checked + .topic-viz a { color: #b5b5b5; }
 
     /* Footer */
     .footer {
@@ -270,7 +391,7 @@
 <header>
   <h1>Self-Study Syllabus</h1>
   <div class="header-meta">
-    <p>~14 hrs/week · ~22 months · ~1,000 hrs total</p>
+    <p>Organised by subject · progress reflects my actual, non-linear path</p>
     <a href="index.html" class="nav-link">← All visualizations</a>
   </div>
 </header>
@@ -284,15 +405,22 @@
   <span class="count" id="overall-count">0 / 0</span>
 </div>
 
-<!-- ── Phase 1: Linear Algebra ───────────────────────────────────────────── -->
-<section class="phase" data-phase="1">
+<!-- Floating table of contents — built from the subject sections by JS -->
+<nav class="toc" id="toc" aria-label="Contents"></nav>
+
+<!-- ── Linear Algebra───────────────────────────────────────────── -->
+<section class="phase" id="linear-algebra" data-phase="1">
   <div class="phase-header">
-    <span class="phase-title">Phase 1 — Linear Algebra</span>
-    <span class="phase-dates">May – mid Jun 2026 · ~70 hrs</span>
+    <span class="phase-title">Linear Algebra</span>
     <span class="phase-progress-text" id="p1-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p1-bar"></div></div>
   <div class="phase-sources">3Blue1Brown — Essence of Linear Algebra · Singh — Linear Algebra: Step by Step</div>
+  <div class="phase-resources">
+    <span><span class="res-label">Glossary</span><a href="linear-algebra-glossary.html">Linear Algebra Glossary →</a></span>
+    <span><span class="res-label">Sources</span><a href="catalog.html">Catalog →</a></span>
+    <span><span class="res-label">Practice</span><span style="color:#ddd">none yet</span></span>
+  </div>
 
   <div class="topic-group-label">Completed</div>
 
@@ -301,7 +429,10 @@
     <span class="topic-name">Dot Product</span>
     <span class="topic-sub">Vectors, angles, and projection</span>
     <span class="topic-source">3B1B · Singh</span>
-    <a href="linear-algebra/dot-product.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+    <a href="linear-algebra-glossary.html#c-dot" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/dot-product.html"><span class="viz-tag">viz</span>Dot Product</a>
   </div>
 
   <div class="topic-row" data-id="la-cross-product" data-default="1">
@@ -309,7 +440,9 @@
     <span class="topic-name">Cross Product</span>
     <span class="topic-sub">Perpendicular vectors and parallelogram area</span>
     <span class="topic-source">3B1B · Singh</span>
-    <a href="linear-algebra/cross-product.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/cross-product.html"><span class="viz-tag">viz</span>Cross Product</a>
   </div>
 
   <div class="topic-row" data-id="la-determinant" data-default="1">
@@ -317,7 +450,10 @@
     <span class="topic-name">Determinant</span>
     <span class="topic-sub">Area scaling, orientation, and collapse — ad − bc</span>
     <span class="topic-source">3B1B · Singh</span>
-    <a href="linear-algebra/determinant.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+    <a href="linear-algebra-glossary.html#c-det" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/determinant.html"><span class="viz-tag">viz</span>Determinant</a>
   </div>
 
   <div class="topic-row" data-id="la-inverse" data-default="1">
@@ -325,7 +461,10 @@
     <span class="topic-name">Inverse Transformation</span>
     <span class="topic-sub">A⁻¹ undoes A — round-trip identity, singular failure</span>
     <span class="topic-source">3B1B · Singh</span>
-    <a href="linear-algebra/inverse-transformation.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+    <a href="linear-algebra-glossary.html#c-inverse" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/inverse-transformation.html"><span class="viz-tag">viz</span>Inverse Transformation</a>
   </div>
 
   <div class="topic-row" data-id="la-eigenvectors" data-default="1">
@@ -333,7 +472,10 @@
     <span class="topic-name">Eigenvectors</span>
     <span class="topic-sub">Av = λv — directions a matrix only stretches</span>
     <span class="topic-source">3B1B · Singh</span>
-    <a href="linear-algebra/eigenvectors.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+    <a href="linear-algebra-glossary.html#c-eigen" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/eigenvectors.html"><span class="viz-tag">viz</span>Eigenvectors</a>
   </div>
 
   <div class="topic-row" data-id="la-eigenspaces" data-default="1">
@@ -341,7 +483,10 @@
     <span class="topic-name">Eigenspaces</span>
     <span class="topic-sub">E_λ = Null(A − λI) — multiplicity &amp; defective matrices</span>
     <span class="topic-source">3B1B · Singh</span>
-    <a href="linear-algebra/eigenspaces.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+    <a href="linear-algebra-glossary.html#c-eigen" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/eigenspaces.html"><span class="viz-tag">viz</span>Eigenspaces</a>
   </div>
 
   <div class="topic-group-label">To do</div>
@@ -351,6 +496,7 @@
     <span class="topic-name">Linear Transformations</span>
     <span class="topic-sub">Rotations, reflections, shears, projections as a unified concept</span>
     <span class="topic-source">3B1B v3</span>
+    <a href="linear-algebra-glossary.html#c-transform" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="la-composition">
@@ -358,6 +504,7 @@
     <span class="topic-name">Matrix Multiplication as Composition</span>
     <span class="topic-sub">Applying A then B = BA; why order matters geometrically</span>
     <span class="topic-source">3B1B v4</span>
+    <a href="linear-algebra-glossary.html#c-transform" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="la-span-basis">
@@ -365,6 +512,8 @@
     <span class="topic-name">Span, Basis &amp; Linear Independence</span>
     <span class="topic-sub">What a basis is; when vectors are redundant; dimension</span>
     <span class="topic-source">3B1B v2 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-span" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+    <a href="linear-algebra-glossary.html#c-basis" class="gloss-link" onclick="event.stopPropagation()">basis →</a>
   </div>
 
   <div class="topic-row" data-id="la-spaces">
@@ -372,8 +521,11 @@
     <span class="topic-name">Column Space &amp; Null Space</span>
     <span class="topic-sub">What A can reach; what it maps to zero; rank-nullity theorem</span>
     <span class="topic-source">3B1B v7 · Singh</span>
-    <a href="linear-algebra/kernel-and-range.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-    <a href="linear-algebra/rank-and-nullity.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+    <a href="linear-algebra-glossary.html#c-kernel" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/kernel-and-range.html"><span class="viz-tag">viz</span>Kernel &amp; Range</a>
+    <a href="linear-algebra/rank-and-nullity.html"><span class="viz-tag">viz</span>Rank &amp; Nullity</a>
   </div>
 
   <div class="topic-row" data-id="la-change-of-basis">
@@ -381,6 +533,7 @@
     <span class="topic-name">Change of Basis</span>
     <span class="topic-sub">Same transformation, different coordinate frame; P⁻¹AP</span>
     <span class="topic-source">3B1B v13 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-basis" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="la-projection">
@@ -388,6 +541,7 @@
     <span class="topic-name">Orthogonal Projection</span>
     <span class="topic-sub">Projecting onto a subspace; least squares</span>
     <span class="topic-source">Singh</span>
+    <a href="linear-algebra-glossary.html#c-ortho" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="la-diagonalisation">
@@ -395,6 +549,7 @@
     <span class="topic-name">Eigendecomposition &amp; Diagonalisation</span>
     <span class="topic-sub">A = PDP⁻¹; matrix powers; why it matters</span>
     <span class="topic-source">3B1B v14 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-eigen" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="la-svd">
@@ -405,11 +560,10 @@
   </div>
 </section>
 
-<!-- ── Phase 2: Thomson ──────────────────────────────────────────────────── -->
-<section class="phase" data-phase="2">
+<!-- ── Dynamics & Orbital Mechanics──────────────────────────────────────────────────── -->
+<section class="phase" id="dynamics-orbital-mechanics" data-phase="2">
   <div class="phase-header">
-    <span class="phase-title">Phase 2 — Thomson: Introduction to Space Dynamics</span>
-    <span class="phase-dates">mid Jun – mid Jul 2026 · ~50 hrs</span>
+    <span class="phase-title">Dynamics &amp; Orbital Mechanics</span>
     <span class="phase-progress-text" id="p2-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p2-bar"></div></div>
@@ -588,11 +742,10 @@
   </div>
 </section>
 
-<!-- ── Phase 3: Arnold + 3B1B DE ─────────────────────────────────────────── -->
-<section class="phase" data-phase="3">
+<!-- ── Differential Equations ───────────────────────────────────────────── -->
+<section class="phase" id="differential-equations" data-phase="3">
   <div class="phase-header">
-    <span class="phase-title">Phase 3 — Differential Equations</span>
-    <span class="phase-dates">mid Jul – Oct 2026 · ~130 hrs</span>
+    <span class="phase-title">Differential Equations</span>
     <span class="phase-progress-text" id="p3-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p3-bar"></div></div>
@@ -685,11 +838,10 @@
   </div>
 </section>
 
-<!-- ── Phase 4: Signals & Systems ────────────────────────────────────────── -->
-<section class="phase" data-phase="4">
+<!-- ── Signals & Systems ─────────────────────────────────────────────────── -->
+<section class="phase" id="signals-systems" data-phase="4">
   <div class="phase-header">
-    <span class="phase-title">Phase 4 — Oppenheim &amp; Willsky: Signals and Systems</span>
-    <span class="phase-dates">Oct – Dec 2026 · ~80 hrs</span>
+    <span class="phase-title">Signals &amp; Systems</span>
     <span class="phase-progress-text" id="p4-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p4-bar"></div></div>
@@ -763,11 +915,10 @@
   </div>
 </section>
 
-<!-- ── Phase 5: Control Systems ──────────────────────────────────────────── -->
-<section class="phase" data-phase="5">
+<!-- ── Control Systems──────────────────────────────────────────── -->
+<section class="phase" id="control-systems" data-phase="5">
   <div class="phase-header">
-    <span class="phase-title">Phase 5 — Control Systems</span>
-    <span class="phase-dates">Dec 2026 – Feb 2027 · ~80 hrs</span>
+    <span class="phase-title">Control Systems</span>
     <span class="phase-progress-text" id="p5-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p5-bar"></div></div>
@@ -855,11 +1006,10 @@
   </div>
 </section>
 
-<!-- ── Phase 6: Abbott ─────────────────────────────────────────────────────── -->
-<section class="phase" data-phase="6">
+<!-- ── Real Analysis─────────────────────────────────────────────────────── -->
+<section class="phase" id="real-analysis" data-phase="6">
   <div class="phase-header">
-    <span class="phase-title">Phase 6 — Abbott: Understanding Analysis</span>
-    <span class="phase-dates">Feb – Apr 2027 · ~90 hrs</span>
+    <span class="phase-title">Real Analysis</span>
     <span class="phase-progress-text" id="p6-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p6-bar"></div></div>
@@ -915,11 +1065,10 @@
   </div>
 </section>
 
-<!-- ── Phase 7: Armstrong ─────────────────────────────────────────────────── -->
-<section class="phase" data-phase="7">
+<!-- ── Topology─────────────────────────────────────────────────── -->
+<section class="phase" id="topology" data-phase="7">
   <div class="phase-header">
-    <span class="phase-title">Phase 7 — Armstrong: Basic Topology</span>
-    <span class="phase-dates">Apr – Sep 2027 · ~160 hrs</span>
+    <span class="phase-title">Topology</span>
     <span class="phase-progress-text" id="p7-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
@@ -982,11 +1131,10 @@
   </div>
 </section>
 
-<!-- ── Phase 8: Probability ───────────────────────────────────────────────── -->
-<section class="phase" data-phase="8">
+<!-- ── Probability ───────────────────────────────────────────────────────── -->
+<section class="phase" id="probability" data-phase="8">
   <div class="phase-header">
-    <span class="phase-title">Phase 8 — Blitzstein &amp; Hwang: Introduction to Probability</span>
-    <span class="phase-dates">Sep – Nov 2027 · ~90 hrs</span>
+    <span class="phase-title">Probability</span>
     <span class="phase-progress-text" id="p8-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
@@ -1049,11 +1197,10 @@
   </div>
 </section>
 
-<!-- ── Phase 9: RF & Communications ──────────────────────────────────────── -->
-<section class="phase" data-phase="9">
+<!-- ── RF & Communications──────────────────────────────────────── -->
+<section class="phase" id="rf-communications" data-phase="9">
   <div class="phase-header">
-    <span class="phase-title">Phase 9 — RF &amp; Communications Fundamentals</span>
-    <span class="phase-dates">Nov 2027 – Jan 2028 · ~70 hrs</span>
+    <span class="phase-title">RF &amp; Communications</span>
     <span class="phase-progress-text" id="p9-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p9-bar"></div></div>
@@ -1122,11 +1269,10 @@
   </div>
 </section>
 
-<!-- ── Phase 10: Signal Processing & Estimation ──────────────────────────── -->
-<section class="phase" data-phase="10">
+<!-- ── Signal Processing & Estimation──────────────────────────── -->
+<section class="phase" id="signal-processing-estimation" data-phase="10">
   <div class="phase-header">
-    <span class="phase-title">Phase 10 — Signal Processing &amp; Estimation Theory</span>
-    <span class="phase-dates">Dec 2027 – Mar 2028 · ~140 hrs</span>
+    <span class="phase-title">Signal Processing &amp; Estimation</span>
     <span class="phase-progress-text" id="p10-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
@@ -1232,11 +1378,10 @@
   </div>
 </section>
 
-<!-- ── Phase 11: Prince — Understanding Deep Learning ────────────────────── -->
-<section class="phase" data-phase="11">
+<!-- ── Deep Learning────────────────────── -->
+<section class="phase" id="deep-learning" data-phase="11">
   <div class="phase-header">
-    <span class="phase-title">Phase 11 — Prince: Understanding Deep Learning</span>
-    <span class="phase-dates">Mar 2028+ · ~120 hrs</span>
+    <span class="phase-title">Deep Learning</span>
     <span class="phase-progress-text" id="p11-text"></span>
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p11-bar"></div></div>
@@ -1467,8 +1612,51 @@
     location.reload();
   });
 
+  // Build the floating table of contents from the subject sections, and
+  // highlight the one currently in view (scroll-spy) — Notion-style.
+  function initToc() {
+    const toc = document.getElementById('toc');
+    const sections = [...document.querySelectorAll('.phase[id]')];
+    if (!toc || !sections.length) return;
+
+    const linkFor = {};
+    sections.forEach(sec => {
+      const label = (sec.querySelector('.phase-title')?.textContent || '').trim();
+      const a = document.createElement('a');
+      a.className = 'toc-item';
+      a.href = '#' + sec.id;
+      a.innerHTML = `<span class="toc-label">${label}</span><span class="toc-tick"></span>`;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', '#' + sec.id);
+      });
+      toc.appendChild(a);
+      linkFor[sec.id] = a;
+    });
+
+    let activeId = null;
+    const setActive = id => {
+      if (id === activeId) return;
+      activeId = id;
+      Object.values(linkFor).forEach(a => a.classList.remove('active'));
+      if (linkFor[id]) linkFor[id].classList.add('active');
+    };
+
+    const observer = new IntersectionObserver(entries => {
+      // Pick the visible section nearest the top of the viewport.
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible.length) setActive(visible[0].target.id);
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(sec => observer.observe(sec));
+    setActive(sections[0].id);
+  }
+
   initCheckboxes();
   updateProgress();
+  initToc();
 </script>
 </body>
 </html>
