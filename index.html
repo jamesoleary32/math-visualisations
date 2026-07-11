@@ -285,6 +285,42 @@
       padding: 8px 12px;
     }
 
+    /* Practicals — hands-on projects that accompany the theory (applied sections) */
+    .practicals {
+      margin: 18px 0 4px;
+      padding: 12px 16px 14px;
+      background: #f6faf7;
+      border: 1px solid #dfeee3;
+      border-radius: 8px;
+    }
+    .practicals-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+    .practicals-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: #2e7d32; font-weight: 600;
+    }
+    .practicals-sub { font-size: 11px; color: #9dc4a6; }
+    .practical-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 7px 8px; border-radius: 6px; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .practical-row:hover { background: #ecf5ee; }
+    .practical-row input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none;
+      width: 16px; height: 16px; border: 1.5px solid #c3ddca; border-radius: 4px;
+      cursor: pointer; flex-shrink: 0; position: relative;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .practical-row input[type="checkbox"]:checked { background: #2e7d32; border-color: #2e7d32; }
+    .practical-row input[type="checkbox"]:checked::after {
+      content: ''; position: absolute; left: 3px; top: 1px; width: 7px; height: 5px;
+      border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg);
+    }
+    .practical-name { font-size: 13px; color: #35502f; flex: 1; user-select: none; }
+    .practical-sub { font-size: 11px; color: #93b89b; flex: 1.4; user-select: none; }
+    .practical-row.checked .practical-name { color: #a9c9b0; text-decoration: line-through; }
+    .practical-empty { font-size: 12px; color: #b7d4bf; font-style: italic; padding: 6px 8px; }
+
     /* Topic rows */
     .topic-group-label {
       font-size: 10px;
@@ -1802,6 +1838,24 @@
     <span class="topic-source">Prince §19</span>
   </div>
   </div>
+
+  <div class="practicals">
+    <div class="practicals-head">
+      <span class="practicals-label">Practicals</span>
+      <span class="practicals-sub">hands-on projects to accompany the theory</span>
+    </div>
+    <div class="practical-row" data-id="dl-prac-backprop">
+      <input type="checkbox" id="dl-prac-backprop">
+      <span class="practical-name">Backprop from scratch</span>
+      <span class="practical-sub">2-layer MLP on toy 2D data; verify gradients numerically</span>
+    </div>
+    <div class="practical-row" data-id="dl-prac-cnn">
+      <input type="checkbox" id="dl-prac-cnn">
+      <span class="practical-name">Train a small CNN on MNIST</span>
+      <span class="practical-sub">From scratch in PyTorch; reach &gt;98% test accuracy</span>
+    </div>
+    <div class="practical-empty">+ add your own (edit the HTML)</div>
+  </div>
 </details>
 
 <div class="footer">
@@ -1822,7 +1876,8 @@
   }
 
   function initCheckboxes() {
-    const rows = document.querySelectorAll('.topic-row[data-id]');
+    // Topic rows count toward progress; practical rows persist the same way but don't.
+    const rows = document.querySelectorAll('.topic-row[data-id], .practical-row[data-id]');
     let saved = loadState();
     const firstLoad = saved === null;
 
