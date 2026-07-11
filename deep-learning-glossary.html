@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deep Learning Glossary</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header { margin-bottom: 48px; }
+
+    h1 { font-size: 28px; font-weight: 600; color: #111; margin-bottom: 10px; }
+    header p { font-size: 14px; color: #999; }
+
+    .back {
+      display: inline-block; font-size: 13px; color: #aaa;
+      text-decoration: none; margin-bottom: 24px;
+    }
+    .back:hover { color: #555; }
+
+    section { margin-bottom: 48px; }
+
+    h2 {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: #aaa; margin-bottom: 20px;
+    }
+
+    .terms { display: flex; flex-direction: column; gap: 1px; }
+
+    .term {
+      display: flex; align-items: stretch;
+      background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+      overflow: hidden; gap: 0;
+    }
+
+    .term-diagram {
+      flex-shrink: 0; width: 220px; border-right: 1px solid #f0f0f0;
+      background: #fafafa; display: flex; align-items: center;
+      justify-content: center; padding: 12px;
+    }
+    .term-diagram canvas { display: block; }
+
+    .term-body {
+      padding: 20px 24px; display: flex; flex-direction: column;
+      justify-content: center; gap: 8px; flex: 1;
+    }
+
+    .term-header { display: flex; align-items: baseline; gap: 12px; }
+
+    .term-symbol {
+      font-size: 22px; font-weight: 600; color: #111;
+      font-family: Georgia, serif; font-style: italic; min-width: 40px;
+    }
+
+    .term-name {
+      font-size: 14px; font-weight: 600; color: #333;
+      font-style: normal; font-family: system-ui, sans-serif;
+    }
+
+    .term-def { font-size: 13px; color: #666; line-height: 1.6; }
+
+    .term-formula {
+      font-size: 13px; color: #888; background: #f8f8f8;
+      padding: 6px 10px; border-radius: 6px; border: 1px solid #efefef;
+      display: inline-block; align-self: flex-start;
+    }
+
+    .term-note {
+      font-size: 12px; color: #aaa; line-height: 1.5;
+      border-top: 1px solid #f0f0f0; padding-top: 8px; margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <a href="visualizations.html" class="back">← All visualizations</a>
+
+  <header>
+    <h1>Deep Learning Glossary</h1>
+    <p>The vocabulary of neural networks — the neuron and its parameters, the activation functions, and the forward and backward passes that train it — each with a small picture.</p>
+  </header>
+
+  <!-- ── Section 1: The Neuron ── -->
+  <section>
+    <h2>The Neuron</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-neuron" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">•</span>
+            <span class="term-name">Neuron (unit)</span>
+          </div>
+          <div class="term-def">The atom of a network. It <strong>multiplies each input by a weight, sums them, adds a bias, then applies a nonlinearity</strong>. Stack many in parallel to make a layer; stack layers to make a deep network.</div>
+          <div class="term-note">Everything else is bookkeeping around this one operation, repeated billions of times.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-weights" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">w, b</span>
+            <span class="term-name">Weights &amp; bias</span>
+          </div>
+          <div class="term-def">The <strong>learnable parameters</strong>. A weight scales how much an input matters (large = influential, negative = inverting); the bias shifts the output up or down independently of the inputs.</div>
+          <div class="term-formula" id="eq-weights"></div>
+          <div class="term-note">Training <em>is</em> the search for good values of w and b — nothing else changes.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-preactivation" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">z</span>
+            <span class="term-name">Pre-activation</span>
+          </div>
+          <div class="term-def">The <strong>weighted sum plus bias, before the nonlinearity</strong>. A single number (per unit) that packs all the inputs into one linear score. Sometimes called the "logit" or "net input".</div>
+          <div class="term-formula" id="eq-preactivation"></div>
+          <div class="term-note">Everything up to z is linear; the activation that follows is what makes networks expressive.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-activation" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">a</span>
+            <span class="term-name">Activation</span>
+          </div>
+          <div class="term-def">The unit's <strong>output after the nonlinearity</strong>, a = φ(z). This value is what feeds the next layer.</div>
+          <div class="term-formula" id="eq-activation"></div>
+          <div class="term-note">In the output layer, a is the prediction; in hidden layers, it is a learned feature.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 2: Activation Functions ── -->
+  <section>
+    <h2>Activation Functions</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-actfn" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">φ</span>
+            <span class="term-name">Activation function</span>
+          </div>
+          <div class="term-def">A <strong>nonlinear</strong> function applied elementwise to z. It is what lets a network approximate curved, complex functions — <strong>without it, stacking layers collapses to a single linear map</strong>.</div>
+          <div class="term-note">Common choices: ReLU (hidden layers), sigmoid/softmax (outputs), tanh, GELU.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-sigmoid" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">σ</span>
+            <span class="term-name">Sigmoid</span>
+          </div>
+          <div class="term-def">Squashes any real number into <strong>(0, 1)</strong> — an S-shaped curve. Handy for probabilities, with an especially clean derivative used in backprop.</div>
+          <div class="term-formula" id="eq-sigmoid"></div>
+          <div class="term-note">It <strong>saturates</strong>: for large |z| the slope → 0, so gradients vanish — the reason ReLU took over hidden layers.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-relu" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">R</span>
+            <span class="term-name">ReLU</span>
+          </div>
+          <div class="term-def">Rectified Linear Unit: <strong>pass positives through unchanged, clamp negatives to zero</strong>. Trivially cheap, and its gradient is either 0 or 1 — so it doesn't shrink gradients the way sigmoid does.</div>
+          <div class="term-formula" id="eq-relu"></div>
+          <div class="term-note">Units stuck at z &lt; 0 output 0 with zero gradient — "dead" ReLUs; leaky variants fix this.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Section 3: Training — Forward & Backward ── -->
+  <section>
+    <h2>Training — Forward &amp; Backward</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-forward" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">→</span>
+            <span class="term-name">Forward pass</span>
+          </div>
+          <div class="term-def">Run the network <strong>input → output, left to right</strong>: at each layer compute z then a, until you reach the prediction and the loss. Pure evaluation — no learning happens yet.</div>
+          <div class="term-note">Each unit caches the values it computed; the backward pass reuses them.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-loss" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">L</span>
+            <span class="term-name">Loss function</span>
+          </div>
+          <div class="term-def">A <strong>single number measuring how wrong</strong> the prediction is versus the target. Training minimises it. Squared error for regression, cross-entropy for classification.</div>
+          <div class="term-formula" id="eq-loss"></div>
+          <div class="term-note">The loss is the only thing the whole network is optimised against.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-gradient" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">∇L</span>
+            <span class="term-name">Gradient</span>
+          </div>
+          <div class="term-def">The vector of partial derivatives of L with respect to every parameter — the <strong>direction of steepest increase</strong> of the loss. Step the opposite way to reduce it.</div>
+          <div class="term-formula" id="eq-gradient"></div>
+          <div class="term-note">∂L/∂w tells each weight which way, and how strongly, to move.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-backward" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">←</span>
+            <span class="term-name">Backward pass (backpropagation)</span>
+          </div>
+          <div class="term-def">Compute the gradient efficiently by walking the graph <strong>right to left</strong>: each node multiplies the incoming (upstream) gradient by its own local derivative and passes it back. One local rule per node, reusing the forward values.</div>
+          <div class="term-formula" id="eq-backward"></div>
+          <div class="term-note">Same cost as one forward pass — the reason training huge models is feasible.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-chainrule" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">∘</span>
+            <span class="term-name">Chain rule</span>
+          </div>
+          <div class="term-def">The calculus that powers backprop: the derivative of a composition is the <strong>product of local derivatives along the path</strong>. Backprop is just the chain rule applied over a graph.</div>
+          <div class="term-formula" id="eq-chainrule"></div>
+          <div class="term-note">"Upstream gradient × local derivative", chained from the loss back to each weight.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-gd" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">↓</span>
+            <span class="term-name">Gradient descent</span>
+          </div>
+          <div class="term-def">The update step: <strong>nudge each parameter a little in the direction that lowers the loss</strong>, i.e. opposite the gradient. Repeat over many batches and the loss rolls downhill.</div>
+          <div class="term-formula" id="eq-gd"></div>
+          <div class="term-note">"Stochastic" GD estimates the gradient from a mini-batch rather than the whole dataset.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-lr" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">η</span>
+            <span class="term-name">Learning rate</span>
+          </div>
+          <div class="term-def">The <strong>size of each gradient-descent step</strong>. Too large and the loss overshoots or diverges; too small and training crawls. The single most important hyperparameter to tune.</div>
+          <div class="term-note">Schedules and adaptive optimisers (Adam) adjust it over the course of training.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script>
+    // ── KaTeX formulas ──────────────────────────────────────────────────────────
+    const eqs = {
+      'eq-weights':       'z = w_1 x_1 + \\dots + w_n x_n + b',
+      'eq-preactivation': 'z = \\mathbf{w}\\cdot\\mathbf{x} + b',
+      'eq-activation':    'a = \\phi(z)',
+      'eq-sigmoid':       '\\sigma(z) = \\dfrac{1}{1+e^{-z}}, \\quad \\sigma\'(z) = a(1-a)',
+      'eq-relu':          '\\mathrm{ReLU}(z) = \\max(0, z)',
+      'eq-loss':          'L = \\tfrac{1}{2}(a - y)^2',
+      'eq-gradient':      '\\nabla L = \\left(\\tfrac{\\partial L}{\\partial w_1}, \\dots, \\tfrac{\\partial L}{\\partial b}\\right)',
+      'eq-backward':      '\\dfrac{\\partial L}{\\partial w} = \\dfrac{\\partial L}{\\partial a}\\,\\dfrac{\\partial a}{\\partial z}\\,\\dfrac{\\partial z}{\\partial w}',
+      'eq-chainrule':     '\\dfrac{dL}{dx} = \\dfrac{dL}{du}\\,\\dfrac{du}{dx}',
+      'eq-gd':            'w \\leftarrow w - \\eta\\,\\dfrac{\\partial L}{\\partial w}',
+    };
+    for (const [id, tex] of Object.entries(eqs)) {
+      const el = document.getElementById(id);
+      if (el) katex.render(tex, el, { displayMode: false, throwOnError: false });
+    }
+
+    // ── Drawing helpers ──────────────────────────────────────────────────────────
+    function draw(id, fn) {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fn(ctx, canvas.width, canvas.height);
+    }
+
+    function label(ctx, text, x, y, color = '#555', size = 11, italic = false) {
+      ctx.fillStyle = color;
+      ctx.font = `${italic ? 'italic ' : ''}${size}px Georgia, serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText(text, x, y);
+    }
+
+    function arrow(ctx, x0, y0, x1, y1, color = '#333', width = 1.6) {
+      const dx = x1 - x0, dy = y1 - y0;
+      const len = Math.hypot(dx, dy);
+      if (len < 1) return;
+      const ux = dx/len, uy = dy/len;
+      const head = Math.min(9, len * 0.4);
+      ctx.beginPath();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.moveTo(x0, y0); ctx.lineTo(x1 - ux*head*0.6, y1 - uy*head*0.6); ctx.stroke();
+      ctx.beginPath(); ctx.fillStyle = color;
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 - ux*head - uy*head*0.45, y1 - uy*head + ux*head*0.45);
+      ctx.lineTo(x1 - ux*head + uy*head*0.45, y1 - uy*head - ux*head*0.45);
+      ctx.closePath(); ctx.fill();
+    }
+
+    function line(ctx, x0, y0, x1, y1, color = '#999', width = 1.5, dash = []) {
+      ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.setLineDash(dash);
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function node(ctx, x, y, r, text, stroke = '#333', fill = '#fff') {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fillStyle = fill; ctx.fill();
+      ctx.lineWidth = 1.6; ctx.strokeStyle = stroke; ctx.stroke();
+      if (text) {
+        ctx.fillStyle = stroke; ctx.font = 'italic 13px Georgia, serif';
+        ctx.textAlign = 'center'; ctx.fillText(text, x, y + 4); ctx.textAlign = 'left';
+      }
+    }
+
+    // plot y = fn(x) over domain [x0,x1]×[y0,y1] into pixel box [L,T,R,B]
+    function plot(ctx, fn, x0, x1, y0, y1, L, T, R, B, color = '#1565c0', width = 2.4) {
+      const sx = x => L + (x - x0) / (x1 - x0) * (R - L);
+      const sy = y => B - (y - y0) / (y1 - y0) * (B - T);
+      ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width;
+      let first = true;
+      for (let i = 0; i <= 120; i++) {
+        const x = x0 + (x1 - x0) * i / 120;
+        const yv = Math.max(y0, Math.min(y1, fn(x)));
+        const px = sx(x), py = sy(yv);
+        if (first) { ctx.moveTo(px, py); first = false; } else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      return { sx, sy };
+    }
+
+    // light axes for a plot box
+    function axes(ctx, L, T, R, B, y0px) {
+      line(ctx, L, y0px, R, y0px, '#ddd', 1);   // x-axis
+      line(ctx, L, T, L, B, '#eee', 1);          // y-axis (left)
+    }
+
+    const BLUE = '#1565c0', ORANGE = '#e8710a', GREEN = '#2e7d32',
+          TEAL = '#00897b', GREY = '#999', PURPLE = '#7b1fa2';
+
+    // ── The Neuron ──
+    draw('c-neuron', (ctx, w, h) => {
+      const cy = h/2;
+      node(ctx, 30, cy - 34, 6, '', BLUE); label(ctx, 'x₁', 8, cy - 30, BLUE, 11);
+      node(ctx, 30, cy + 34, 6, '', BLUE); label(ctx, 'x₂', 8, cy + 38, BLUE, 11);
+      arrow(ctx, 36, cy - 32, 74, cy - 6, GREY);
+      arrow(ctx, 36, cy + 32, 74, cy + 6, GREY);
+      node(ctx, 98, cy, 26, 'Σφ', '#333', '#f6f6f6');
+      arrow(ctx, 124, cy, 158, cy, '#333');
+      node(ctx, 172, cy, 12, 'a', GREEN, '#eef6ef');
+      label(ctx, 'bias b', 78, cy + 46, PURPLE, 10);
+      line(ctx, 98, cy + 40, 98, cy + 26, PURPLE, 1.4, [3,3]);
+    });
+
+    draw('c-weights', (ctx, w, h) => {
+      const cy = h/2, nx = 120;
+      node(ctx, 34, cy - 34, 6, '', BLUE); label(ctx, 'x₁', 12, cy - 30, BLUE, 11);
+      node(ctx, 34, cy + 34, 6, '', BLUE); label(ctx, 'x₂', 12, cy + 38, BLUE, 11);
+      // thick edge = big weight, thin = small
+      line(ctx, 40, cy - 32, nx - 22, cy - 4, BLUE, 4.5);
+      line(ctx, 40, cy + 32, nx - 22, cy + 4, BLUE, 1.3);
+      label(ctx, 'w₁ (large)', 44, cy - 22, BLUE, 10);
+      label(ctx, 'w₂ (small)', 44, cy + 30, BLUE, 10);
+      node(ctx, nx, cy, 22, 'Σ', '#333', '#f6f6f6');
+      line(ctx, nx, cy + 40, nx, cy + 22, PURPLE, 1.4, [3,3]);
+      label(ctx, '+b', nx + 6, cy + 44, PURPLE, 11);
+    });
+
+    draw('c-preactivation', (ctx, w, h) => {
+      const cy = h/2;
+      node(ctx, 30, cy - 30, 6, '', BLUE);
+      node(ctx, 30, cy + 30, 6, '', BLUE);
+      arrow(ctx, 36, cy - 28, 78, cy - 6, GREY);
+      arrow(ctx, 36, cy + 28, 78, cy + 6, GREY);
+      node(ctx, 100, cy, 28, '', '#333', '#f6f6f6');
+      label(ctx, 'z', 95, cy + 5, '#333', 18, true);
+      arrow(ctx, 128, cy, 160, cy, '#bbb');
+      label(ctx, 'φ', 168, cy + 5, GREY, 14, true);
+      label(ctx, 'linear score', 54, h - 12, '#aaa', 10);
+    });
+
+    draw('c-activation', (ctx, w, h) => {
+      const cy = h/2;
+      label(ctx, 'z', 16, cy + 5, GREY, 14, true);
+      arrow(ctx, 26, cy, 66, cy, '#bbb');
+      node(ctx, 96, cy, 28, 'φ', '#333', '#f6f6f6');
+      arrow(ctx, 124, cy, 158, cy, '#333');
+      node(ctx, 172, cy, 12, 'a', GREEN, '#eef6ef');
+      // mini nonlinear curve inside the phi node
+      plot(ctx, x => 1/(1+Math.exp(-x*2)), -1.2, 1.2, 0, 1, 82, cy - 10, 110, cy + 10, TEAL, 1.6);
+    });
+
+    // ── Activation functions ──
+    function graphBox() { return [34, 20, 178, 150]; }
+
+    draw('c-actfn', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const y0px = B - (0 - (-1)) / (1 - (-1)) * (B - T);
+      axes(ctx, L, T, R, B, y0px);
+      plot(ctx, x => Math.tanh(x), -3, 3, -1, 1, L, T, R, B, TEAL);
+      label(ctx, 'nonlinear', 44, 34, '#bbb', 10);
+      label(ctx, 'z', R - 4, y0px + 14, '#bbb', 11, true);
+    });
+
+    draw('c-sigmoid', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      axes(ctx, L, T, R, B, B);
+      line(ctx, L, T, R, T, '#eee', 1, [3,3]);        // asymptote at 1
+      label(ctx, '1', L - 10, T + 4, '#bbb', 10);
+      label(ctx, '0', L - 10, B + 4, '#bbb', 10);
+      plot(ctx, x => 1/(1+Math.exp(-x)), -6, 6, 0, 1, L, T, R, B, BLUE);
+      label(ctx, 'z', R - 4, B + 14, '#bbb', 11, true);
+    });
+
+    draw('c-relu', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const x0 = -3, x1 = 3, y0 = 0, y1 = 3;
+      const sx = x => L + (x - x0)/(x1 - x0)*(R - L);
+      const sy = y => B - (y - y0)/(y1 - y0)*(B - T);
+      axes(ctx, L, T, R, B, B);
+      line(ctx, sx(0), T, sx(0), B, '#eee', 1);
+      ctx.beginPath(); ctx.strokeStyle = BLUE; ctx.lineWidth = 2.6;
+      ctx.moveTo(sx(-3), sy(0)); ctx.lineTo(sx(0), sy(0)); ctx.lineTo(sx(3), sy(3));
+      ctx.stroke();
+      label(ctx, 'max(0, z)', 44, 34, '#bbb', 10);
+      label(ctx, 'z', R - 4, B + 14, '#bbb', 11, true);
+    });
+
+    // ── Training ──
+    draw('c-forward', (ctx, w, h) => {
+      const cy = h/2, xs = [34, 98, 162];
+      for (const x of xs) node(ctx, x, cy, 15, '', '#333', '#fff');
+      arrow(ctx, 49, cy, 83, cy, BLUE, 2.2);
+      arrow(ctx, 113, cy, 147, cy, BLUE, 2.2);
+      label(ctx, 'input', 18, cy + 34, '#aaa', 10);
+      label(ctx, 'L', 158, cy + 34, '#aaa', 12, true);
+      label(ctx, 'forward →', 60, 26, BLUE, 11);
+    });
+
+    draw('c-loss', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const sx = x => L + (x + 2)/4*(R - L);
+      const sy = y => B - y/4*(B - T);
+      axes(ctx, L, T, R, B, B);
+      plot(ctx, x => x*x, -2, 2, 0, 4, L, T, R, B, ORANGE);
+      // minimum marker
+      ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(0), sy(0), 4, 0, Math.PI*2); ctx.fill();
+      label(ctx, 'min L', sx(0) - 14, sy(0) + 16, GREEN, 10);
+      label(ctx, 'error (a − y)', 40, 34, '#bbb', 10);
+    });
+
+    draw('c-gradient', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const sx = x => L + (x + 2)/4*(R - L);
+      const sy = y => B - y/4*(B - T);
+      axes(ctx, L, T, R, B, B);
+      plot(ctx, x => x*x, -2, 2, 0, 4, L, T, R, B, '#ccc', 2);
+      // tangent at x = 1.1 (slope 2.2)
+      const px = 1.1, slope = 2*px;
+      line(ctx, sx(px - 1), sy(px*px - slope*1), sx(px + 1), sy(px*px + slope*1), ORANGE, 2.2);
+      ctx.beginPath(); ctx.fillStyle = ORANGE; ctx.arc(sx(px), sy(px*px), 4, 0, Math.PI*2); ctx.fill();
+      label(ctx, 'slope = ∂L/∂w', 40, 34, ORANGE, 10);
+    });
+
+    draw('c-backward', (ctx, w, h) => {
+      const cy = h/2, xs = [34, 98, 162];
+      for (const x of xs) node(ctx, x, cy, 15, '', '#333', '#fff');
+      arrow(ctx, 147, cy, 113, cy, ORANGE, 2.2);
+      arrow(ctx, 83, cy, 49, cy, ORANGE, 2.2);
+      label(ctx, '← backward', 54, 26, ORANGE, 11);
+      label(ctx, '∂L/∂w', 150, cy + 34, '#aaa', 11, true);
+    });
+
+    draw('c-chainrule', (ctx, w, h) => {
+      const cy = h/2;
+      const boxes = [['x', 28], ['u', 84], ['L', 140]];
+      for (const [t, x] of boxes) {
+        ctx.strokeStyle = '#333'; ctx.lineWidth = 1.6; ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.rect(x, cy - 16, 32, 32); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#333'; ctx.font = 'italic 14px Georgia, serif';
+        ctx.textAlign = 'center'; ctx.fillText(t, x + 16, cy + 5); ctx.textAlign = 'left';
+      }
+      arrow(ctx, 62, cy, 82, cy, GREY);
+      arrow(ctx, 118, cy, 138, cy, GREY);
+      label(ctx, 'du/dx', 60, cy - 24, TEAL, 10);
+      label(ctx, 'dL/du', 116, cy - 24, TEAL, 10);
+      label(ctx, 'multiply local derivatives', 24, h - 12, '#aaa', 10);
+    });
+
+    draw('c-gd', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const sx = x => L + (x + 2)/4*(R - L);
+      const sy = y => B - y/4*(B - T);
+      axes(ctx, L, T, R, B, B);
+      plot(ctx, x => x*x, -2, 2, 0, 4, L, T, R, B, '#ccc', 2);
+      // steps rolling downhill from x=1.6
+      let x = 1.6;
+      for (let i = 0; i < 3; i++) {
+        const nx = x - 0.5 * (2*x);   // gradient step, eta 0.5, but clamp
+        const nxc = Math.max(-0.1, nx > x ? x - 0.6 : nx);
+        ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(x), sy(x*x), 4, 0, Math.PI*2); ctx.fill();
+        arrow(ctx, sx(x), sy(x*x), sx(x*0.45), sy((x*0.45)*(x*0.45)), GREEN, 1.8);
+        x = x * 0.45;
+      }
+      ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(x), sy(x*x), 4, 0, Math.PI*2); ctx.fill();
+      label(ctx, 'downhill', 44, 34, GREEN, 10);
+    });
+
+    draw('c-lr', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const sx = x => L + (x + 2)/4*(R - L);
+      const sy = y => B - y/4*(B - T);
+      axes(ctx, L, T, R, B, B);
+      plot(ctx, x => x*x, -2, 2, 0, 4, L, T, R, B, '#ccc', 2);
+      // small step (green) vs large overshoot (orange)
+      ctx.beginPath(); ctx.fillStyle = '#333'; ctx.arc(sx(1.5), sy(1.5*1.5), 4, 0, Math.PI*2); ctx.fill();
+      arrow(ctx, sx(1.5), sy(1.5*1.5), sx(1.0), sy(1.0), GREEN, 1.8);
+      label(ctx, 'small η', sx(1.0) - 4, sy(1.0) - 8, GREEN, 10);
+      arrow(ctx, sx(1.5), sy(1.5*1.5), sx(-1.3), sy(1.3*1.3), ORANGE, 1.8);
+      label(ctx, 'large η (overshoot)', 40, 30, ORANGE, 10);
+    });
+  </script>
+</body>
+</html>
