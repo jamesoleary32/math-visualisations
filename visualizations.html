@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Learning Visualizations</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .header-meta p {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .catalog-link {
+      font-size: 12px;
+      color: #aaa;
+      text-decoration: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 3px 10px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .catalog-link:hover { border-color: #bbb; color: #555; }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px 24px 20px 20px;
+      width: 220px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .card:hover {
+      border-color: #bbb;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Learning Visualizations</h1>
+    <div class="header-meta">
+      <p>Interactive explorations of mathematics and physics</p>
+      <a href="catalog.html" class="catalog-link">Sources &amp; Textbooks →</a>
+      <a href="glossary.html" class="catalog-link">Orbital Mechanics Glossary →</a>
+      <a href="linear-algebra-glossary.html" class="catalog-link">Linear Algebra Glossary →</a>
+      <a href="probability-glossary.html" class="catalog-link">Probability Glossary →</a>
+      <a href="index.html" class="catalog-link">Syllabus →</a>
+      <a href="practice.html" class="catalog-link">Practice Problems →</a>
+      <a href="#tools" class="catalog-link">Tools →</a>
+    </div>
+  </header>
+
+  <section id="tools">
+    <h2>Tools</h2>
+    <div class="grid">
+      <a href="tools/distribution-calculator.html" class="card">
+        <div class="card-title">Distribution Calculator</div>
+        <div class="card-desc">PMF/PDF and CDF of named distributions with live parameter sliders, point and inverse-CDF queries, and moments — Normal, Binomial, Poisson, t, χ², Gamma, Beta and more</div>
+      </a>
+      <a href="tools/statistical-tests.html" class="card">
+        <div class="card-title">Statistical Tests</div>
+        <div class="card-desc">One- and two-sample t-tests, paired t-test, and chi-square goodness-of-fit — paste data, pick α, read the statistic, df, p-value and verdict</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Linear Algebra</h2>
+    <div class="grid">
+      <a href="linear-algebra/basis-and-independence.html" class="card">
+        <div class="card-title">Basis, Span &amp; Linear Independence</div>
+        <div class="card-desc">Dependence, the parallelogram test, span collapsing to a line vs filling the plane, coordinates in a non-standard basis</div>
+      </a>
+      <a href="linear-algebra/row-column-space.html" class="card">
+        <div class="card-title">Row Space &amp; Column Space</div>
+        <div class="card-desc">Col(A) as reachable outputs, rank-1 collapse, Row(A) in the input space, Null(A) ⊥ Row(A), rank theorem and rank-nullity</div>
+      </a>
+      <a href="linear-algebra/kernel-and-range.html" class="card">
+        <div class="card-title">Kernel &amp; Range</div>
+        <div class="card-desc">A transformation as a map: range as everything T can output, kernel as inputs that vanish, fibers as kernel cosets, injective ⟺ ker = {0}, surjective ⟺ range = W, and rank-nullity</div>
+      </a>
+      <a href="linear-algebra/rank-and-nullity.html" class="card">
+        <div class="card-title">Rank &amp; Nullity</div>
+        <div class="card-desc">Computing rank and nullity by hand: row-reduce, count pivots vs free columns, and read off the kernel basis — worked on a 3×3, a wide and a tall matrix, plus differentiation on polynomials</div>
+      </a>
+      <a href="linear-algebra/matrix-vector-multiplication.html" class="card">
+        <div class="card-title">Matrix-Vector Multiplication</div>
+        <div class="card-desc">The row rule, column picture, rotation matrix, how A transforms the whole plane, and linearity A(u+v) = Au + Av</div>
+      </a>
+      <a href="linear-algebra/two-ways-to-read-ax.html" class="card">
+        <div class="card-title">Two Ways to Read Ax</div>
+        <div class="card-desc">Column picture: Ax as a weighted sum of columns. Row picture: each output component as a dot product — rows as questions, null space as the blind spot</div>
+      </a>
+      <a href="linear-algebra/vector-subspaces.html" class="card">
+        <div class="card-title">Vector Subspaces</div>
+        <div class="card-desc">Three axioms, the subspaces of ℝ², closure under addition and scaling, span</div>
+      </a>
+      <a href="linear-algebra/dot-product.html" class="card">
+        <div class="card-title">Dot Product</div>
+        <div class="card-desc">Vectors, angles, and projection</div>
+      </a>
+      <a href="linear-algebra/inner-product.html" class="card">
+        <div class="card-title">Inner Product</div>
+        <div class="card-desc">Three axioms that generalise the dot product to any vector space — weighted inner products, L² function spaces, induced norm, Cauchy-Schwarz, and generalised projection</div>
+      </a>
+      <a href="linear-algebra/gram-schmidt.html" class="card">
+        <div class="card-title">Gram-Schmidt</div>
+        <div class="card-desc">Turning any independent set into an orthonormal basis — the projection subtraction trick, why orthogonality is guaranteed, and the QR decomposition</div>
+      </a>
+      <a href="linear-algebra/orthogonal-matrices.html" class="card">
+        <div class="card-title">Orthogonal Matrices</div>
+        <div class="card-desc">QᵀQ = I means transpose is inverse — rotations (det = +1), reflections (det = −1), preserving lengths and angles, and frame change T′ = QTQᵀ</div>
+      </a>
+      <a href="linear-algebra/linear-transformations.html" class="card">
+        <div class="card-title">Linear Transformations</div>
+        <div class="card-desc">T(u+v) = T(u)+T(v) in any vector space — differentiation on polynomials, integration, transpose on matrices, kernel, image, rank-nullity, and matrix representation</div>
+      </a>
+      <a href="linear-algebra/cross-product.html" class="card">
+        <div class="card-title">Cross Product</div>
+        <div class="card-desc">Perpendicular vectors and parallelogram area</div>
+      </a>
+      <a href="linear-algebra/moment.html" class="card">
+        <div class="card-title">Moment of a Force</div>
+        <div class="card-desc">Torque as a cross product: M = r × F</div>
+      </a>
+      <a href="linear-algebra/determinant.html" class="card">
+        <div class="card-title">Determinant</div>
+        <div class="card-desc">Area scaling, orientation, and collapse — the geometry behind ad − bc</div>
+      </a>
+      <a href="linear-algebra/trace.html" class="card">
+        <div class="card-title">Trace</div>
+        <div class="card-desc">Why the diagonal sum is basis-independent — eigenvalue sum, infinitesimal determinant, and the cyclic property tr(AB) = tr(BA)</div>
+      </a>
+      <a href="linear-algebra/inverse-transformation.html" class="card">
+        <div class="card-title">Inverse Transformation</div>
+        <div class="card-desc">A⁻¹ undoes A — the round-trip identity and why singular matrices have no inverse</div>
+      </a>
+      <a href="linear-algebra/eigenvectors.html" class="card">
+        <div class="card-title">Eigenvectors</div>
+        <div class="card-desc">Av = λv — the special directions a matrix only stretches, never rotates</div>
+      </a>
+      <a href="linear-algebra/eigenspaces.html" class="card">
+        <div class="card-title">Eigenspaces</div>
+        <div class="card-desc">E_λ = Null(A − λI) as a subspace — geometric vs algebraic multiplicity, repeated eigenvalues, and defective (non-diagonalisable) matrices</div>
+      </a>
+      <a href="linear-algebra/tensors.html" class="card">
+        <div class="card-title">Tensors</div>
+        <div class="card-desc">Rank, transformation law T′ = RTRᵀ, index notation, and principal axes as eigenvectors</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Kinematics</h2>
+    <div class="grid">
+      <a href="kinematics/angular-velocity.html" class="card">
+        <div class="card-title">Angular Velocity</div>
+        <div class="card-desc">Why ω is orthogonal, and v = ω × r</div>
+      </a>
+      <a href="kinematics/plane-motion.html" class="card">
+        <div class="card-title">Plane Motion</div>
+        <div class="card-desc">Radial and transverse components in polar coordinates</div>
+      </a>
+      <a href="kinematics/instantaneous-center.html" class="card">
+        <div class="card-title">Instantaneous Center</div>
+        <div class="card-desc">The point about which the body is rotating instantaneously</div>
+      </a>
+      <a href="kinematics/euler-angles.html" class="card">
+        <div class="card-title">Euler Angles</div>
+        <div class="card-desc">ψ, θ, φ and transformation of displacements</div>
+      </a>
+      <a href="kinematics/areal-rate.html" class="card">
+        <div class="card-title">Areal Rate</div>
+        <div class="card-desc">r × v, equal areas, and Kepler's second law</div>
+      </a>
+      <a href="kinematics/circular-motion.html" class="card">
+        <div class="card-title">Circular Motion</div>
+        <div class="card-desc">v = rω, centripetal and tangential acceleration</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Particle Dynamics — Kepler's Laws</h2>
+    <div class="grid">
+      <a href="particle-dynamics/kepler-first.html" class="card">
+        <div class="card-title">Kepler's First Law</div>
+        <div class="card-desc">Orbits are conic sections — derived from Newton's inverse-square law via Binet's substitution</div>
+      </a>
+      <a href="particle-dynamics/kepler-second.html" class="card">
+        <div class="card-title">Kepler's Second Law</div>
+        <div class="card-desc">Equal areas in equal times — conservation of angular momentum h = r²θ̇</div>
+      </a>
+      <a href="particle-dynamics/kepler-third.html" class="card">
+        <div class="card-title">Kepler's Third Law</div>
+        <div class="card-desc">T² = 4π²a³/K — period depends only on semi-major axis, not eccentricity</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Particle Dynamics</h2>
+    <div class="grid">
+      <a href="particle-dynamics/a.html" class="card">
+        <div class="card-title">Impulse &amp; Momentum</div>
+        <div class="card-desc">Visualisation of impulse and momentum</div>
+      </a>
+      <a href="particle-dynamics/satellite-orbits.html" class="card">
+        <div class="card-title">Satellite Orbits</div>
+        <div class="card-desc">Radial &amp; transverse equations, Binet's substitution, orbit as a conic</div>
+      </a>
+      <a href="particle-dynamics/two-body.html" class="card">
+        <div class="card-title">Two-Body Problem</div>
+        <div class="card-desc">CoM reduction, relative coordinate, and reduced mass</div>
+      </a>
+      <a href="particle-dynamics/orbit-initial-conditions.html" class="card">
+        <div class="card-title">Orbit from Initial Conditions</div>
+        <div class="card-desc">χ, eccentricity from v₀ and β₀, and the Fig 4.9-2 chart</div>
+      </a>
+      <a href="particle-dynamics/hohmann-transfer.html" class="card">
+        <div class="card-title">Hohmann Transfer</div>
+        <div class="card-desc">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂, transfer time</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Particle Dynamics — Scenarios</h2>
+    <div class="grid">
+      <a href="particle-dynamics/scenarios/repulsive-orbit.html" class="card">
+        <div class="card-title">Repulsive Inverse-Square Force</div>
+        <div class="card-desc">F = +K/r² produces the repulsive branch of a hyperbola — Rutherford scattering geometry</div>
+      </a>
+      <a href="particle-dynamics/scenarios/impulse-orbit-change.html" class="card">
+        <div class="card-title">Impulsive Orbit Change</div>
+        <div class="card-desc">Δv at θ* = 150° transfers between two orbits sharing the same apse line — velocity vector decomposition into Δvₜ and Δvₙ</div>
+      </a>
+      <a href="particle-dynamics/scenarios/orbit-from-burnout.html" class="card">
+        <div class="card-title">Orbit from Burnout (Ex. 4.13-I)</div>
+        <div class="card-desc">Given χ = r₀v₀²/K, β₀, and r₀/R at engine cutoff, derive e, a/R, and initial position θ₀ relative to perigee</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Geometry</h2>
+    <div class="grid">
+      <a href="geometry/conic-sections.html" class="card">
+        <div class="card-title">Conic Sections</div>
+        <div class="card-desc">Eccentricity, focus-directrix definition, and the polar equation</div>
+      </a>
+      <a href="geometry/ellipse-geometry.html" class="card">
+        <div class="card-title">Ellipse Geometry</div>
+        <div class="card-desc">Semi-axes, area = πab, focal properties, and the bridge to orbital mechanics</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Differential Equations</h2>
+    <div class="grid">
+      <a href="differential-equations/ode-overview.html" class="card">
+        <div class="card-title">ODE Overview</div>
+        <div class="card-desc">Slope fields, solution curves, initial conditions, order and linearity</div>
+      </a>
+      <a href="differential-equations/pendulum.html" class="card">
+        <div class="card-title">The Pendulum</div>
+        <div class="card-desc">SHM, phase portrait, separatrix, and nonlinear period corrections</div>
+      </a>
+      <a href="differential-equations/heat-equation.html" class="card">
+        <div class="card-title">The Heat Equation</div>
+        <div class="card-desc">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Probability</h2>
+    <div class="grid">
+      <a href="probability/de-morgans-laws.html" class="card">
+        <div class="card-title">De Morgan's Laws</div>
+        <div class="card-desc">(A∪B)ᶜ = Aᶜ∩Bᶜ and (A∩B)ᶜ = Aᶜ∪Bᶜ — visualised as Venn diagrams</div>
+      </a>
+      <a href="probability/conditional-probability.html" class="card">
+        <div class="card-title">Conditional Probability</div>
+        <div class="card-desc">P(A|B) = P(A∩B)/P(B) as shrinking the sample space — and why P(A|B) ≠ P(B|A)</div>
+      </a>
+      <a href="probability/bayes-rule.html" class="card">
+        <div class="card-title">Bayes' Rule &amp; Total Probability</div>
+        <div class="card-desc">Partitioning P(A), inverting conditionals, the rare-disease test, and the chain rule for n events</div>
+      </a>
+      <a href="probability/independence.html" class="card">
+        <div class="card-title">Independence of Events</div>
+        <div class="card-desc">P(A∩B)=P(A)P(B), why independent ≠ disjoint, and conditional independence</div>
+      </a>
+      <a href="probability/pairwise-independence.html" class="card">
+        <div class="card-title">Pairwise vs. Mutual Independence</div>
+        <div class="card-desc">Why every pair being independent doesn't make events mutually independent — the two-coin parity counterexample</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Machine Learning</h2>
+    <div class="grid">
+      <a href="machine-learning/perceptron.html" class="card">
+        <div class="card-title">Perceptron</div>
+        <div class="card-desc">Weighted sum, activation, decision boundary, and the learning rule</div>
+      </a>
+      <a href="machine-learning/shallow-network.html" class="card">
+        <div class="card-title">Shallow Neural Network</div>
+        <div class="card-desc">How ReLU hidden units fold the input space into a piecewise linear surface — Figure 3.8 from Prince</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Gyrodynamics</h2>
+    <div class="grid">
+      <a href="gyrodynamics/polhode-herpolhode.html" class="card">
+        <div class="card-title">Polhode &amp; Herpolhode</div>
+        <div class="card-desc">The motion of the instantaneous rotation axis in body and space frames</div>
+      </a>
+      <a href="gyrodynamics/moment-of-momentum.html" class="card">
+        <div class="card-title">Moment of Momentum</div>
+        <div class="card-desc">Velocity of a point on a rigid body → h_i = r_i × m_i v_i → H = Iω</div>
+      </a>
+      <a href="gyrodynamics/bar-inertia.html" class="card">
+        <div class="card-title">Bar Inertia &amp; Angular Momentum</div>
+        <div class="card-desc">Inertia tensor of a slender bar at angle θ — moments, products, and H = [I]·ω when spinning about z</div>
+      </a>
+    </div>
+  </section>
+
+</body>
+</html>

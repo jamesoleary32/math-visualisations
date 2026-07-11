@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Learning Visualizations</title>
+  <title>Self-Study Syllabus</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,7 +15,7 @@
     }
 
     header {
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
     h1 {
@@ -37,7 +37,7 @@
       color: #999;
     }
 
-    .catalog-link {
+    .nav-link {
       font-size: 12px;
       color: #aaa;
       text-decoration: none;
@@ -46,354 +46,1729 @@
       padding: 3px 10px;
       transition: border-color 0.15s, color 0.15s;
     }
+    .nav-link:hover { border-color: #bbb; color: #555; }
 
-    .catalog-link:hover { border-color: #bbb; color: #555; }
-
-    section {
+    /* Overall progress */
+    .overall-progress {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px 24px;
       margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
 
-    h2 {
+    .overall-progress .label {
+      font-size: 13px;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .overall-progress .count {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111;
+      white-space: nowrap;
+    }
+
+    .bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: #efefef;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: #2e7d32;
+      transition: width 0.3s ease;
+    }
+
+    /* Floating table of contents (Notion-style, right edge) */
+    .toc {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+    .toc:hover {
+      background: #ffffff;
+      border-color: #e8e8e8;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #bbb;
+      padding: 3px 2px;
+      transition: color 0.15s;
+    }
+    .toc-tick {
+      display: block;
+      height: 2px;
+      width: 16px;
+      border-radius: 2px;
+      background: #d3d3d3;
+      flex-shrink: 0;
+      transition: width 0.18s, background 0.18s;
+      margin-left: auto;
+    }
+    .toc-label {
+      font-size: 12px;
+      white-space: nowrap;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-width 0.18s, opacity 0.18s;
+    }
+    .toc:hover .toc-label { max-width: 240px; opacity: 1; }
+    .toc-item:hover { color: #555; }
+    .toc-item:hover .toc-tick { background: #999; }
+    /* Active section */
+    .toc-item.active { color: #1565c0; }
+    .toc-item.active .toc-tick { width: 26px; background: #1565c0; }
+    .toc:hover .toc-item.active .toc-tick { width: 16px; }
+    @media (max-width: 1100px) { .toc { display: none; } }
+
+    /* Subject sections (accordion) */
+    .phase {
+      margin-bottom: 16px;
+      background: #fff;
+      border: 1px solid #ececec;
+      border-radius: 10px;
+      padding: 4px 20px;
+    }
+    .phase[open] { padding-bottom: 20px; }
+
+    .phase-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 0 12px;
+      outline: none;
+    }
+    .phase-summary::-webkit-details-marker { display: none; }
+    .phase-summary:focus-visible { box-shadow: 0 0 0 2px #cfe0f5; border-radius: 6px; }
+
+    /* Rotating disclosure chevron on the subject title */
+    .phase-summary .phase-title::before {
+      content: '▸';
+      display: inline-block;
+      margin-right: 9px;
+      color: #ccc;
+      font-size: 10px;
+      transition: transform 0.15s;
+    }
+    .phase[open] > .phase-summary .phase-title::before { transform: rotate(90deg); }
+    .phase-summary:hover .phase-title { color: #777; }
+    .phase-summary:hover .phase-title::before { color: #999; }
+    /* Collapsed summary keeps the progress bar visible but tightens spacing */
+    .phase-summary .phase-bar-wrap { margin-bottom: 0; }
+
+    .phase-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .phase-title {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 2px;
       color: #aaa;
-      margin-bottom: 16px;
+      font-weight: 600;
     }
 
-    .grid {
+    .phase-dates {
+      font-size: 11px;
+      color: #bbb;
+      letter-spacing: 0.5px;
+    }
+
+    .phase-progress-text {
+      font-size: 11px;
+      color: #bbb;
+      margin-left: auto;
+    }
+
+    .phase-bar-wrap {
+      height: 3px;
+      background: #efefef;
+      border-radius: 2px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .phase-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: #1565c0;
+      transition: width 0.3s ease;
+    }
+
+    .phase-sources {
+      font-size: 11px;
+      color: #bbb;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Source (textbook) subdivisions within a subject */
+    .source-group { margin: 2px 0 20px; }
+    .source-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 2px 6px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .source-name { font-size: 12.5px; color: #555; font-weight: 600; }
+    .source-detail { font-size: 11px; color: #bbb; }
+    .source-status {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .status-done    { color: #2e7d32; background: #eaf5eb; border-color: #d3ebd5; }
+    .status-current { color: #1565c0; background: #e9f1fb; border-color: #d2e3f7; }
+    .status-next    { color: #b8912f; background: #fbf6e9; border-color: #efe4c4; }
+    .status-planned { color: #9a9a9a; background: #f3f3f3; border-color: #e6e6e6; }
+    .source-empty {
+      font-size: 12px;
+      color: #c4c4c4;
+      font-style: italic;
+      padding: 8px 12px;
+    }
+
+    /* Topic rows */
+    .topic-group-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #ccc;
+      padding: 12px 0 6px 0;
+    }
+
+    .topic-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 7px;
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    .topic-row:hover { background: #f0f0f0; }
+
+    .topic-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid #d0d0d0;
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .topic-row input[type="checkbox"]:checked {
+      background: #2e7d32;
+      border-color: #2e7d32;
+    }
+
+    .topic-row input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 1px;
+      width: 7px;
+      height: 5px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg);
+    }
+
+    .topic-name {
+      font-size: 14px;
+      color: #1a1a1a;
+      flex: 1;
+      transition: color 0.15s;
+      user-select: none;
+    }
+
+    .topic-row.checked .topic-name {
+      color: #aaa;
+      text-decoration: line-through;
+      text-decoration-color: #ccc;
+    }
+
+    .topic-sub {
+      font-size: 11px;
+      color: #bbb;
+      flex: 1.5;
+      user-select: none;
+    }
+
+    .topic-row.checked .topic-sub { color: #ccc; }
+
+    .topic-source {
+      font-size: 10px;
+      color: #ccc;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    /* Resource links appended to a topic row: viz, glossary */
+    .viz-link, .gloss-link {
+      font-size: 11px;
+      text-decoration: none;
+      white-space: nowrap;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .viz-link { color: #1565c0; }
+    .gloss-link { color: #00897b; }
+    .viz-link:hover, .gloss-link:hover { opacity: 1; }
+    .topic-row.checked .viz-link,
+    .topic-row.checked .gloss-link { color: #aaa; }
+
+    /* Subject-level resources bar (glossary + practice for the whole subject) */
+    .phase-resources {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 18px;
+      font-size: 11px;
+      color: #bbb;
+      margin: 4px 0 14px 0;
     }
-
-    .card {
-      position: relative;
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
-      padding: 20px 24px 20px 20px;
-      width: 220px;
+    .phase-resources a {
       text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      color: #1565c0;
+      opacity: 0.75;
+      transition: opacity 0.15s;
+    }
+    .phase-resources a:hover { opacity: 1; }
+    .phase-resources .res-label {
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 10px;
+      color: #ccc;
+      margin-right: 6px;
     }
 
-    .card:hover {
-      border-color: #bbb;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    /* Visualisations nested hierarchically under a topic */
+    .topic-viz {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin: -2px 0 8px 42px;
     }
-
-    .card-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #111;
-      margin-bottom: 6px;
-    }
-
-    .card-desc {
+    .topic-viz a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 4px 10px;
+      border-radius: 6px;
       font-size: 12px;
-      color: #999;
-      line-height: 1.5;
+      color: #666;
+      text-decoration: none;
+      transition: background 0.1s, color 0.1s;
     }
+    .topic-viz a::before {
+      content: '↳';
+      color: #d0d0d0;
+    }
+    .topic-viz a:hover { background: #eef4fb; color: #1565c0; }
+    .topic-viz .viz-tag {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #aaa;
+      border: 1px solid #e4e4e4;
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    .topic-row.checked + .topic-viz a { color: #b5b5b5; }
+
+    /* Footer */
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #ebebeb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .reset-btn {
+      font-size: 12px;
+      color: #ccc;
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .reset-btn:hover { border-color: #c62828; color: #c62828; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Learning Visualizations</h1>
-    <div class="header-meta">
-      <p>Interactive explorations of mathematics and physics</p>
-      <a href="catalog.html" class="catalog-link">Sources &amp; Textbooks →</a>
-      <a href="glossary.html" class="catalog-link">Orbital Mechanics Glossary →</a>
-      <a href="linear-algebra-glossary.html" class="catalog-link">Linear Algebra Glossary →</a>
-      <a href="probability-glossary.html" class="catalog-link">Probability Glossary →</a>
-      <a href="syllabus.html" class="catalog-link">Syllabus →</a>
-      <a href="practice.html" class="catalog-link">Practice Problems →</a>
-      <a href="#tools" class="catalog-link">Tools →</a>
-    </div>
-  </header>
 
-  <section id="tools">
-    <h2>Tools</h2>
-    <div class="grid">
-      <a href="tools/distribution-calculator.html" class="card">
-        <div class="card-title">Distribution Calculator</div>
-        <div class="card-desc">PMF/PDF and CDF of named distributions with live parameter sliders, point and inverse-CDF queries, and moments — Normal, Binomial, Poisson, t, χ², Gamma, Beta and more</div>
-      </a>
-      <a href="tools/statistical-tests.html" class="card">
-        <div class="card-title">Statistical Tests</div>
-        <div class="card-desc">One- and two-sample t-tests, paired t-test, and chi-square goodness-of-fit — paste data, pick α, read the statistic, df, p-value and verdict</div>
-      </a>
-    </div>
-  </section>
+<header>
+  <h1>Self-Study Syllabus</h1>
+  <div class="header-meta">
+    <p>Organised by subject · progress reflects my actual, non-linear path</p>
+    <a href="visualizations.html" class="nav-link">← All visualizations</a>
+  </div>
+</header>
 
-  <section>
-    <h2>Linear Algebra</h2>
-    <div class="grid">
-      <a href="linear-algebra/basis-and-independence.html" class="card">
-        <div class="card-title">Basis, Span &amp; Linear Independence</div>
-        <div class="card-desc">Dependence, the parallelogram test, span collapsing to a line vs filling the plane, coordinates in a non-standard basis</div>
-      </a>
-      <a href="linear-algebra/row-column-space.html" class="card">
-        <div class="card-title">Row Space &amp; Column Space</div>
-        <div class="card-desc">Col(A) as reachable outputs, rank-1 collapse, Row(A) in the input space, Null(A) ⊥ Row(A), rank theorem and rank-nullity</div>
-      </a>
-      <a href="linear-algebra/kernel-and-range.html" class="card">
-        <div class="card-title">Kernel &amp; Range</div>
-        <div class="card-desc">A transformation as a map: range as everything T can output, kernel as inputs that vanish, fibers as kernel cosets, injective ⟺ ker = {0}, surjective ⟺ range = W, and rank-nullity</div>
-      </a>
-      <a href="linear-algebra/rank-and-nullity.html" class="card">
-        <div class="card-title">Rank &amp; Nullity</div>
-        <div class="card-desc">Computing rank and nullity by hand: row-reduce, count pivots vs free columns, and read off the kernel basis — worked on a 3×3, a wide and a tall matrix, plus differentiation on polynomials</div>
-      </a>
-      <a href="linear-algebra/matrix-vector-multiplication.html" class="card">
-        <div class="card-title">Matrix-Vector Multiplication</div>
-        <div class="card-desc">The row rule, column picture, rotation matrix, how A transforms the whole plane, and linearity A(u+v) = Au + Av</div>
-      </a>
-      <a href="linear-algebra/two-ways-to-read-ax.html" class="card">
-        <div class="card-title">Two Ways to Read Ax</div>
-        <div class="card-desc">Column picture: Ax as a weighted sum of columns. Row picture: each output component as a dot product — rows as questions, null space as the blind spot</div>
-      </a>
-      <a href="linear-algebra/vector-subspaces.html" class="card">
-        <div class="card-title">Vector Subspaces</div>
-        <div class="card-desc">Three axioms, the subspaces of ℝ², closure under addition and scaling, span</div>
-      </a>
-      <a href="linear-algebra/dot-product.html" class="card">
-        <div class="card-title">Dot Product</div>
-        <div class="card-desc">Vectors, angles, and projection</div>
-      </a>
-      <a href="linear-algebra/inner-product.html" class="card">
-        <div class="card-title">Inner Product</div>
-        <div class="card-desc">Three axioms that generalise the dot product to any vector space — weighted inner products, L² function spaces, induced norm, Cauchy-Schwarz, and generalised projection</div>
-      </a>
-      <a href="linear-algebra/gram-schmidt.html" class="card">
-        <div class="card-title">Gram-Schmidt</div>
-        <div class="card-desc">Turning any independent set into an orthonormal basis — the projection subtraction trick, why orthogonality is guaranteed, and the QR decomposition</div>
-      </a>
-      <a href="linear-algebra/orthogonal-matrices.html" class="card">
-        <div class="card-title">Orthogonal Matrices</div>
-        <div class="card-desc">QᵀQ = I means transpose is inverse — rotations (det = +1), reflections (det = −1), preserving lengths and angles, and frame change T′ = QTQᵀ</div>
-      </a>
-      <a href="linear-algebra/linear-transformations.html" class="card">
-        <div class="card-title">Linear Transformations</div>
-        <div class="card-desc">T(u+v) = T(u)+T(v) in any vector space — differentiation on polynomials, integration, transpose on matrices, kernel, image, rank-nullity, and matrix representation</div>
-      </a>
-      <a href="linear-algebra/cross-product.html" class="card">
-        <div class="card-title">Cross Product</div>
-        <div class="card-desc">Perpendicular vectors and parallelogram area</div>
-      </a>
-      <a href="linear-algebra/moment.html" class="card">
-        <div class="card-title">Moment of a Force</div>
-        <div class="card-desc">Torque as a cross product: M = r × F</div>
-      </a>
-      <a href="linear-algebra/determinant.html" class="card">
-        <div class="card-title">Determinant</div>
-        <div class="card-desc">Area scaling, orientation, and collapse — the geometry behind ad − bc</div>
-      </a>
-      <a href="linear-algebra/trace.html" class="card">
-        <div class="card-title">Trace</div>
-        <div class="card-desc">Why the diagonal sum is basis-independent — eigenvalue sum, infinitesimal determinant, and the cyclic property tr(AB) = tr(BA)</div>
-      </a>
-      <a href="linear-algebra/inverse-transformation.html" class="card">
-        <div class="card-title">Inverse Transformation</div>
-        <div class="card-desc">A⁻¹ undoes A — the round-trip identity and why singular matrices have no inverse</div>
-      </a>
-      <a href="linear-algebra/eigenvectors.html" class="card">
-        <div class="card-title">Eigenvectors</div>
-        <div class="card-desc">Av = λv — the special directions a matrix only stretches, never rotates</div>
-      </a>
-      <a href="linear-algebra/eigenspaces.html" class="card">
-        <div class="card-title">Eigenspaces</div>
-        <div class="card-desc">E_λ = Null(A − λI) as a subspace — geometric vs algebraic multiplicity, repeated eigenvalues, and defective (non-diagonalisable) matrices</div>
-      </a>
-      <a href="linear-algebra/tensors.html" class="card">
-        <div class="card-title">Tensors</div>
-        <div class="card-desc">Rank, transformation law T′ = RTRᵀ, index notation, and principal axes as eigenvectors</div>
-      </a>
-    </div>
-  </section>
+<!-- Overall progress -->
+<div class="overall-progress">
+  <span class="label">Overall</span>
+  <div class="bar-wrap">
+    <div class="bar-fill" id="overall-bar" style="width:0%"></div>
+  </div>
+  <span class="count" id="overall-count">0 / 0</span>
+</div>
 
-  <section>
-    <h2>Kinematics</h2>
-    <div class="grid">
-      <a href="kinematics/angular-velocity.html" class="card">
-        <div class="card-title">Angular Velocity</div>
-        <div class="card-desc">Why ω is orthogonal, and v = ω × r</div>
-      </a>
-      <a href="kinematics/plane-motion.html" class="card">
-        <div class="card-title">Plane Motion</div>
-        <div class="card-desc">Radial and transverse components in polar coordinates</div>
-      </a>
-      <a href="kinematics/instantaneous-center.html" class="card">
-        <div class="card-title">Instantaneous Center</div>
-        <div class="card-desc">The point about which the body is rotating instantaneously</div>
-      </a>
-      <a href="kinematics/euler-angles.html" class="card">
-        <div class="card-title">Euler Angles</div>
-        <div class="card-desc">ψ, θ, φ and transformation of displacements</div>
-      </a>
-      <a href="kinematics/areal-rate.html" class="card">
-        <div class="card-title">Areal Rate</div>
-        <div class="card-desc">r × v, equal areas, and Kepler's second law</div>
-      </a>
-      <a href="kinematics/circular-motion.html" class="card">
-        <div class="card-title">Circular Motion</div>
-        <div class="card-desc">v = rω, centripetal and tangential acceleration</div>
-      </a>
-    </div>
-  </section>
+<!-- Floating table of contents — built from the subject sections by JS -->
+<nav class="toc" id="toc" aria-label="Contents"></nav>
 
-  <section>
-    <h2>Particle Dynamics — Kepler's Laws</h2>
-    <div class="grid">
-      <a href="particle-dynamics/kepler-first.html" class="card">
-        <div class="card-title">Kepler's First Law</div>
-        <div class="card-desc">Orbits are conic sections — derived from Newton's inverse-square law via Binet's substitution</div>
-      </a>
-      <a href="particle-dynamics/kepler-second.html" class="card">
-        <div class="card-title">Kepler's Second Law</div>
-        <div class="card-desc">Equal areas in equal times — conservation of angular momentum h = r²θ̇</div>
-      </a>
-      <a href="particle-dynamics/kepler-third.html" class="card">
-        <div class="card-title">Kepler's Third Law</div>
-        <div class="card-desc">T² = 4π²a³/K — period depends only on semi-major axis, not eccentricity</div>
-      </a>
-    </div>
-  </section>
+<!-- ── Linear Algebra───────────────────────────────────────────── -->
+<details class="phase" id="linear-algebra" data-phase="1" open>
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Linear Algebra</span>
+    <span class="phase-progress-text" id="p1-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p1-bar"></div></div>
+  </summary>
+  <div class="phase-sources">3Blue1Brown — Essence of Linear Algebra · Singh — Linear Algebra: Step by Step</div>
+  <div class="phase-resources">
+    <span><span class="res-label">Glossary</span><a href="linear-algebra-glossary.html">Linear Algebra Glossary →</a></span>
+    <span><span class="res-label">Sources</span><a href="catalog.html">Catalog →</a></span>
+    <span><span class="res-label">Practice</span><span style="color:#ddd">none yet</span></span>
+  </div>
 
-  <section>
-    <h2>Particle Dynamics</h2>
-    <div class="grid">
-      <a href="particle-dynamics/a.html" class="card">
-        <div class="card-title">Impulse &amp; Momentum</div>
-        <div class="card-desc">Visualisation of impulse and momentum</div>
-      </a>
-      <a href="particle-dynamics/satellite-orbits.html" class="card">
-        <div class="card-title">Satellite Orbits</div>
-        <div class="card-desc">Radial &amp; transverse equations, Binet's substitution, orbit as a conic</div>
-      </a>
-      <a href="particle-dynamics/two-body.html" class="card">
-        <div class="card-title">Two-Body Problem</div>
-        <div class="card-desc">CoM reduction, relative coordinate, and reduced mass</div>
-      </a>
-      <a href="particle-dynamics/orbit-initial-conditions.html" class="card">
-        <div class="card-title">Orbit from Initial Conditions</div>
-        <div class="card-desc">χ, eccentricity from v₀ and β₀, and the Fig 4.9-2 chart</div>
-      </a>
-      <a href="particle-dynamics/hohmann-transfer.html" class="card">
-        <div class="card-title">Hohmann Transfer</div>
-        <div class="card-desc">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂, transfer time</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-group-label">Completed</div>
 
-  <section>
-    <h2>Particle Dynamics — Scenarios</h2>
-    <div class="grid">
-      <a href="particle-dynamics/scenarios/repulsive-orbit.html" class="card">
-        <div class="card-title">Repulsive Inverse-Square Force</div>
-        <div class="card-desc">F = +K/r² produces the repulsive branch of a hyperbola — Rutherford scattering geometry</div>
-      </a>
-      <a href="particle-dynamics/scenarios/impulse-orbit-change.html" class="card">
-        <div class="card-title">Impulsive Orbit Change</div>
-        <div class="card-desc">Δv at θ* = 150° transfers between two orbits sharing the same apse line — velocity vector decomposition into Δvₜ and Δvₙ</div>
-      </a>
-      <a href="particle-dynamics/scenarios/orbit-from-burnout.html" class="card">
-        <div class="card-title">Orbit from Burnout (Ex. 4.13-I)</div>
-        <div class="card-desc">Given χ = r₀v₀²/K, β₀, and r₀/R at engine cutoff, derive e, a/R, and initial position θ₀ relative to perigee</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-row" data-id="la-dot-product" data-default="1">
+    <input type="checkbox" id="la-dot-product">
+    <span class="topic-name">Dot Product</span>
+    <span class="topic-sub">Vectors, angles, and projection</span>
+    <span class="topic-source">3B1B · Singh</span>
+    <a href="linear-algebra-glossary.html#c-dot" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/dot-product.html"><span class="viz-tag">viz</span>Dot Product</a>
+  </div>
 
-  <section>
-    <h2>Geometry</h2>
-    <div class="grid">
-      <a href="geometry/conic-sections.html" class="card">
-        <div class="card-title">Conic Sections</div>
-        <div class="card-desc">Eccentricity, focus-directrix definition, and the polar equation</div>
-      </a>
-      <a href="geometry/ellipse-geometry.html" class="card">
-        <div class="card-title">Ellipse Geometry</div>
-        <div class="card-desc">Semi-axes, area = πab, focal properties, and the bridge to orbital mechanics</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-row" data-id="la-cross-product" data-default="1">
+    <input type="checkbox" id="la-cross-product">
+    <span class="topic-name">Cross Product</span>
+    <span class="topic-sub">Perpendicular vectors and parallelogram area</span>
+    <span class="topic-source">3B1B · Singh</span>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/cross-product.html"><span class="viz-tag">viz</span>Cross Product</a>
+  </div>
 
-  <section>
-    <h2>Differential Equations</h2>
-    <div class="grid">
-      <a href="differential-equations/ode-overview.html" class="card">
-        <div class="card-title">ODE Overview</div>
-        <div class="card-desc">Slope fields, solution curves, initial conditions, order and linearity</div>
-      </a>
-      <a href="differential-equations/pendulum.html" class="card">
-        <div class="card-title">The Pendulum</div>
-        <div class="card-desc">SHM, phase portrait, separatrix, and nonlinear period corrections</div>
-      </a>
-      <a href="differential-equations/heat-equation.html" class="card">
-        <div class="card-title">The Heat Equation</div>
-        <div class="card-desc">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-row" data-id="la-determinant" data-default="1">
+    <input type="checkbox" id="la-determinant">
+    <span class="topic-name">Determinant</span>
+    <span class="topic-sub">Area scaling, orientation, and collapse — ad − bc</span>
+    <span class="topic-source">3B1B · Singh</span>
+    <a href="linear-algebra-glossary.html#c-det" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/determinant.html"><span class="viz-tag">viz</span>Determinant</a>
+  </div>
 
-  <section>
-    <h2>Probability</h2>
-    <div class="grid">
-      <a href="probability/de-morgans-laws.html" class="card">
-        <div class="card-title">De Morgan's Laws</div>
-        <div class="card-desc">(A∪B)ᶜ = Aᶜ∩Bᶜ and (A∩B)ᶜ = Aᶜ∪Bᶜ — visualised as Venn diagrams</div>
-      </a>
-      <a href="probability/conditional-probability.html" class="card">
-        <div class="card-title">Conditional Probability</div>
-        <div class="card-desc">P(A|B) = P(A∩B)/P(B) as shrinking the sample space — and why P(A|B) ≠ P(B|A)</div>
-      </a>
-      <a href="probability/bayes-rule.html" class="card">
-        <div class="card-title">Bayes' Rule &amp; Total Probability</div>
-        <div class="card-desc">Partitioning P(A), inverting conditionals, the rare-disease test, and the chain rule for n events</div>
-      </a>
-      <a href="probability/independence.html" class="card">
-        <div class="card-title">Independence of Events</div>
-        <div class="card-desc">P(A∩B)=P(A)P(B), why independent ≠ disjoint, and conditional independence</div>
-      </a>
-      <a href="probability/pairwise-independence.html" class="card">
-        <div class="card-title">Pairwise vs. Mutual Independence</div>
-        <div class="card-desc">Why every pair being independent doesn't make events mutually independent — the two-coin parity counterexample</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-row" data-id="la-inverse" data-default="1">
+    <input type="checkbox" id="la-inverse">
+    <span class="topic-name">Inverse Transformation</span>
+    <span class="topic-sub">A⁻¹ undoes A — round-trip identity, singular failure</span>
+    <span class="topic-source">3B1B · Singh</span>
+    <a href="linear-algebra-glossary.html#c-inverse" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/inverse-transformation.html"><span class="viz-tag">viz</span>Inverse Transformation</a>
+  </div>
 
-  <section>
-    <h2>Machine Learning</h2>
-    <div class="grid">
-      <a href="machine-learning/perceptron.html" class="card">
-        <div class="card-title">Perceptron</div>
-        <div class="card-desc">Weighted sum, activation, decision boundary, and the learning rule</div>
-      </a>
-      <a href="machine-learning/shallow-network.html" class="card">
-        <div class="card-title">Shallow Neural Network</div>
-        <div class="card-desc">How ReLU hidden units fold the input space into a piecewise linear surface — Figure 3.8 from Prince</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-row" data-id="la-eigenvectors" data-default="1">
+    <input type="checkbox" id="la-eigenvectors">
+    <span class="topic-name">Eigenvectors</span>
+    <span class="topic-sub">Av = λv — directions a matrix only stretches</span>
+    <span class="topic-source">3B1B · Singh</span>
+    <a href="linear-algebra-glossary.html#c-eigen" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/eigenvectors.html"><span class="viz-tag">viz</span>Eigenvectors</a>
+  </div>
 
-  <section>
-    <h2>Gyrodynamics</h2>
-    <div class="grid">
-      <a href="gyrodynamics/polhode-herpolhode.html" class="card">
-        <div class="card-title">Polhode &amp; Herpolhode</div>
-        <div class="card-desc">The motion of the instantaneous rotation axis in body and space frames</div>
-      </a>
-      <a href="gyrodynamics/moment-of-momentum.html" class="card">
-        <div class="card-title">Moment of Momentum</div>
-        <div class="card-desc">Velocity of a point on a rigid body → h_i = r_i × m_i v_i → H = Iω</div>
-      </a>
-      <a href="gyrodynamics/bar-inertia.html" class="card">
-        <div class="card-title">Bar Inertia &amp; Angular Momentum</div>
-        <div class="card-desc">Inertia tensor of a slender bar at angle θ — moments, products, and H = [I]·ω when spinning about z</div>
-      </a>
-    </div>
-  </section>
+  <div class="topic-row" data-id="la-eigenspaces" data-default="1">
+    <input type="checkbox" id="la-eigenspaces">
+    <span class="topic-name">Eigenspaces</span>
+    <span class="topic-sub">E_λ = Null(A − λI) — multiplicity &amp; defective matrices</span>
+    <span class="topic-source">3B1B · Singh</span>
+    <a href="linear-algebra-glossary.html#c-eigen" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/eigenspaces.html"><span class="viz-tag">viz</span>Eigenspaces</a>
+  </div>
 
+  <div class="topic-group-label">To do</div>
+
+  <div class="topic-row" data-id="la-transformations">
+    <input type="checkbox" id="la-transformations">
+    <span class="topic-name">Linear Transformations</span>
+    <span class="topic-sub">Rotations, reflections, shears, projections as a unified concept</span>
+    <span class="topic-source">3B1B v3</span>
+    <a href="linear-algebra-glossary.html#c-transform" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="la-composition">
+    <input type="checkbox" id="la-composition">
+    <span class="topic-name">Matrix Multiplication as Composition</span>
+    <span class="topic-sub">Applying A then B = BA; why order matters geometrically</span>
+    <span class="topic-source">3B1B v4</span>
+    <a href="linear-algebra-glossary.html#c-transform" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="la-span-basis">
+    <input type="checkbox" id="la-span-basis">
+    <span class="topic-name">Span, Basis &amp; Linear Independence</span>
+    <span class="topic-sub">What a basis is; when vectors are redundant; dimension</span>
+    <span class="topic-source">3B1B v2 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-span" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+    <a href="linear-algebra-glossary.html#c-basis" class="gloss-link" onclick="event.stopPropagation()">basis →</a>
+  </div>
+
+  <div class="topic-row" data-id="la-spaces">
+    <input type="checkbox" id="la-spaces">
+    <span class="topic-name">Column Space &amp; Null Space</span>
+    <span class="topic-sub">What A can reach; what it maps to zero; rank-nullity theorem</span>
+    <span class="topic-source">3B1B v7 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-kernel" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="linear-algebra/kernel-and-range.html"><span class="viz-tag">viz</span>Kernel &amp; Range</a>
+    <a href="linear-algebra/rank-and-nullity.html"><span class="viz-tag">viz</span>Rank &amp; Nullity</a>
+  </div>
+
+  <div class="topic-row" data-id="la-change-of-basis">
+    <input type="checkbox" id="la-change-of-basis">
+    <span class="topic-name">Change of Basis</span>
+    <span class="topic-sub">Same transformation, different coordinate frame; P⁻¹AP</span>
+    <span class="topic-source">3B1B v13 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-basis" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="la-projection">
+    <input type="checkbox" id="la-projection">
+    <span class="topic-name">Orthogonal Projection</span>
+    <span class="topic-sub">Projecting onto a subspace; least squares</span>
+    <span class="topic-source">Singh</span>
+    <a href="linear-algebra-glossary.html#c-ortho" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="la-diagonalisation">
+    <input type="checkbox" id="la-diagonalisation">
+    <span class="topic-name">Eigendecomposition &amp; Diagonalisation</span>
+    <span class="topic-sub">A = PDP⁻¹; matrix powers; why it matters</span>
+    <span class="topic-source">3B1B v14 · Singh</span>
+    <a href="linear-algebra-glossary.html#c-eigen" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="la-svd">
+    <input type="checkbox" id="la-svd">
+    <span class="topic-name">Singular Value Decomposition</span>
+    <span class="topic-sub">The most general decomposition; every matrix</span>
+    <span class="topic-source">Singh</span>
+  </div>
+</details>
+
+<!-- ── Probability ───────────────────────────────────────────────────────── -->
+<details class="phase" id="probability" data-phase="8">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Probability</span>
+    <span class="phase-progress-text" id="p8-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
+  </summary>
+
+  <div class="source-group">
+    <div class="source-head">
+      <span class="source-name">Blitzstein &amp; Hwang — Introduction to Probability</span>
+      <span class="source-detail">CRC Press · Harvard Stat 110</span>
+      <span class="source-status status-current">Current</span>
+    </div>
+
+  <div class="topic-row" data-id="prob-counting">
+    <input type="checkbox" id="prob-counting">
+    <span class="topic-name">Counting &amp; Naive Probability</span>
+    <span class="topic-sub">Multiplication rule, permutations, combinations; birthday problem</span>
+    <span class="topic-source">B&amp;H §1</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-conditional">
+    <input type="checkbox" id="prob-conditional">
+    <span class="topic-name">Conditional Probability &amp; Bayes</span>
+    <span class="topic-sub">P(A|B), law of total probability, Bayes' theorem</span>
+    <span class="topic-source">B&amp;H §2</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-rvs">
+    <input type="checkbox" id="prob-rvs">
+    <span class="topic-name">Random Variables &amp; Distributions</span>
+    <span class="topic-sub">PMF, CDF, Bernoulli, Binomial, Geometric, Poisson</span>
+    <span class="topic-source">B&amp;H §3–4</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-expectation">
+    <input type="checkbox" id="prob-expectation">
+    <span class="topic-name">Expectation &amp; Variance</span>
+    <span class="topic-sub">E[X], linearity of expectation, LOTUS, Var(X)</span>
+    <span class="topic-source">B&amp;H §4–5</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-continuous">
+    <input type="checkbox" id="prob-continuous">
+    <span class="topic-name">Continuous Distributions</span>
+    <span class="topic-sub">PDF, Uniform, Normal, Exponential, Beta, Gamma</span>
+    <span class="topic-source">B&amp;H §5–8</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-joint">
+    <input type="checkbox" id="prob-joint">
+    <span class="topic-name">Joint Distributions &amp; Independence</span>
+    <span class="topic-sub">Joint PDF/PMF, marginals, covariance, correlation</span>
+    <span class="topic-source">B&amp;H §7</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-limit-theorems">
+    <input type="checkbox" id="prob-limit-theorems">
+    <span class="topic-name">Law of Large Numbers &amp; Central Limit Theorem</span>
+    <span class="topic-sub">Convergence in probability; normal approximation</span>
+    <span class="topic-source">B&amp;H §10</span>
+  </div>
+
+  <div class="topic-row" data-id="prob-markov">
+    <input type="checkbox" id="prob-markov">
+    <span class="topic-name">Markov Chains</span>
+    <span class="topic-sub">Transition matrices, stationary distributions, PageRank</span>
+    <span class="topic-source">B&amp;H §11</span>
+  </div>
+  </div><!-- /source-group B&H -->
+
+  <div class="source-group">
+    <div class="source-head">
+      <span class="source-name">Brzeźniak &amp; Zastawniak — Basic Stochastic Processes</span>
+      <span class="source-detail">harder follow-on</span>
+      <span class="source-status status-next">Up next</span>
+    </div>
+    <div class="source-empty">Topics added as I begin this book.</div>
+  </div><!-- /source-group Basic Stochastic Processes -->
+</details>
+
+<!-- ── Dynamics & Orbital Mechanics──────────────────────────────────────────────────── -->
+<details class="phase" id="dynamics-orbital-mechanics" data-phase="2">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Dynamics &amp; Orbital Mechanics</span>
+    <span class="phase-progress-text" id="p2-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p2-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Thomson — Introduction to Space Dynamics (Dover)</div>
+
+  <div class="topic-group-label">Completed — Kinematics</div>
+
+  <div class="topic-row" data-id="th-circular" data-default="1">
+    <input type="checkbox" id="th-circular">
+    <span class="topic-name">Circular Motion</span>
+    <span class="topic-sub">v = rω, centripetal and tangential acceleration</span>
+    <span class="topic-source">Thomson §1</span>
+    <a href="kinematics/circular-motion.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-angular-vel" data-default="1">
+    <input type="checkbox" id="th-angular-vel">
+    <span class="topic-name">Angular Velocity</span>
+    <span class="topic-sub">Why ω is orthogonal, and v = ω × r</span>
+    <span class="topic-source">Thomson §1</span>
+    <a href="kinematics/angular-velocity.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-plane-motion" data-default="1">
+    <input type="checkbox" id="th-plane-motion">
+    <span class="topic-name">Plane Motion</span>
+    <span class="topic-sub">Radial and transverse components in polar coordinates</span>
+    <span class="topic-source">Thomson §1</span>
+    <a href="kinematics/plane-motion.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-instant-center" data-default="1">
+    <input type="checkbox" id="th-instant-center">
+    <span class="topic-name">Instantaneous Center</span>
+    <span class="topic-sub">The point about which the body rotates instantaneously</span>
+    <span class="topic-source">Thomson §1</span>
+    <a href="kinematics/instantaneous-center.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-euler-angles" data-default="1">
+    <input type="checkbox" id="th-euler-angles">
+    <span class="topic-name">Euler Angles</span>
+    <span class="topic-sub">ψ, θ, φ and transformation of displacements</span>
+    <span class="topic-source">Thomson §1</span>
+    <a href="kinematics/euler-angles.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-areal-rate" data-default="1">
+    <input type="checkbox" id="th-areal-rate">
+    <span class="topic-name">Areal Rate</span>
+    <span class="topic-sub">r × v, equal areas, and Kepler's second law</span>
+    <span class="topic-source">Thomson §2</span>
+    <a href="kinematics/areal-rate.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-group-label">Completed — Orbital Mechanics</div>
+
+  <div class="topic-row" data-id="th-kepler1" data-default="1">
+    <input type="checkbox" id="th-kepler1">
+    <span class="topic-name">Kepler's First Law</span>
+    <span class="topic-sub">Orbits are conic sections — Newton's inverse-square law via Binet's substitution</span>
+    <span class="topic-source">Thomson §4</span>
+    <a href="particle-dynamics/kepler-first.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-kepler2" data-default="1">
+    <input type="checkbox" id="th-kepler2">
+    <span class="topic-name">Kepler's Second Law</span>
+    <span class="topic-sub">Equal areas in equal times — conservation of h = r²θ̇</span>
+    <span class="topic-source">Thomson §4</span>
+    <a href="particle-dynamics/kepler-second.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-kepler3" data-default="1">
+    <input type="checkbox" id="th-kepler3">
+    <span class="topic-name">Kepler's Third Law</span>
+    <span class="topic-sub">T² = 4π²a³/K — period depends only on semi-major axis</span>
+    <span class="topic-source">Thomson §4</span>
+    <a href="particle-dynamics/kepler-third.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-sat-orbits" data-default="1">
+    <input type="checkbox" id="th-sat-orbits">
+    <span class="topic-name">Satellite Orbits</span>
+    <span class="topic-sub">Radial & transverse equations, Binet's substitution, orbit as a conic</span>
+    <span class="topic-source">Thomson §4</span>
+    <a href="particle-dynamics/satellite-orbits.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-two-body" data-default="1">
+    <input type="checkbox" id="th-two-body">
+    <span class="topic-name">Two-Body Problem</span>
+    <span class="topic-sub">CoM reduction, relative coordinate, and reduced mass</span>
+    <span class="topic-source">Thomson §4</span>
+    <a href="particle-dynamics/two-body.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-orbit-ic" data-default="1">
+    <input type="checkbox" id="th-orbit-ic">
+    <span class="topic-name">Orbit from Initial Conditions</span>
+    <span class="topic-sub">χ, eccentricity from v₀ and β₀, Fig 4.9-2 chart</span>
+    <span class="topic-source">Thomson §4.9</span>
+    <a href="particle-dynamics/orbit-initial-conditions.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-hohmann" data-default="1">
+    <input type="checkbox" id="th-hohmann">
+    <span class="topic-name">Hohmann Transfer</span>
+    <span class="topic-sub">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂</span>
+    <span class="topic-source">Thomson §4</span>
+    <a href="particle-dynamics/hohmann-transfer.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-repulsive" data-default="1">
+    <input type="checkbox" id="th-repulsive">
+    <span class="topic-name">Repulsive Inverse-Square Force</span>
+    <span class="topic-sub">F = +K/r² produces repulsive hyperbola — Rutherford scattering</span>
+    <span class="topic-source">Thomson §4.13</span>
+    <a href="particle-dynamics/scenarios/repulsive-orbit.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-impulse-orbit" data-default="1">
+    <input type="checkbox" id="th-impulse-orbit">
+    <span class="topic-name">Impulsive Orbit Change</span>
+    <span class="topic-sub">Δv at θ* transfers between orbits sharing the apse line</span>
+    <span class="topic-source">Thomson §4.13</span>
+    <a href="particle-dynamics/scenarios/impulse-orbit-change.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-burnout" data-default="1">
+    <input type="checkbox" id="th-burnout">
+    <span class="topic-name">Orbit from Burnout</span>
+    <span class="topic-sub">Given χ, β₀, r₀/R at engine cutoff — derive e, a/R, θ₀</span>
+    <span class="topic-source">Thomson §4.13</span>
+    <a href="particle-dynamics/scenarios/orbit-from-burnout.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-group-label">Completed — Gyrodynamics</div>
+
+  <div class="topic-row" data-id="th-polhode" data-default="1">
+    <input type="checkbox" id="th-polhode">
+    <span class="topic-name">Polhode &amp; Herpolhode</span>
+    <span class="topic-sub">Motion of the instantaneous rotation axis in body and space frames</span>
+    <span class="topic-source">Thomson §5</span>
+    <a href="gyrodynamics/polhode-herpolhode.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-group-label">To do — Rigid Body Dynamics &amp; Gyrodynamics</div>
+
+  <div class="topic-row" data-id="th-euler-eqs">
+    <input type="checkbox" id="th-euler-eqs">
+    <span class="topic-name">Euler's Equations for Rigid Body Rotation</span>
+    <span class="topic-sub">Body-frame equations of motion; torque-free case</span>
+    <span class="topic-source">Thomson §3</span>
+  </div>
+
+  <div class="topic-row" data-id="th-moi-tensor">
+    <input type="checkbox" id="th-moi-tensor">
+    <span class="topic-name">Moment of Inertia Tensor</span>
+    <span class="topic-sub">Principal axes, eigenvalues of I, Steiner's theorem</span>
+    <span class="topic-source">Thomson §3</span>
+  </div>
+
+  <div class="topic-row" data-id="th-precession">
+    <input type="checkbox" id="th-precession">
+    <span class="topic-name">Precession &amp; Nutation</span>
+    <span class="topic-sub">Spinning top under gravity; steady precession conditions</span>
+    <span class="topic-source">Thomson §5</span>
+  </div>
+
+  <div class="topic-row" data-id="th-gyroscope">
+    <input type="checkbox" id="th-gyroscope">
+    <span class="topic-name">Gyroscope Dynamics</span>
+    <span class="topic-sub">Gyroscopic couple, stabilisation, spacecraft attitude control</span>
+    <span class="topic-source">Thomson §5</span>
+  </div>
+</details>
+
+<!-- ── Differential Equations ───────────────────────────────────────────── -->
+<details class="phase" id="differential-equations" data-phase="3">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Differential Equations</span>
+    <span class="phase-progress-text" id="p3-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p3-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Arnold — Ordinary Differential Equations · 3Blue1Brown — Differential Equations</div>
+
+  <div class="topic-group-label">Completed</div>
+
+  <div class="topic-row" data-id="de-ode-overview" data-default="1">
+    <input type="checkbox" id="de-ode-overview">
+    <span class="topic-name">ODE Overview</span>
+    <span class="topic-sub">Slope fields, solution curves, initial conditions, order and linearity</span>
+    <span class="topic-source">Arnold · 3B1B</span>
+    <a href="differential-equations/ode-overview.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="de-pendulum" data-default="1">
+    <input type="checkbox" id="de-pendulum">
+    <span class="topic-name">The Pendulum</span>
+    <span class="topic-sub">SHM, phase portrait, separatrix, nonlinear period corrections</span>
+    <span class="topic-source">Arnold · 3B1B</span>
+    <a href="differential-equations/pendulum.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="de-heat" data-default="1">
+    <input type="checkbox" id="de-heat">
+    <span class="topic-name">Heat Equation</span>
+    <span class="topic-sub">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</span>
+    <span class="topic-source">3B1B</span>
+    <a href="differential-equations/heat-equation.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-group-label">To do — 3Blue1Brown</div>
+
+  <div class="topic-row" data-id="de-fourier">
+    <input type="checkbox" id="de-fourier">
+    <span class="topic-name">Fourier Series</span>
+    <span class="topic-sub">Decomposing functions into sine/cosine modes; why they solve the heat equation</span>
+    <span class="topic-source">3B1B</span>
+  </div>
+
+  <div class="topic-row" data-id="de-laplace">
+    <input type="checkbox" id="de-laplace">
+    <span class="topic-name">Laplace Transforms</span>
+    <span class="topic-sub">Solving ODEs via algebraic manipulation in s-domain</span>
+    <span class="topic-source">3B1B</span>
+  </div>
+
+  <div class="topic-group-label">To do — Arnold</div>
+
+  <div class="topic-row" data-id="ar-phase-portraits">
+    <input type="checkbox" id="ar-phase-portraits">
+    <span class="topic-name">Phase Portraits &amp; Vector Fields</span>
+    <span class="topic-sub">Qualitative analysis of autonomous systems; equilibria and orbits</span>
+    <span class="topic-source">Arnold §1–2</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-stability">
+    <input type="checkbox" id="ar-stability">
+    <span class="topic-name">Stability of Equilibria</span>
+    <span class="topic-sub">Lyapunov stability; linearisation; stable vs unstable fixed points</span>
+    <span class="topic-source">Arnold §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-linear-systems">
+    <input type="checkbox" id="ar-linear-systems">
+    <span class="topic-name">Linear ODE Systems</span>
+    <span class="topic-sub">x' = Ax; eigenvalue classification of phase portraits</span>
+    <span class="topic-source">Arnold §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-limit-cycles">
+    <input type="checkbox" id="ar-limit-cycles">
+    <span class="topic-name">Limit Cycles</span>
+    <span class="topic-sub">Isolated closed orbits; Poincaré–Bendixson theorem</span>
+    <span class="topic-source">Arnold §5</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-bifurcations">
+    <input type="checkbox" id="ar-bifurcations">
+    <span class="topic-name">Structural Stability &amp; Bifurcations</span>
+    <span class="topic-sub">How phase portraits change as parameters vary</span>
+    <span class="topic-source">Arnold §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-manifolds">
+    <input type="checkbox" id="ar-manifolds">
+    <span class="topic-name">Differential Equations on Manifolds</span>
+    <span class="topic-sub">Flows on surfaces; torus; global qualitative behaviour</span>
+    <span class="topic-source">Arnold §7–8</span>
+  </div>
+</details>
+
+<!-- ── Signals & Systems ─────────────────────────────────────────────────── -->
+<details class="phase" id="signals-systems" data-phase="4">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Signals &amp; Systems</span>
+    <span class="phase-progress-text" id="p4-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p4-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Oppenheim &amp; Willsky — Signals and Systems (2nd ed.)</div>
+
+  <div class="topic-group-label">Continuous-time signals &amp; systems</div>
+
+  <div class="topic-row" data-id="ss-signals-systems">
+    <input type="checkbox" id="ss-signals-systems">
+    <span class="topic-name">Signals &amp; Systems — Classification</span>
+    <span class="topic-sub">Memory, causality, stability, invertibility; continuous vs discrete; energy and power signals</span>
+    <span class="topic-source">O&amp;W §1</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-lti-ct">
+    <input type="checkbox" id="ss-lti-ct">
+    <span class="topic-name">CT LTI Systems &amp; Convolution</span>
+    <span class="topic-sub">Convolution integral, impulse response, BIBO stability, causality from h(t)</span>
+    <span class="topic-source">O&amp;W §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-fourier-series">
+    <input type="checkbox" id="ss-fourier-series">
+    <span class="topic-name">Fourier Series (CT)</span>
+    <span class="topic-sub">Orthogonality, synthesis and analysis equations, Gibbs phenomenon, Parseval's theorem</span>
+    <span class="topic-source">O&amp;W §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ctft">
+    <input type="checkbox" id="ss-ctft">
+    <span class="topic-name">Continuous-Time Fourier Transform</span>
+    <span class="topic-sub">CTFT pair, convolution theorem, Parseval, duality; spectrum of standard signals</span>
+    <span class="topic-source">O&amp;W §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ctft-lti">
+    <input type="checkbox" id="ss-ctft-lti">
+    <span class="topic-name">Frequency Response of CT LTI Systems</span>
+    <span class="topic-sub">H(jω), ideal filters, first- and second-order system frequency response</span>
+    <span class="topic-source">O&amp;W §3–4</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-sampling">
+    <input type="checkbox" id="ss-sampling">
+    <span class="topic-name">Sampling Theorem</span>
+    <span class="topic-sub">Nyquist rate, aliasing, reconstruction; the bridge from CT to DT</span>
+    <span class="topic-source">O&amp;W §7</span>
+  </div>
+
+  <div class="topic-group-label">Laplace &amp; Z-transforms (system perspective)</div>
+
+  <div class="topic-row" data-id="ss-laplace">
+    <input type="checkbox" id="ss-laplace">
+    <span class="topic-name">Laplace Transform &amp; Transfer Functions</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, partial fractions, system stability from pole locations</span>
+    <span class="topic-source">O&amp;W §9</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-block-diagrams">
+    <input type="checkbox" id="ss-block-diagrams">
+    <span class="topic-name">Block Diagrams &amp; System Interconnections</span>
+    <span class="topic-sub">Series, parallel, feedback; unilateral Laplace for IVPs; signal flow graphs</span>
+    <span class="topic-source">O&amp;W §9–10</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ztransform">
+    <input type="checkbox" id="ss-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">ROC, poles and zeros, inverse Z-transform; DT system stability</span>
+    <span class="topic-source">O&amp;W §10</span>
+  </div>
+</details>
+
+<!-- ── Control Systems──────────────────────────────────────────── -->
+<details class="phase" id="control-systems" data-phase="5">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Control Systems</span>
+    <span class="phase-progress-text" id="p5-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p5-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Ogata — Modern Control Engineering (5th ed.) · Franklin — Feedback Control of Dynamic Systems</div>
+
+  <div class="topic-group-label">Classical control</div>
+
+  <div class="topic-row" data-id="ctrl-models">
+    <input type="checkbox" id="ctrl-models">
+    <span class="topic-name">Mathematical Models of Systems</span>
+    <span class="topic-sub">Transfer functions from ODEs; block diagram algebra; linearisation around operating points</span>
+    <span class="topic-source">Ogata §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-transient">
+    <input type="checkbox" id="ctrl-transient">
+    <span class="topic-name">Time-Domain Response</span>
+    <span class="topic-sub">First- and second-order step response; damping ratio, natural frequency, settling time, overshoot</span>
+    <span class="topic-source">Ogata §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-root-locus">
+    <input type="checkbox" id="ctrl-root-locus">
+    <span class="topic-name">Root Locus</span>
+    <span class="topic-sub">Closed-loop poles as gain varies; construction rules; designing for desired transient specs</span>
+    <span class="topic-source">Ogata §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-frequency-response">
+    <input type="checkbox" id="ctrl-frequency-response">
+    <span class="topic-name">Frequency Response &amp; Bode Plots</span>
+    <span class="topic-sub">Magnitude and phase vs frequency; asymptotic Bode construction; gain and phase margins</span>
+    <span class="topic-source">Ogata §7</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-nyquist">
+    <input type="checkbox" id="ctrl-nyquist">
+    <span class="topic-name">Nyquist Stability Criterion</span>
+    <span class="topic-sub">Encirclement condition; stability margins in the frequency domain; robustness</span>
+    <span class="topic-source">Ogata §8</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-pid">
+    <input type="checkbox" id="ctrl-pid">
+    <span class="topic-name">PID Controllers</span>
+    <span class="topic-sub">Proportional, integral, derivative action; Ziegler–Nichols tuning; practical limitations</span>
+    <span class="topic-source">Ogata §8</span>
+  </div>
+
+  <div class="topic-group-label">Modern (state-space) control</div>
+
+  <div class="topic-row" data-id="ctrl-state-space">
+    <input type="checkbox" id="ctrl-state-space">
+    <span class="topic-name">State-Space Representation</span>
+    <span class="topic-sub">ẋ = Ax + Bu, y = Cx + Du; eigenvalues as poles; solution via matrix exponential</span>
+    <span class="topic-source">Ogata §9</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-controllability">
+    <input type="checkbox" id="ctrl-controllability">
+    <span class="topic-name">Controllability &amp; Observability</span>
+    <span class="topic-sub">Controllability matrix rank; observability matrix rank; duality theorem</span>
+    <span class="topic-source">Ogata §10</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-state-feedback">
+    <input type="checkbox" id="ctrl-state-feedback">
+    <span class="topic-name">State Feedback &amp; Pole Placement</span>
+    <span class="topic-sub">Full-state feedback u = −Kx; placing closed-loop poles; integral action for zero steady-state error</span>
+    <span class="topic-source">Ogata §10</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-observer">
+    <input type="checkbox" id="ctrl-observer">
+    <span class="topic-name">State Observers (Luenberger)</span>
+    <span class="topic-sub">Estimating states from outputs; observer gain; separation principle — direct precursor to Kalman filter</span>
+    <span class="topic-source">Ogata §10 · Franklin §7</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-lqr">
+    <input type="checkbox" id="ctrl-lqr">
+    <span class="topic-name">LQR &amp; Optimal Control</span>
+    <span class="topic-sub">Quadratic cost minimisation; Riccati equation; relationship between LQR and Kalman filtering (LQG)</span>
+    <span class="topic-source">Franklin §9</span>
+  </div>
+</details>
+
+<!-- ── Real Analysis─────────────────────────────────────────────────────── -->
+<details class="phase" id="real-analysis" data-phase="6">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Real Analysis</span>
+    <span class="phase-progress-text" id="p6-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p6-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Abbott — Understanding Analysis (Springer UTM, 2nd ed.)</div>
+
+  <div class="topic-row" data-id="ra-real-numbers">
+    <input type="checkbox" id="ra-real-numbers">
+    <span class="topic-name">The Real Numbers</span>
+    <span class="topic-sub">Axiom of completeness, Archimedean property, uncountability of ℝ</span>
+    <span class="topic-source">Abbott §1</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-sequences">
+    <input type="checkbox" id="ra-sequences">
+    <span class="topic-name">Sequences &amp; Series</span>
+    <span class="topic-sub">Convergence, Cauchy sequences, monotone convergence, infinite series</span>
+    <span class="topic-source">Abbott §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-topology-r">
+    <input type="checkbox" id="ra-topology-r">
+    <span class="topic-name">Basic Topology of ℝ</span>
+    <span class="topic-sub">Open and closed sets, compactness, connectedness — the real line version before Armstrong's general treatment</span>
+    <span class="topic-source">Abbott §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-continuity">
+    <input type="checkbox" id="ra-continuity">
+    <span class="topic-name">Functional Limits &amp; Continuity</span>
+    <span class="topic-sub">ε–δ definition, uniform continuity, extreme value and intermediate value theorems</span>
+    <span class="topic-source">Abbott §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-derivative">
+    <input type="checkbox" id="ra-derivative">
+    <span class="topic-name">The Derivative</span>
+    <span class="topic-sub">Rigorous definition, mean value theorem, L'Hôpital's rule</span>
+    <span class="topic-source">Abbott §5</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-series-functions">
+    <input type="checkbox" id="ra-series-functions">
+    <span class="topic-name">Sequences &amp; Series of Functions</span>
+    <span class="topic-sub">Pointwise vs uniform convergence; power series; Taylor series with rigorous remainder</span>
+    <span class="topic-source">Abbott §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-integral">
+    <input type="checkbox" id="ra-integral">
+    <span class="topic-name">The Riemann Integral</span>
+    <span class="topic-sub">Darboux definition, integrability criteria, fundamental theorem of calculus</span>
+    <span class="topic-source">Abbott §7</span>
+  </div>
+</details>
+
+<!-- ── Topology─────────────────────────────────────────────────── -->
+<details class="phase" id="topology" data-phase="7">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Topology</span>
+    <span class="phase-progress-text" id="p7-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Armstrong — Basic Topology (Springer UTM) · Abbott §3 provides the ℝ warm-up</div>
+
+  <div class="topic-row" data-id="top-spaces">
+    <input type="checkbox" id="top-spaces">
+    <span class="topic-name">Topological Spaces &amp; Continuity</span>
+    <span class="topic-sub">Open sets, neighbourhoods, continuous maps — without distance</span>
+    <span class="topic-source">Armstrong §1–2</span>
+  </div>
+
+  <div class="topic-row" data-id="top-homeomorphisms">
+    <input type="checkbox" id="top-homeomorphisms">
+    <span class="topic-name">Homeomorphisms</span>
+    <span class="topic-sub">Topological equivalence; invariants that tell spaces apart</span>
+    <span class="topic-source">Armstrong §2</span>
+  </div>
+
+  <div class="topic-row" data-id="top-connectedness">
+    <input type="checkbox" id="top-connectedness">
+    <span class="topic-name">Connectedness</span>
+    <span class="topic-sub">Path-connected vs connected; intermediate value theorem revisited</span>
+    <span class="topic-source">Armstrong §3</span>
+  </div>
+
+  <div class="topic-row" data-id="top-compactness">
+    <input type="checkbox" id="top-compactness">
+    <span class="topic-name">Compactness</span>
+    <span class="topic-sub">Open covers; Heine–Borel; why compact spaces behave nicely</span>
+    <span class="topic-source">Armstrong §3</span>
+  </div>
+
+  <div class="topic-row" data-id="top-identification">
+    <input type="checkbox" id="top-identification">
+    <span class="topic-name">Identification Spaces &amp; Quotient Topology</span>
+    <span class="topic-sub">Gluing constructions; torus, Möbius band, Klein bottle</span>
+    <span class="topic-source">Armstrong §4</span>
+  </div>
+
+  <div class="topic-row" data-id="top-fundamental-group">
+    <input type="checkbox" id="top-fundamental-group">
+    <span class="topic-name">The Fundamental Group</span>
+    <span class="topic-sub">π₁ — loops based at a point; homotopy; simply connected spaces</span>
+    <span class="topic-source">Armstrong §5</span>
+  </div>
+
+  <div class="topic-row" data-id="top-surfaces">
+    <input type="checkbox" id="top-surfaces">
+    <span class="topic-name">Classification of Surfaces</span>
+    <span class="topic-sub">Genus, orientability; every compact surface is a sphere, connected sum of tori, or projective planes</span>
+    <span class="topic-source">Armstrong §7</span>
+  </div>
+
+  <div class="topic-row" data-id="top-homology">
+    <input type="checkbox" id="top-homology">
+    <span class="topic-name">Simplicial Homology</span>
+    <span class="topic-sub">Triangulations; boundary operator; H₀, H₁, H₂ — holes in different dimensions</span>
+    <span class="topic-source">Armstrong §8</span>
+  </div>
+</details>
+
+<!-- ── RF & Communications──────────────────────────────────────── -->
+<details class="phase" id="rf-communications" data-phase="9">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">RF &amp; Communications</span>
+    <span class="phase-progress-text" id="p9-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p9-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Proakis &amp; Salehi — Communication Systems Engineering (2nd ed.) · Haykin — Communication Systems</div>
+
+  <div class="topic-group-label">Foundations</div>
+
+  <div class="topic-row" data-id="rf-channel-models">
+    <input type="checkbox" id="rf-channel-models">
+    <span class="topic-name">Channel Models &amp; Noise</span>
+    <span class="topic-sub">AWGN channel, SNR, noise power spectral density; thermal noise and N₀/2</span>
+    <span class="topic-source">Proakis §3</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-analog-mod">
+    <input type="checkbox" id="rf-analog-mod">
+    <span class="topic-name">Analog Modulation</span>
+    <span class="topic-sub">AM, DSB-SC, SSB, FM, PM; bandwidth and power tradeoffs; coherent vs envelope detection</span>
+    <span class="topic-source">Proakis §3</span>
+  </div>
+
+  <div class="topic-group-label">Digital communications</div>
+
+  <div class="topic-row" data-id="rf-digital-mod">
+    <input type="checkbox" id="rf-digital-mod">
+    <span class="topic-name">Digital Modulation — BPSK, QPSK, QAM</span>
+    <span class="topic-sub">Signal constellations, decision regions, BER vs Eb/N₀; matched filter receiver</span>
+    <span class="topic-source">Proakis §5</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-spread-spectrum">
+    <input type="checkbox" id="rf-spread-spectrum">
+    <span class="topic-name">Spread Spectrum — DSSS &amp; FHSS</span>
+    <span class="topic-sub">PN sequences, processing gain, jamming margin; CDMA; GPS L1 C/A signal structure</span>
+    <span class="topic-source">Proakis §9</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-channel-coding">
+    <input type="checkbox" id="rf-channel-coding">
+    <span class="topic-name">Channel Coding &amp; Shannon Capacity</span>
+    <span class="topic-sub">Shannon's theorem, capacity–bandwidth tradeoff; Hamming codes; convolutional codes and Viterbi</span>
+    <span class="topic-source">Proakis §8</span>
+  </div>
+
+  <div class="topic-group-label">RF propagation &amp; link budgets</div>
+
+  <div class="topic-row" data-id="rf-antennas">
+    <input type="checkbox" id="rf-antennas">
+    <span class="topic-name">Antenna Fundamentals</span>
+    <span class="topic-sub">Gain, directivity, effective aperture, beam pattern; dipole and patch antennas for GNSS receivers</span>
+    <span class="topic-source">Proakis §2 · Balanis §1–2</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-link-budget">
+    <input type="checkbox" id="rf-link-budget">
+    <span class="topic-name">Link Budget &amp; Friis Equation</span>
+    <span class="topic-sub">EIRP, path loss, receiver sensitivity, C/N₀; computing GPS received power from 20,200 km</span>
+    <span class="topic-source">Proakis §2</span>
+  </div>
+
+  <div class="topic-row" data-id="rf-multipath">
+    <input type="checkbox" id="rf-multipath">
+    <span class="topic-name">Multipath &amp; Ionospheric Effects</span>
+    <span class="topic-sub">Rayleigh fading, Doppler shift, ionospheric delay model; how these degrade GNSS pseudorange</span>
+    <span class="topic-source">Proakis §13 · Kaplan §7</span>
+  </div>
+</details>
+
+<!-- ── Signal Processing & Estimation──────────────────────────── -->
+<details class="phase" id="signal-processing-estimation" data-phase="10">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Signal Processing &amp; Estimation</span>
+    <span class="phase-progress-text" id="p10-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing · Kay — Statistical Signal Processing · Kaplan &amp; Hegarty — Understanding GPS/GNSS</div>
+
+  <div class="topic-group-label">Discrete-time signals &amp; systems</div>
+
+  <div class="topic-row" data-id="sp-sampling">
+    <input type="checkbox" id="sp-sampling">
+    <span class="topic-name">Sampling &amp; Reconstruction</span>
+    <span class="topic-sub">Nyquist theorem, aliasing, reconstruction from samples</span>
+    <span class="topic-source">Oppenheim §1</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-convolution">
+    <input type="checkbox" id="sp-convolution">
+    <span class="topic-name">Convolution &amp; LTI Systems</span>
+    <span class="topic-sub">Impulse response, linearity, time-invariance, BIBO stability</span>
+    <span class="topic-source">Oppenheim §2</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-ztransform">
+    <input type="checkbox" id="sp-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, inverse Z-transform</span>
+    <span class="topic-source">Oppenheim §3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-dft">
+    <input type="checkbox" id="sp-dft">
+    <span class="topic-name">Discrete Fourier Transform &amp; FFT</span>
+    <span class="topic-sub">DFT as sampled spectrum; FFT algorithm; spectral leakage and windowing</span>
+    <span class="topic-source">Oppenheim §8</span>
+  </div>
+
+  <div class="topic-group-label">Statistical signal processing</div>
+
+  <div class="topic-row" data-id="sp-estimation">
+    <input type="checkbox" id="sp-estimation">
+    <span class="topic-name">Estimation Theory</span>
+    <span class="topic-sub">MVUE, Cramér–Rao bound, maximum likelihood estimation, bias vs variance</span>
+    <span class="topic-source">Kay Vol.1 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-detection">
+    <input type="checkbox" id="sp-detection">
+    <span class="topic-name">Detection Theory</span>
+    <span class="topic-sub">Hypothesis testing, Neyman–Pearson, ROC curves, matched filter</span>
+    <span class="topic-source">Kay Vol.2 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-wiener">
+    <input type="checkbox" id="sp-wiener">
+    <span class="topic-name">Wiener Filter</span>
+    <span class="topic-sub">Optimal linear filter for stationary processes; MMSE estimation</span>
+    <span class="topic-source">Kay Vol.1 §12</span>
+  </div>
+
+  <div class="topic-group-label">Kalman filtering — the core target</div>
+
+  <div class="topic-row" data-id="sp-kalman-linear">
+    <input type="checkbox" id="sp-kalman-linear">
+    <span class="topic-name">Linear Kalman Filter</span>
+    <span class="topic-sub">State-space model, predict–update cycle, optimal gain, covariance propagation</span>
+    <span class="topic-source">Kay · Welch &amp; Bishop tutorial</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-kalman-ekf">
+    <input type="checkbox" id="sp-kalman-ekf">
+    <span class="topic-name">Extended &amp; Unscented Kalman Filter</span>
+    <span class="topic-sub">Linearisation for nonlinear systems; UKF sigma-point approach; orbit determination</span>
+    <span class="topic-source">Kay · Crassidis &amp; Junkins</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-particle-filter">
+    <input type="checkbox" id="sp-particle-filter">
+    <span class="topic-name">Particle Filters</span>
+    <span class="topic-sub">Sequential Monte Carlo; non-Gaussian state estimation; tracking highly nonlinear dynamics</span>
+    <span class="topic-source">Arulampalam et al. tutorial</span>
+  </div>
+
+  <div class="topic-group-label">Navigation &amp; PNT</div>
+
+  <div class="topic-row" data-id="sp-gnss">
+    <input type="checkbox" id="sp-gnss">
+    <span class="topic-name">GNSS Architecture &amp; Signal Structure</span>
+    <span class="topic-sub">GPS/Galileo/GLONASS signal design; pseudorange, carrier phase, satellite geometry (DOP)</span>
+    <span class="topic-source">Kaplan &amp; Hegarty §1–4</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-pnt-resilience">
+    <input type="checkbox" id="sp-pnt-resilience">
+    <span class="topic-name">Spoofing, Jamming &amp; Resilient PNT</span>
+    <span class="topic-sub">Threat taxonomy; detection algorithms; alternative and complementary positioning (IMU, eLoran, LEO PNT)</span>
+    <span class="topic-source">Kaplan §9 · CISA advisories</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-orbit-determination">
+    <input type="checkbox" id="sp-orbit-determination">
+    <span class="topic-name">Orbit Determination &amp; SSA</span>
+    <span class="topic-sub">Batch least squares, sequential estimation, conjunction analysis — Thomson dynamics + Kalman estimation combined</span>
+    <span class="topic-source">Vallado · Crassidis &amp; Junkins</span>
+  </div>
+</details>
+
+<!-- ── Deep Learning────────────────────── -->
+<details class="phase" id="deep-learning" data-phase="11">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Deep Learning</span>
+    <span class="phase-progress-text" id="p11-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p11-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Prince — Understanding Deep Learning (MIT Press, 2024) · free PDF at udlbook.github.io</div>
+
+  <div class="topic-group-label">Foundations</div>
+
+  <div class="topic-row" data-id="dl-supervised">
+    <input type="checkbox" id="dl-supervised">
+    <span class="topic-name">Supervised Learning</span>
+    <span class="topic-sub">Input–output mappings, loss functions, empirical risk minimisation</span>
+    <span class="topic-source">Prince §2</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-shallow">
+    <input type="checkbox" id="dl-shallow">
+    <span class="topic-name">Shallow Neural Networks</span>
+    <span class="topic-sub">One hidden layer, activation functions, universal approximation</span>
+    <span class="topic-source">Prince §3</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-deep">
+    <input type="checkbox" id="dl-deep">
+    <span class="topic-name">Deep Neural Networks</span>
+    <span class="topic-sub">Composing layers, depth vs width, piecewise linear regions</span>
+    <span class="topic-source">Prince §4</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-loss">
+    <input type="checkbox" id="dl-loss">
+    <span class="topic-name">Loss Functions</span>
+    <span class="topic-sub">MSE, cross-entropy, maximum likelihood perspective</span>
+    <span class="topic-source">Prince §5</span>
+  </div>
+
+  <div class="topic-group-label">Training</div>
+
+  <div class="topic-row" data-id="dl-gradient-descent">
+    <input type="checkbox" id="dl-gradient-descent">
+    <span class="topic-name">Gradient Descent &amp; Backpropagation</span>
+    <span class="topic-sub">SGD, mini-batch, chain rule through computation graphs</span>
+    <span class="topic-source">Prince §6</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-init-grad">
+    <input type="checkbox" id="dl-init-grad">
+    <span class="topic-name">Gradients &amp; Initialisation</span>
+    <span class="topic-sub">Vanishing/exploding gradients, He/Xavier init, batch norm</span>
+    <span class="topic-source">Prince §7</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-performance">
+    <input type="checkbox" id="dl-performance">
+    <span class="topic-name">Measuring Performance</span>
+    <span class="topic-sub">Bias–variance tradeoff, train/val/test split, double descent</span>
+    <span class="topic-source">Prince §8</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-regularisation">
+    <input type="checkbox" id="dl-regularisation">
+    <span class="topic-name">Regularisation</span>
+    <span class="topic-sub">L1/L2, dropout, data augmentation, early stopping</span>
+    <span class="topic-source">Prince §9</span>
+  </div>
+
+  <div class="topic-group-label">Architectures</div>
+
+  <div class="topic-row" data-id="dl-convnets">
+    <input type="checkbox" id="dl-convnets">
+    <span class="topic-name">Convolutional Networks</span>
+    <span class="topic-sub">Convolution, pooling, receptive field, translation equivariance</span>
+    <span class="topic-source">Prince §10</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-resnets">
+    <input type="checkbox" id="dl-resnets">
+    <span class="topic-name">Residual Networks</span>
+    <span class="topic-sub">Skip connections, batch norm, modern CNN architectures</span>
+    <span class="topic-source">Prince §11</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-transformers">
+    <input type="checkbox" id="dl-transformers">
+    <span class="topic-name">Transformers</span>
+    <span class="topic-sub">Self-attention, multi-head attention, positional encoding, encoder–decoder</span>
+    <span class="topic-source">Prince §12</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-gnns">
+    <input type="checkbox" id="dl-gnns">
+    <span class="topic-name">Graph Neural Networks</span>
+    <span class="topic-sub">Message passing, node/edge/graph classification, relational inductive bias</span>
+    <span class="topic-source">Prince §13</span>
+  </div>
+
+  <div class="topic-group-label">Generative models</div>
+
+  <div class="topic-row" data-id="dl-unsupervised">
+    <input type="checkbox" id="dl-unsupervised">
+    <span class="topic-name">Unsupervised Learning</span>
+    <span class="topic-sub">Clustering, dimensionality reduction, self-supervised pretraining</span>
+    <span class="topic-source">Prince §14</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-gans">
+    <input type="checkbox" id="dl-gans">
+    <span class="topic-name">Generative Adversarial Networks</span>
+    <span class="topic-sub">Minimax game, training instability, mode collapse, Wasserstein GAN</span>
+    <span class="topic-source">Prince §15</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-normalizing-flows">
+    <input type="checkbox" id="dl-normalizing-flows">
+    <span class="topic-name">Normalizing Flows</span>
+    <span class="topic-sub">Bijective mappings, change-of-variables formula, exact likelihood</span>
+    <span class="topic-source">Prince §16</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-vaes">
+    <input type="checkbox" id="dl-vaes">
+    <span class="topic-name">Variational Autoencoders</span>
+    <span class="topic-sub">Latent variable models, ELBO, reparameterisation trick</span>
+    <span class="topic-source">Prince §17</span>
+  </div>
+
+  <div class="topic-row" data-id="dl-diffusion">
+    <input type="checkbox" id="dl-diffusion">
+    <span class="topic-name">Diffusion Models</span>
+    <span class="topic-sub">Forward noising process, denoising score matching, DDPM</span>
+    <span class="topic-source">Prince §18</span>
+  </div>
+
+  <div class="topic-group-label">Reinforcement learning</div>
+
+  <div class="topic-row" data-id="dl-rl">
+    <input type="checkbox" id="dl-rl">
+    <span class="topic-name">Reinforcement Learning</span>
+    <span class="topic-sub">MDP, policy/value functions, Q-learning, policy gradient, RLHF</span>
+    <span class="topic-source">Prince §19</span>
+  </div>
+</details>
+
+<div class="footer">
+  <p>Progress saved automatically in your browser.</p>
+  <button class="reset-btn" id="reset-btn">Reset progress</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'syllabus-v1';
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; }
+    catch { return null; }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function initCheckboxes() {
+    const rows = document.querySelectorAll('.topic-row[data-id]');
+    let saved = loadState();
+    const firstLoad = saved === null;
+
+    if (firstLoad) {
+      saved = {};
+      rows.forEach(row => {
+        const id = row.dataset.id;
+        saved[id] = row.dataset.default === '1';
+      });
+      saveState(saved);
+    }
+
+    rows.forEach(row => {
+      const id = row.dataset.id;
+      const cb = row.querySelector('input[type="checkbox"]');
+      if (!cb || cb.disabled) return;
+
+      const checked = firstLoad ? (row.dataset.default === '1') : (saved[id] === true);
+      cb.checked = checked;
+      row.classList.toggle('checked', checked);
+
+      row.addEventListener('click', e => {
+        if (e.target.tagName === 'A') return;
+        cb.checked = !cb.checked;
+        row.classList.toggle('checked', cb.checked);
+        const s = loadState() || {};
+        s[id] = cb.checked;
+        saveState(s);
+        updateProgress();
+      });
+    });
+  }
+
+  function updateProgress() {
+    const phases = document.querySelectorAll('.phase[data-phase]');
+    let totalAll = 0, doneAll = 0;
+
+    phases.forEach(phase => {
+      const id = phase.dataset.phase;
+      const rows = phase.querySelectorAll('.topic-row[data-id]');
+      let total = 0, done = 0;
+      rows.forEach(row => {
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (!cb || cb.disabled) return;
+        total++;
+        if (cb.checked) done++;
+      });
+
+      totalAll += total;
+      doneAll += done;
+
+      const pct = total > 0 ? (done / total) * 100 : 0;
+      const bar = document.getElementById(`p${id}-bar`);
+      const txt = document.getElementById(`p${id}-text`);
+      if (bar) bar.style.width = pct + '%';
+      if (txt) txt.textContent = `${done} / ${total}`;
+    });
+
+    const overallPct = totalAll > 0 ? (doneAll / totalAll) * 100 : 0;
+    document.getElementById('overall-bar').style.width = overallPct + '%';
+    document.getElementById('overall-count').textContent = `${doneAll} / ${totalAll} topics`;
+  }
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  });
+
+  // Build the floating table of contents from the subject sections, and
+  // highlight the one currently in view (scroll-spy) — Notion-style.
+  function initToc() {
+    const toc = document.getElementById('toc');
+    const sections = [...document.querySelectorAll('.phase[id]')];
+    if (!toc || !sections.length) return;
+
+    const linkFor = {};
+    sections.forEach(sec => {
+      const label = (sec.querySelector('.phase-title')?.textContent || '').trim();
+      const a = document.createElement('a');
+      a.className = 'toc-item';
+      a.href = '#' + sec.id;
+      a.innerHTML = `<span class="toc-label">${label}</span><span class="toc-tick"></span>`;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        sec.open = true;                       // expand the target subject
+        history.replaceState(null, '', '#' + sec.id);
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      toc.appendChild(a);
+      linkFor[sec.id] = a;
+    });
+
+    let activeId = null;
+    const setActive = id => {
+      if (id === activeId) return;
+      activeId = id;
+      Object.values(linkFor).forEach(a => a.classList.remove('active'));
+      if (linkFor[id]) linkFor[id].classList.add('active');
+    };
+
+    const observer = new IntersectionObserver(entries => {
+      // Pick the visible section nearest the top of the viewport.
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible.length) setActive(visible[0].target.id);
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(sec => observer.observe(sec));
+    setActive(sections[0].id);
+  }
+
+  // A deep link (#probability) should expand its subject and scroll to it.
+  function openHashSection() {
+    if (!location.hash) return;
+    const target = document.getElementById(location.hash.slice(1));
+    if (target && target.classList.contains('phase')) {
+      target.open = true;
+      requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    }
+  }
+
+  initCheckboxes();
+  updateProgress();
+  initToc();
+  openHashSection();
+</script>
 </body>
 </html>
