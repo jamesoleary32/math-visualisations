@@ -147,6 +147,27 @@
     .toc:hover .toc-item.active .toc-tick { width: 16px; }
     @media (max-width: 1100px) { .toc { display: none; } }
 
+    /* Tier bands grouping foundations vs applications */
+    .tier-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 10px 0 20px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 600;
+      color: #999;
+    }
+    .tier-label + .tier-label,
+    .phase + .tier-label { margin-top: 34px; }
+    .tier-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e4e4e4;
+    }
+
     /* Subject sections (accordion) */
     .phase {
       margin-bottom: 16px;
@@ -470,6 +491,8 @@
 <!-- Floating table of contents — built from the subject sections by JS -->
 <nav class="toc" id="toc" aria-label="Contents"></nav>
 
+<div class="tier-label"><span>Mathematical Foundations</span></div>
+
 <!-- ── Linear Algebra───────────────────────────────────────────── -->
 <details class="phase" id="linear-algebra" data-phase="1" open>
   <summary class="phase-summary">
@@ -633,6 +656,11 @@
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
   </summary>
+  <div class="phase-resources">
+    <span><span class="res-label">Glossary</span><a href="probability-glossary.html">Probability Glossary →</a></span>
+    <span><span class="res-label">Sources</span><a href="catalog.html">Catalog →</a></span>
+    <span><span class="res-label">Practice</span><span style="color:#ddd">none yet</span></span>
+  </div>
 
   <div class="source-group">
     <div class="source-head">
@@ -646,6 +674,10 @@
     <span class="topic-name">Counting &amp; Naive Probability</span>
     <span class="topic-sub">Multiplication rule, permutations, combinations; birthday problem</span>
     <span class="topic-source">B&amp;H §1</span>
+    <a href="probability-glossary.html#c-event" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="probability/de-morgans-laws.html"><span class="viz-tag">viz</span>De Morgan's Laws</a>
   </div>
 
   <div class="topic-row" data-id="prob-conditional">
@@ -653,6 +685,11 @@
     <span class="topic-name">Conditional Probability &amp; Bayes</span>
     <span class="topic-sub">P(A|B), law of total probability, Bayes' theorem</span>
     <span class="topic-source">B&amp;H §2</span>
+    <a href="probability-glossary.html#c-conditional" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="probability/conditional-probability.html"><span class="viz-tag">viz</span>Conditional Probability</a>
+    <a href="probability/bayes-rule.html"><span class="viz-tag">viz</span>Bayes' Rule</a>
   </div>
 
   <div class="topic-row" data-id="prob-rvs">
@@ -660,6 +697,7 @@
     <span class="topic-name">Random Variables &amp; Distributions</span>
     <span class="topic-sub">PMF, CDF, Bernoulli, Binomial, Geometric, Poisson</span>
     <span class="topic-source">B&amp;H §3–4</span>
+    <a href="probability-glossary.html#c-rv" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-expectation">
@@ -667,6 +705,7 @@
     <span class="topic-name">Expectation &amp; Variance</span>
     <span class="topic-sub">E[X], linearity of expectation, LOTUS, Var(X)</span>
     <span class="topic-source">B&amp;H §4–5</span>
+    <a href="probability-glossary.html#c-expectation" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-continuous">
@@ -674,6 +713,7 @@
     <span class="topic-name">Continuous Distributions</span>
     <span class="topic-sub">PDF, Uniform, Normal, Exponential, Beta, Gamma</span>
     <span class="topic-source">B&amp;H §5–8</span>
+    <a href="probability-glossary.html#c-pdf" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-joint">
@@ -681,6 +721,11 @@
     <span class="topic-name">Joint Distributions &amp; Independence</span>
     <span class="topic-sub">Joint PDF/PMF, marginals, covariance, correlation</span>
     <span class="topic-source">B&amp;H §7</span>
+    <a href="probability-glossary.html#c-independence" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="probability/independence.html"><span class="viz-tag">viz</span>Independence of Events</a>
+    <a href="probability/pairwise-independence.html"><span class="viz-tag">viz</span>Pairwise vs. Mutual Independence</a>
   </div>
 
   <div class="topic-row" data-id="prob-limit-theorems">
@@ -688,6 +733,7 @@
     <span class="topic-name">Law of Large Numbers &amp; Central Limit Theorem</span>
     <span class="topic-sub">Convergence in probability; normal approximation</span>
     <span class="topic-source">B&amp;H §10</span>
+    <a href="probability-glossary.html#c-normal" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-markov">
@@ -706,190 +752,6 @@
     </div>
     <div class="source-empty">Topics added as I begin this book.</div>
   </div><!-- /source-group Basic Stochastic Processes -->
-</details>
-
-<!-- ── Dynamics & Orbital Mechanics──────────────────────────────────────────────────── -->
-<details class="phase" id="dynamics-orbital-mechanics" data-phase="2">
-  <summary class="phase-summary">
-  <div class="phase-header">
-    <span class="phase-title">Dynamics &amp; Orbital Mechanics</span>
-    <span class="phase-progress-text" id="p2-text"></span>
-  </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p2-bar"></div></div>
-  </summary>
-  <div class="phase-sources">Thomson — Introduction to Space Dynamics (Dover)</div>
-
-  <div class="topic-group-label">Completed — Kinematics</div>
-
-  <div class="topic-row" data-id="th-circular" data-default="1">
-    <input type="checkbox" id="th-circular">
-    <span class="topic-name">Circular Motion</span>
-    <span class="topic-sub">v = rω, centripetal and tangential acceleration</span>
-    <span class="topic-source">Thomson §1</span>
-    <a href="kinematics/circular-motion.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-angular-vel" data-default="1">
-    <input type="checkbox" id="th-angular-vel">
-    <span class="topic-name">Angular Velocity</span>
-    <span class="topic-sub">Why ω is orthogonal, and v = ω × r</span>
-    <span class="topic-source">Thomson §1</span>
-    <a href="kinematics/angular-velocity.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-plane-motion" data-default="1">
-    <input type="checkbox" id="th-plane-motion">
-    <span class="topic-name">Plane Motion</span>
-    <span class="topic-sub">Radial and transverse components in polar coordinates</span>
-    <span class="topic-source">Thomson §1</span>
-    <a href="kinematics/plane-motion.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-instant-center" data-default="1">
-    <input type="checkbox" id="th-instant-center">
-    <span class="topic-name">Instantaneous Center</span>
-    <span class="topic-sub">The point about which the body rotates instantaneously</span>
-    <span class="topic-source">Thomson §1</span>
-    <a href="kinematics/instantaneous-center.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-euler-angles" data-default="1">
-    <input type="checkbox" id="th-euler-angles">
-    <span class="topic-name">Euler Angles</span>
-    <span class="topic-sub">ψ, θ, φ and transformation of displacements</span>
-    <span class="topic-source">Thomson §1</span>
-    <a href="kinematics/euler-angles.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-areal-rate" data-default="1">
-    <input type="checkbox" id="th-areal-rate">
-    <span class="topic-name">Areal Rate</span>
-    <span class="topic-sub">r × v, equal areas, and Kepler's second law</span>
-    <span class="topic-source">Thomson §2</span>
-    <a href="kinematics/areal-rate.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-group-label">Completed — Orbital Mechanics</div>
-
-  <div class="topic-row" data-id="th-kepler1" data-default="1">
-    <input type="checkbox" id="th-kepler1">
-    <span class="topic-name">Kepler's First Law</span>
-    <span class="topic-sub">Orbits are conic sections — Newton's inverse-square law via Binet's substitution</span>
-    <span class="topic-source">Thomson §4</span>
-    <a href="particle-dynamics/kepler-first.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-kepler2" data-default="1">
-    <input type="checkbox" id="th-kepler2">
-    <span class="topic-name">Kepler's Second Law</span>
-    <span class="topic-sub">Equal areas in equal times — conservation of h = r²θ̇</span>
-    <span class="topic-source">Thomson §4</span>
-    <a href="particle-dynamics/kepler-second.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-kepler3" data-default="1">
-    <input type="checkbox" id="th-kepler3">
-    <span class="topic-name">Kepler's Third Law</span>
-    <span class="topic-sub">T² = 4π²a³/K — period depends only on semi-major axis</span>
-    <span class="topic-source">Thomson §4</span>
-    <a href="particle-dynamics/kepler-third.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-sat-orbits" data-default="1">
-    <input type="checkbox" id="th-sat-orbits">
-    <span class="topic-name">Satellite Orbits</span>
-    <span class="topic-sub">Radial & transverse equations, Binet's substitution, orbit as a conic</span>
-    <span class="topic-source">Thomson §4</span>
-    <a href="particle-dynamics/satellite-orbits.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-two-body" data-default="1">
-    <input type="checkbox" id="th-two-body">
-    <span class="topic-name">Two-Body Problem</span>
-    <span class="topic-sub">CoM reduction, relative coordinate, and reduced mass</span>
-    <span class="topic-source">Thomson §4</span>
-    <a href="particle-dynamics/two-body.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-orbit-ic" data-default="1">
-    <input type="checkbox" id="th-orbit-ic">
-    <span class="topic-name">Orbit from Initial Conditions</span>
-    <span class="topic-sub">χ, eccentricity from v₀ and β₀, Fig 4.9-2 chart</span>
-    <span class="topic-source">Thomson §4.9</span>
-    <a href="particle-dynamics/orbit-initial-conditions.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-hohmann" data-default="1">
-    <input type="checkbox" id="th-hohmann">
-    <span class="topic-name">Hohmann Transfer</span>
-    <span class="topic-sub">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂</span>
-    <span class="topic-source">Thomson §4</span>
-    <a href="particle-dynamics/hohmann-transfer.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-repulsive" data-default="1">
-    <input type="checkbox" id="th-repulsive">
-    <span class="topic-name">Repulsive Inverse-Square Force</span>
-    <span class="topic-sub">F = +K/r² produces repulsive hyperbola — Rutherford scattering</span>
-    <span class="topic-source">Thomson §4.13</span>
-    <a href="particle-dynamics/scenarios/repulsive-orbit.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-impulse-orbit" data-default="1">
-    <input type="checkbox" id="th-impulse-orbit">
-    <span class="topic-name">Impulsive Orbit Change</span>
-    <span class="topic-sub">Δv at θ* transfers between orbits sharing the apse line</span>
-    <span class="topic-source">Thomson §4.13</span>
-    <a href="particle-dynamics/scenarios/impulse-orbit-change.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="th-burnout" data-default="1">
-    <input type="checkbox" id="th-burnout">
-    <span class="topic-name">Orbit from Burnout</span>
-    <span class="topic-sub">Given χ, β₀, r₀/R at engine cutoff — derive e, a/R, θ₀</span>
-    <span class="topic-source">Thomson §4.13</span>
-    <a href="particle-dynamics/scenarios/orbit-from-burnout.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-group-label">Completed — Gyrodynamics</div>
-
-  <div class="topic-row" data-id="th-polhode" data-default="1">
-    <input type="checkbox" id="th-polhode">
-    <span class="topic-name">Polhode &amp; Herpolhode</span>
-    <span class="topic-sub">Motion of the instantaneous rotation axis in body and space frames</span>
-    <span class="topic-source">Thomson §5</span>
-    <a href="gyrodynamics/polhode-herpolhode.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-group-label">To do — Rigid Body Dynamics &amp; Gyrodynamics</div>
-
-  <div class="topic-row" data-id="th-euler-eqs">
-    <input type="checkbox" id="th-euler-eqs">
-    <span class="topic-name">Euler's Equations for Rigid Body Rotation</span>
-    <span class="topic-sub">Body-frame equations of motion; torque-free case</span>
-    <span class="topic-source">Thomson §3</span>
-  </div>
-
-  <div class="topic-row" data-id="th-moi-tensor">
-    <input type="checkbox" id="th-moi-tensor">
-    <span class="topic-name">Moment of Inertia Tensor</span>
-    <span class="topic-sub">Principal axes, eigenvalues of I, Steiner's theorem</span>
-    <span class="topic-source">Thomson §3</span>
-  </div>
-
-  <div class="topic-row" data-id="th-precession">
-    <input type="checkbox" id="th-precession">
-    <span class="topic-name">Precession &amp; Nutation</span>
-    <span class="topic-sub">Spinning top under gravity; steady precession conditions</span>
-    <span class="topic-source">Thomson §5</span>
-  </div>
-
-  <div class="topic-row" data-id="th-gyroscope">
-    <input type="checkbox" id="th-gyroscope">
-    <span class="topic-name">Gyroscope Dynamics</span>
-    <span class="topic-sub">Gyroscopic couple, stabilisation, spacecraft attitude control</span>
-    <span class="topic-source">Thomson §5</span>
-  </div>
 </details>
 
 <!-- ── Differential Equations ───────────────────────────────────────────── -->
@@ -987,178 +849,6 @@
     <span class="topic-name">Differential Equations on Manifolds</span>
     <span class="topic-sub">Flows on surfaces; torus; global qualitative behaviour</span>
     <span class="topic-source">Arnold §7–8</span>
-  </div>
-</details>
-
-<!-- ── Signals & Systems ─────────────────────────────────────────────────── -->
-<details class="phase" id="signals-systems" data-phase="4">
-  <summary class="phase-summary">
-  <div class="phase-header">
-    <span class="phase-title">Signals &amp; Systems</span>
-    <span class="phase-progress-text" id="p4-text"></span>
-  </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p4-bar"></div></div>
-  </summary>
-  <div class="phase-sources">Oppenheim &amp; Willsky — Signals and Systems (2nd ed.)</div>
-
-  <div class="topic-group-label">Continuous-time signals &amp; systems</div>
-
-  <div class="topic-row" data-id="ss-signals-systems">
-    <input type="checkbox" id="ss-signals-systems">
-    <span class="topic-name">Signals &amp; Systems — Classification</span>
-    <span class="topic-sub">Memory, causality, stability, invertibility; continuous vs discrete; energy and power signals</span>
-    <span class="topic-source">O&amp;W §1</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-lti-ct">
-    <input type="checkbox" id="ss-lti-ct">
-    <span class="topic-name">CT LTI Systems &amp; Convolution</span>
-    <span class="topic-sub">Convolution integral, impulse response, BIBO stability, causality from h(t)</span>
-    <span class="topic-source">O&amp;W §2</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-fourier-series">
-    <input type="checkbox" id="ss-fourier-series">
-    <span class="topic-name">Fourier Series (CT)</span>
-    <span class="topic-sub">Orthogonality, synthesis and analysis equations, Gibbs phenomenon, Parseval's theorem</span>
-    <span class="topic-source">O&amp;W §3</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-ctft">
-    <input type="checkbox" id="ss-ctft">
-    <span class="topic-name">Continuous-Time Fourier Transform</span>
-    <span class="topic-sub">CTFT pair, convolution theorem, Parseval, duality; spectrum of standard signals</span>
-    <span class="topic-source">O&amp;W §4</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-ctft-lti">
-    <input type="checkbox" id="ss-ctft-lti">
-    <span class="topic-name">Frequency Response of CT LTI Systems</span>
-    <span class="topic-sub">H(jω), ideal filters, first- and second-order system frequency response</span>
-    <span class="topic-source">O&amp;W §3–4</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-sampling">
-    <input type="checkbox" id="ss-sampling">
-    <span class="topic-name">Sampling Theorem</span>
-    <span class="topic-sub">Nyquist rate, aliasing, reconstruction; the bridge from CT to DT</span>
-    <span class="topic-source">O&amp;W §7</span>
-  </div>
-
-  <div class="topic-group-label">Laplace &amp; Z-transforms (system perspective)</div>
-
-  <div class="topic-row" data-id="ss-laplace">
-    <input type="checkbox" id="ss-laplace">
-    <span class="topic-name">Laplace Transform &amp; Transfer Functions</span>
-    <span class="topic-sub">Region of convergence, poles and zeros, partial fractions, system stability from pole locations</span>
-    <span class="topic-source">O&amp;W §9</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-block-diagrams">
-    <input type="checkbox" id="ss-block-diagrams">
-    <span class="topic-name">Block Diagrams &amp; System Interconnections</span>
-    <span class="topic-sub">Series, parallel, feedback; unilateral Laplace for IVPs; signal flow graphs</span>
-    <span class="topic-source">O&amp;W §9–10</span>
-  </div>
-
-  <div class="topic-row" data-id="ss-ztransform">
-    <input type="checkbox" id="ss-ztransform">
-    <span class="topic-name">Z-Transform</span>
-    <span class="topic-sub">ROC, poles and zeros, inverse Z-transform; DT system stability</span>
-    <span class="topic-source">O&amp;W §10</span>
-  </div>
-</details>
-
-<!-- ── Control Systems──────────────────────────────────────────── -->
-<details class="phase" id="control-systems" data-phase="5">
-  <summary class="phase-summary">
-  <div class="phase-header">
-    <span class="phase-title">Control Systems</span>
-    <span class="phase-progress-text" id="p5-text"></span>
-  </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p5-bar"></div></div>
-  </summary>
-  <div class="phase-sources">Ogata — Modern Control Engineering (5th ed.) · Franklin — Feedback Control of Dynamic Systems</div>
-
-  <div class="topic-group-label">Classical control</div>
-
-  <div class="topic-row" data-id="ctrl-models">
-    <input type="checkbox" id="ctrl-models">
-    <span class="topic-name">Mathematical Models of Systems</span>
-    <span class="topic-sub">Transfer functions from ODEs; block diagram algebra; linearisation around operating points</span>
-    <span class="topic-source">Ogata §2</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-transient">
-    <input type="checkbox" id="ctrl-transient">
-    <span class="topic-name">Time-Domain Response</span>
-    <span class="topic-sub">First- and second-order step response; damping ratio, natural frequency, settling time, overshoot</span>
-    <span class="topic-source">Ogata §4</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-root-locus">
-    <input type="checkbox" id="ctrl-root-locus">
-    <span class="topic-name">Root Locus</span>
-    <span class="topic-sub">Closed-loop poles as gain varies; construction rules; designing for desired transient specs</span>
-    <span class="topic-source">Ogata §6</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-frequency-response">
-    <input type="checkbox" id="ctrl-frequency-response">
-    <span class="topic-name">Frequency Response &amp; Bode Plots</span>
-    <span class="topic-sub">Magnitude and phase vs frequency; asymptotic Bode construction; gain and phase margins</span>
-    <span class="topic-source">Ogata §7</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-nyquist">
-    <input type="checkbox" id="ctrl-nyquist">
-    <span class="topic-name">Nyquist Stability Criterion</span>
-    <span class="topic-sub">Encirclement condition; stability margins in the frequency domain; robustness</span>
-    <span class="topic-source">Ogata §8</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-pid">
-    <input type="checkbox" id="ctrl-pid">
-    <span class="topic-name">PID Controllers</span>
-    <span class="topic-sub">Proportional, integral, derivative action; Ziegler–Nichols tuning; practical limitations</span>
-    <span class="topic-source">Ogata §8</span>
-  </div>
-
-  <div class="topic-group-label">Modern (state-space) control</div>
-
-  <div class="topic-row" data-id="ctrl-state-space">
-    <input type="checkbox" id="ctrl-state-space">
-    <span class="topic-name">State-Space Representation</span>
-    <span class="topic-sub">ẋ = Ax + Bu, y = Cx + Du; eigenvalues as poles; solution via matrix exponential</span>
-    <span class="topic-source">Ogata §9</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-controllability">
-    <input type="checkbox" id="ctrl-controllability">
-    <span class="topic-name">Controllability &amp; Observability</span>
-    <span class="topic-sub">Controllability matrix rank; observability matrix rank; duality theorem</span>
-    <span class="topic-source">Ogata §10</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-state-feedback">
-    <input type="checkbox" id="ctrl-state-feedback">
-    <span class="topic-name">State Feedback &amp; Pole Placement</span>
-    <span class="topic-sub">Full-state feedback u = −Kx; placing closed-loop poles; integral action for zero steady-state error</span>
-    <span class="topic-source">Ogata §10</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-observer">
-    <input type="checkbox" id="ctrl-observer">
-    <span class="topic-name">State Observers (Luenberger)</span>
-    <span class="topic-sub">Estimating states from outputs; observer gain; separation principle — direct precursor to Kalman filter</span>
-    <span class="topic-source">Ogata §10 · Franklin §7</span>
-  </div>
-
-  <div class="topic-row" data-id="ctrl-lqr">
-    <input type="checkbox" id="ctrl-lqr">
-    <span class="topic-name">LQR &amp; Optimal Control</span>
-    <span class="topic-sub">Quadratic cost minimisation; Riccati equation; relationship between LQR and Kalman filtering (LQG)</span>
-    <span class="topic-source">Franklin §9</span>
   </div>
 </details>
 
@@ -1291,6 +981,525 @@
   </div>
 </details>
 
+
+<div class="tier-label"><span>Applications &amp; Engineering</span></div>
+
+<!-- ── Dynamics & Orbital Mechanics──────────────────────────────────────────────────── -->
+<details class="phase" id="dynamics-orbital-mechanics" data-phase="2">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Dynamics &amp; Orbital Mechanics</span>
+    <span class="phase-progress-text" id="p2-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p2-bar"></div></div>
+  </summary>
+  <div class="phase-resources">
+    <span><span class="res-label">Glossary</span><a href="glossary.html">Orbital Mechanics Glossary →</a></span>
+    <span><span class="res-label">Sources</span><a href="catalog.html">Catalog →</a></span>
+    <span><span class="res-label">Practice</span><a href="practice.html">Classical Mechanics →</a></span>
+  </div>
+
+  <div class="source-group">
+    <div class="source-head">
+      <span class="source-name">Thomson — Introduction to Space Dynamics</span>
+      <span class="source-detail">Dover</span>
+      <span class="source-status status-current">Current</span>
+    </div>
+
+  <div class="topic-group-label">Kinematics</div>
+
+  <div class="topic-row" data-id="th-circular" data-default="1">
+    <input type="checkbox" id="th-circular">
+    <span class="topic-name">Circular Motion</span>
+    <span class="topic-sub">v = rω, centripetal and tangential acceleration</span>
+    <span class="topic-source">Thomson §1</span>
+      </div>
+  <div class="topic-viz">
+    <a href="kinematics/circular-motion.html"><span class="viz-tag">viz</span>Circular Motion</a>
+  </div>
+
+  <div class="topic-row" data-id="th-angular-vel" data-default="1">
+    <input type="checkbox" id="th-angular-vel">
+    <span class="topic-name">Angular Velocity</span>
+    <span class="topic-sub">Why ω is orthogonal, and v = ω × r</span>
+    <span class="topic-source">Thomson §1</span>
+      </div>
+  <div class="topic-viz">
+    <a href="kinematics/angular-velocity.html"><span class="viz-tag">viz</span>Angular Velocity</a>
+  </div>
+
+  <div class="topic-row" data-id="th-plane-motion" data-default="1">
+    <input type="checkbox" id="th-plane-motion">
+    <span class="topic-name">Plane Motion</span>
+    <span class="topic-sub">Radial and transverse components in polar coordinates</span>
+    <span class="topic-source">Thomson §1</span>
+      </div>
+  <div class="topic-viz">
+    <a href="kinematics/plane-motion.html"><span class="viz-tag">viz</span>Plane Motion</a>
+  </div>
+
+  <div class="topic-row" data-id="th-instant-center" data-default="1">
+    <input type="checkbox" id="th-instant-center">
+    <span class="topic-name">Instantaneous Center</span>
+    <span class="topic-sub">The point about which the body rotates instantaneously</span>
+    <span class="topic-source">Thomson §1</span>
+      </div>
+  <div class="topic-viz">
+    <a href="kinematics/instantaneous-center.html"><span class="viz-tag">viz</span>Instantaneous Center</a>
+  </div>
+
+  <div class="topic-row" data-id="th-euler-angles" data-default="1">
+    <input type="checkbox" id="th-euler-angles">
+    <span class="topic-name">Euler Angles</span>
+    <span class="topic-sub">ψ, θ, φ and transformation of displacements</span>
+    <span class="topic-source">Thomson §1</span>
+      </div>
+  <div class="topic-viz">
+    <a href="kinematics/euler-angles.html"><span class="viz-tag">viz</span>Euler Angles</a>
+  </div>
+
+  <div class="topic-row" data-id="th-areal-rate" data-default="1">
+    <input type="checkbox" id="th-areal-rate">
+    <span class="topic-name">Areal Rate</span>
+    <span class="topic-sub">r × v, equal areas, and Kepler's second law</span>
+    <span class="topic-source">Thomson §2</span>
+      </div>
+  <div class="topic-viz">
+    <a href="kinematics/areal-rate.html"><span class="viz-tag">viz</span>Areal Rate</a>
+    <a href="glossary.html#c-h" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-group-label">Orbital Mechanics</div>
+
+  <div class="topic-row" data-id="th-kepler1" data-default="1">
+    <input type="checkbox" id="th-kepler1">
+    <span class="topic-name">Kepler's First Law</span>
+    <span class="topic-sub">Orbits are conic sections — Newton's inverse-square law via Binet's substitution</span>
+    <span class="topic-source">Thomson §4</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/kepler-first.html"><span class="viz-tag">viz</span>Kepler's First Law</a>
+    <a href="geometry/conic-sections.html"><span class="viz-tag">viz</span>Conic Sections</a>
+    <a href="glossary.html#c-e" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-kepler2" data-default="1">
+    <input type="checkbox" id="th-kepler2">
+    <span class="topic-name">Kepler's Second Law</span>
+    <span class="topic-sub">Equal areas in equal times — conservation of h = r²θ̇</span>
+    <span class="topic-source">Thomson §4</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/kepler-second.html"><span class="viz-tag">viz</span>Kepler's Second Law</a>
+    <a href="glossary.html#c-h" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-kepler3" data-default="1">
+    <input type="checkbox" id="th-kepler3">
+    <span class="topic-name">Kepler's Third Law</span>
+    <span class="topic-sub">T² = 4π²a³/K — period depends only on semi-major axis</span>
+    <span class="topic-source">Thomson §4</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/kepler-third.html"><span class="viz-tag">viz</span>Kepler's Third Law</a>
+  </div>
+
+  <div class="topic-row" data-id="th-sat-orbits" data-default="1">
+    <input type="checkbox" id="th-sat-orbits">
+    <span class="topic-name">Satellite Orbits</span>
+    <span class="topic-sub">Radial & transverse equations, Binet's substitution, orbit as a conic</span>
+    <span class="topic-source">Thomson §4</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/satellite-orbits.html"><span class="viz-tag">viz</span>Satellite Orbits</a>
+    <a href="geometry/ellipse-geometry.html"><span class="viz-tag">viz</span>Ellipse Geometry</a>
+    <a href="glossary.html#c-p" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-two-body" data-default="1">
+    <input type="checkbox" id="th-two-body">
+    <span class="topic-name">Two-Body Problem</span>
+    <span class="topic-sub">CoM reduction, relative coordinate, and reduced mass</span>
+    <span class="topic-source">Thomson §4</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/two-body.html"><span class="viz-tag">viz</span>Two-Body Problem</a>
+  </div>
+
+  <div class="topic-row" data-id="th-orbit-ic" data-default="1">
+    <input type="checkbox" id="th-orbit-ic">
+    <span class="topic-name">Orbit from Initial Conditions</span>
+    <span class="topic-sub">χ, eccentricity from v₀ and β₀, Fig 4.9-2 chart</span>
+    <span class="topic-source">Thomson §4.9</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/orbit-initial-conditions.html"><span class="viz-tag">viz</span>Orbit from Initial Conditions</a>
+    <a href="glossary.html#c-chi" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-hohmann" data-default="1">
+    <input type="checkbox" id="th-hohmann">
+    <span class="topic-name">Hohmann Transfer</span>
+    <span class="topic-sub">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂</span>
+    <span class="topic-source">Thomson §4</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/hohmann-transfer.html"><span class="viz-tag">viz</span>Hohmann Transfer</a>
+    <a href="glossary.html#c-dv" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-repulsive" data-default="1">
+    <input type="checkbox" id="th-repulsive">
+    <span class="topic-name">Repulsive Inverse-Square Force</span>
+    <span class="topic-sub">F = +K/r² produces repulsive hyperbola — Rutherford scattering</span>
+    <span class="topic-source">Thomson §4.13</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/scenarios/repulsive-orbit.html"><span class="viz-tag">viz</span>Repulsive Inverse-Square Force</a>
+  </div>
+
+  <div class="topic-row" data-id="th-impulse-orbit" data-default="1">
+    <input type="checkbox" id="th-impulse-orbit">
+    <span class="topic-name">Impulsive Orbit Change</span>
+    <span class="topic-sub">Δv at θ* transfers between orbits sharing the apse line</span>
+    <span class="topic-source">Thomson §4.13</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/scenarios/impulse-orbit-change.html"><span class="viz-tag">viz</span>Impulsive Orbit Change</a>
+    <a href="glossary.html#c-apse" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-row" data-id="th-burnout" data-default="1">
+    <input type="checkbox" id="th-burnout">
+    <span class="topic-name">Orbit from Burnout</span>
+    <span class="topic-sub">Given χ, β₀, r₀/R at engine cutoff — derive e, a/R, θ₀</span>
+    <span class="topic-source">Thomson §4.13</span>
+      </div>
+  <div class="topic-viz">
+    <a href="particle-dynamics/scenarios/orbit-from-burnout.html"><span class="viz-tag">viz</span>Orbit from Burnout</a>
+    <a href="glossary.html#c-chi" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+
+  <div class="topic-group-label">Gyrodynamics</div>
+
+  <div class="topic-row" data-id="th-polhode" data-default="1">
+    <input type="checkbox" id="th-polhode">
+    <span class="topic-name">Polhode &amp; Herpolhode</span>
+    <span class="topic-sub">Motion of the instantaneous rotation axis in body and space frames</span>
+    <span class="topic-source">Thomson §5</span>
+      </div>
+  <div class="topic-viz">
+    <a href="gyrodynamics/polhode-herpolhode.html"><span class="viz-tag">viz</span>Polhode &amp; Herpolhode</a>
+  </div>
+
+  <div class="topic-group-label">Rigid Body Dynamics &amp; Gyrodynamics</div>
+
+  <div class="topic-row" data-id="th-euler-eqs">
+    <input type="checkbox" id="th-euler-eqs">
+    <span class="topic-name">Euler's Equations for Rigid Body Rotation</span>
+    <span class="topic-sub">Body-frame equations of motion; torque-free case</span>
+    <span class="topic-source">Thomson §3</span>
+  </div>
+  <div class="topic-viz">
+    <a href="gyrodynamics/moment-of-momentum.html"><span class="viz-tag">viz</span>Moment of Momentum</a>
+  </div>
+
+  <div class="topic-row" data-id="th-moi-tensor">
+    <input type="checkbox" id="th-moi-tensor">
+    <span class="topic-name">Moment of Inertia Tensor</span>
+    <span class="topic-sub">Principal axes, eigenvalues of I, Steiner's theorem</span>
+    <span class="topic-source">Thomson §3</span>
+  </div>
+  <div class="topic-viz">
+    <a href="gyrodynamics/bar-inertia.html"><span class="viz-tag">viz</span>Bar Inertia &amp; Angular Momentum</a>
+  </div>
+
+  <div class="topic-row" data-id="th-precession">
+    <input type="checkbox" id="th-precession">
+    <span class="topic-name">Precession &amp; Nutation</span>
+    <span class="topic-sub">Spinning top under gravity; steady precession conditions</span>
+    <span class="topic-source">Thomson §5</span>
+  </div>
+
+  <div class="topic-row" data-id="th-gyroscope">
+    <input type="checkbox" id="th-gyroscope">
+    <span class="topic-name">Gyroscope Dynamics</span>
+    <span class="topic-sub">Gyroscopic couple, stabilisation, spacecraft attitude control</span>
+    <span class="topic-source">Thomson §5</span>
+  </div>
+  </div>
+</details>
+
+<!-- ── Signals & Systems ─────────────────────────────────────────────────── -->
+<details class="phase" id="signals-systems" data-phase="4">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Signals &amp; Systems</span>
+    <span class="phase-progress-text" id="p4-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p4-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Oppenheim &amp; Willsky — Signals and Systems (2nd ed.)</div>
+
+  <div class="topic-group-label">Continuous-time signals &amp; systems</div>
+
+  <div class="topic-row" data-id="ss-signals-systems">
+    <input type="checkbox" id="ss-signals-systems">
+    <span class="topic-name">Signals &amp; Systems — Classification</span>
+    <span class="topic-sub">Memory, causality, stability, invertibility; continuous vs discrete; energy and power signals</span>
+    <span class="topic-source">O&amp;W §1</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-lti-ct">
+    <input type="checkbox" id="ss-lti-ct">
+    <span class="topic-name">CT LTI Systems &amp; Convolution</span>
+    <span class="topic-sub">Convolution integral, impulse response, BIBO stability, causality from h(t)</span>
+    <span class="topic-source">O&amp;W §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-fourier-series">
+    <input type="checkbox" id="ss-fourier-series">
+    <span class="topic-name">Fourier Series (CT)</span>
+    <span class="topic-sub">Orthogonality, synthesis and analysis equations, Gibbs phenomenon, Parseval's theorem</span>
+    <span class="topic-source">O&amp;W §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ctft">
+    <input type="checkbox" id="ss-ctft">
+    <span class="topic-name">Continuous-Time Fourier Transform</span>
+    <span class="topic-sub">CTFT pair, convolution theorem, Parseval, duality; spectrum of standard signals</span>
+    <span class="topic-source">O&amp;W §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ctft-lti">
+    <input type="checkbox" id="ss-ctft-lti">
+    <span class="topic-name">Frequency Response of CT LTI Systems</span>
+    <span class="topic-sub">H(jω), ideal filters, first- and second-order system frequency response</span>
+    <span class="topic-source">O&amp;W §3–4</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-sampling">
+    <input type="checkbox" id="ss-sampling">
+    <span class="topic-name">Sampling Theorem</span>
+    <span class="topic-sub">Nyquist rate, aliasing, reconstruction; the bridge from CT to DT</span>
+    <span class="topic-source">O&amp;W §7</span>
+  </div>
+
+  <div class="topic-group-label">Laplace &amp; Z-transforms (system perspective)</div>
+
+  <div class="topic-row" data-id="ss-laplace">
+    <input type="checkbox" id="ss-laplace">
+    <span class="topic-name">Laplace Transform &amp; Transfer Functions</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, partial fractions, system stability from pole locations</span>
+    <span class="topic-source">O&amp;W §9</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-block-diagrams">
+    <input type="checkbox" id="ss-block-diagrams">
+    <span class="topic-name">Block Diagrams &amp; System Interconnections</span>
+    <span class="topic-sub">Series, parallel, feedback; unilateral Laplace for IVPs; signal flow graphs</span>
+    <span class="topic-source">O&amp;W §9–10</span>
+  </div>
+
+  <div class="topic-row" data-id="ss-ztransform">
+    <input type="checkbox" id="ss-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">ROC, poles and zeros, inverse Z-transform; DT system stability</span>
+    <span class="topic-source">O&amp;W §10</span>
+  </div>
+</details>
+
+<!-- ── Signal Processing ──────────────────────────────────────────────── -->
+<details class="phase" id="signal-processing" data-phase="10">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Signal Processing</span>
+    <span class="phase-progress-text" id="p10-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing</div>
+
+  <div class="topic-row" data-id="sp-sampling">
+    <input type="checkbox" id="sp-sampling">
+    <span class="topic-name">Sampling &amp; Reconstruction</span>
+    <span class="topic-sub">Nyquist theorem, aliasing, reconstruction from samples</span>
+    <span class="topic-source">Oppenheim §1</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-convolution">
+    <input type="checkbox" id="sp-convolution">
+    <span class="topic-name">Convolution &amp; LTI Systems</span>
+    <span class="topic-sub">Impulse response, linearity, time-invariance, BIBO stability</span>
+    <span class="topic-source">Oppenheim §2</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-ztransform">
+    <input type="checkbox" id="sp-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, inverse Z-transform</span>
+    <span class="topic-source">Oppenheim §3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-dft">
+    <input type="checkbox" id="sp-dft">
+    <span class="topic-name">Discrete Fourier Transform &amp; FFT</span>
+    <span class="topic-sub">DFT as sampled spectrum; FFT algorithm; spectral leakage and windowing</span>
+    <span class="topic-source">Oppenheim §8</span>
+  </div>
+</details>
+
+<!-- ── Estimation &amp; Filtering ─────────────────────────────────────── -->
+<details class="phase" id="estimation-filtering" data-phase="12">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Estimation &amp; Filtering</span>
+    <span class="phase-progress-text" id="p12-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p12-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Kay — Statistical Signal Processing (Estimation &amp; Detection) · builds on Probability</div>
+
+  <div class="topic-group-label">Estimation &amp; detection</div>
+
+  <div class="topic-row" data-id="sp-estimation">
+    <input type="checkbox" id="sp-estimation">
+    <span class="topic-name">Estimation Theory</span>
+    <span class="topic-sub">MVUE, Cramér–Rao bound, maximum likelihood estimation, bias vs variance</span>
+    <span class="topic-source">Kay Vol.1 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-detection">
+    <input type="checkbox" id="sp-detection">
+    <span class="topic-name">Detection Theory</span>
+    <span class="topic-sub">Hypothesis testing, Neyman–Pearson, ROC curves, matched filter</span>
+    <span class="topic-source">Kay Vol.2 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-wiener">
+    <input type="checkbox" id="sp-wiener">
+    <span class="topic-name">Wiener Filter</span>
+    <span class="topic-sub">Optimal linear filter for stationary processes; MMSE estimation</span>
+    <span class="topic-source">Kay Vol.1 §12</span>
+  </div>
+
+  <div class="topic-group-label">Kalman &amp; sequential filtering</div>
+
+  <div class="topic-row" data-id="sp-kalman-linear">
+    <input type="checkbox" id="sp-kalman-linear">
+    <span class="topic-name">Linear Kalman Filter</span>
+    <span class="topic-sub">State-space model, predict–update cycle, optimal gain, covariance propagation</span>
+    <span class="topic-source">Kay · Welch &amp; Bishop tutorial</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-kalman-ekf">
+    <input type="checkbox" id="sp-kalman-ekf">
+    <span class="topic-name">Extended &amp; Unscented Kalman Filter</span>
+    <span class="topic-sub">Linearisation for nonlinear systems; UKF sigma-point approach; orbit determination</span>
+    <span class="topic-source">Kay · Crassidis &amp; Junkins</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-particle-filter">
+    <input type="checkbox" id="sp-particle-filter">
+    <span class="topic-name">Particle Filters</span>
+    <span class="topic-sub">Sequential Monte Carlo; non-Gaussian state estimation; tracking highly nonlinear dynamics</span>
+    <span class="topic-source">Arulampalam et al. tutorial</span>
+  </div>
+</details>
+
+<!-- ── Control Systems──────────────────────────────────────────── -->
+<details class="phase" id="control-systems" data-phase="5">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Control Systems</span>
+    <span class="phase-progress-text" id="p5-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p5-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Ogata — Modern Control Engineering (5th ed.) · Franklin — Feedback Control of Dynamic Systems</div>
+
+  <div class="topic-group-label">Classical control</div>
+
+  <div class="topic-row" data-id="ctrl-models">
+    <input type="checkbox" id="ctrl-models">
+    <span class="topic-name">Mathematical Models of Systems</span>
+    <span class="topic-sub">Transfer functions from ODEs; block diagram algebra; linearisation around operating points</span>
+    <span class="topic-source">Ogata §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-transient">
+    <input type="checkbox" id="ctrl-transient">
+    <span class="topic-name">Time-Domain Response</span>
+    <span class="topic-sub">First- and second-order step response; damping ratio, natural frequency, settling time, overshoot</span>
+    <span class="topic-source">Ogata §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-root-locus">
+    <input type="checkbox" id="ctrl-root-locus">
+    <span class="topic-name">Root Locus</span>
+    <span class="topic-sub">Closed-loop poles as gain varies; construction rules; designing for desired transient specs</span>
+    <span class="topic-source">Ogata §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-frequency-response">
+    <input type="checkbox" id="ctrl-frequency-response">
+    <span class="topic-name">Frequency Response &amp; Bode Plots</span>
+    <span class="topic-sub">Magnitude and phase vs frequency; asymptotic Bode construction; gain and phase margins</span>
+    <span class="topic-source">Ogata §7</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-nyquist">
+    <input type="checkbox" id="ctrl-nyquist">
+    <span class="topic-name">Nyquist Stability Criterion</span>
+    <span class="topic-sub">Encirclement condition; stability margins in the frequency domain; robustness</span>
+    <span class="topic-source">Ogata §8</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-pid">
+    <input type="checkbox" id="ctrl-pid">
+    <span class="topic-name">PID Controllers</span>
+    <span class="topic-sub">Proportional, integral, derivative action; Ziegler–Nichols tuning; practical limitations</span>
+    <span class="topic-source">Ogata §8</span>
+  </div>
+
+  <div class="topic-group-label">Modern (state-space) control</div>
+
+  <div class="topic-row" data-id="ctrl-state-space">
+    <input type="checkbox" id="ctrl-state-space">
+    <span class="topic-name">State-Space Representation</span>
+    <span class="topic-sub">ẋ = Ax + Bu, y = Cx + Du; eigenvalues as poles; solution via matrix exponential</span>
+    <span class="topic-source">Ogata §9</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-controllability">
+    <input type="checkbox" id="ctrl-controllability">
+    <span class="topic-name">Controllability &amp; Observability</span>
+    <span class="topic-sub">Controllability matrix rank; observability matrix rank; duality theorem</span>
+    <span class="topic-source">Ogata §10</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-state-feedback">
+    <input type="checkbox" id="ctrl-state-feedback">
+    <span class="topic-name">State Feedback &amp; Pole Placement</span>
+    <span class="topic-sub">Full-state feedback u = −Kx; placing closed-loop poles; integral action for zero steady-state error</span>
+    <span class="topic-source">Ogata §10</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-observer">
+    <input type="checkbox" id="ctrl-observer">
+    <span class="topic-name">State Observers (Luenberger)</span>
+    <span class="topic-sub">Estimating states from outputs; observer gain; separation principle — direct precursor to Kalman filter</span>
+    <span class="topic-source">Ogata §10 · Franklin §7</span>
+  </div>
+
+  <div class="topic-row" data-id="ctrl-lqr">
+    <input type="checkbox" id="ctrl-lqr">
+    <span class="topic-name">LQR &amp; Optimal Control</span>
+    <span class="topic-sub">Quadratic cost minimisation; Riccati equation; relationship between LQR and Kalman filtering (LQG)</span>
+    <span class="topic-source">Franklin §9</span>
+  </div>
+</details>
+
 <!-- ── RF & Communications──────────────────────────────────────── -->
 <details class="phase" id="rf-communications" data-phase="9">
   <summary class="phase-summary">
@@ -1365,94 +1574,16 @@
   </div>
 </details>
 
-<!-- ── Signal Processing & Estimation──────────────────────────── -->
-<details class="phase" id="signal-processing-estimation" data-phase="10">
+<!-- ── GNSS &amp; Navigation ──────────────────────────────────────────── -->
+<details class="phase" id="gnss-navigation" data-phase="13">
   <summary class="phase-summary">
   <div class="phase-header">
-    <span class="phase-title">Signal Processing &amp; Estimation</span>
-    <span class="phase-progress-text" id="p10-text"></span>
+    <span class="phase-title">GNSS &amp; Navigation</span>
+    <span class="phase-progress-text" id="p13-text"></span>
   </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p13-bar"></div></div>
   </summary>
-  <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing · Kay — Statistical Signal Processing · Kaplan &amp; Hegarty — Understanding GPS/GNSS</div>
-
-  <div class="topic-group-label">Discrete-time signals &amp; systems</div>
-
-  <div class="topic-row" data-id="sp-sampling">
-    <input type="checkbox" id="sp-sampling">
-    <span class="topic-name">Sampling &amp; Reconstruction</span>
-    <span class="topic-sub">Nyquist theorem, aliasing, reconstruction from samples</span>
-    <span class="topic-source">Oppenheim §1</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-convolution">
-    <input type="checkbox" id="sp-convolution">
-    <span class="topic-name">Convolution &amp; LTI Systems</span>
-    <span class="topic-sub">Impulse response, linearity, time-invariance, BIBO stability</span>
-    <span class="topic-source">Oppenheim §2</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-ztransform">
-    <input type="checkbox" id="sp-ztransform">
-    <span class="topic-name">Z-Transform</span>
-    <span class="topic-sub">Region of convergence, poles and zeros, inverse Z-transform</span>
-    <span class="topic-source">Oppenheim §3</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-dft">
-    <input type="checkbox" id="sp-dft">
-    <span class="topic-name">Discrete Fourier Transform &amp; FFT</span>
-    <span class="topic-sub">DFT as sampled spectrum; FFT algorithm; spectral leakage and windowing</span>
-    <span class="topic-source">Oppenheim §8</span>
-  </div>
-
-  <div class="topic-group-label">Statistical signal processing</div>
-
-  <div class="topic-row" data-id="sp-estimation">
-    <input type="checkbox" id="sp-estimation">
-    <span class="topic-name">Estimation Theory</span>
-    <span class="topic-sub">MVUE, Cramér–Rao bound, maximum likelihood estimation, bias vs variance</span>
-    <span class="topic-source">Kay Vol.1 §1–3</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-detection">
-    <input type="checkbox" id="sp-detection">
-    <span class="topic-name">Detection Theory</span>
-    <span class="topic-sub">Hypothesis testing, Neyman–Pearson, ROC curves, matched filter</span>
-    <span class="topic-source">Kay Vol.2 §1–3</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-wiener">
-    <input type="checkbox" id="sp-wiener">
-    <span class="topic-name">Wiener Filter</span>
-    <span class="topic-sub">Optimal linear filter for stationary processes; MMSE estimation</span>
-    <span class="topic-source">Kay Vol.1 §12</span>
-  </div>
-
-  <div class="topic-group-label">Kalman filtering — the core target</div>
-
-  <div class="topic-row" data-id="sp-kalman-linear">
-    <input type="checkbox" id="sp-kalman-linear">
-    <span class="topic-name">Linear Kalman Filter</span>
-    <span class="topic-sub">State-space model, predict–update cycle, optimal gain, covariance propagation</span>
-    <span class="topic-source">Kay · Welch &amp; Bishop tutorial</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-kalman-ekf">
-    <input type="checkbox" id="sp-kalman-ekf">
-    <span class="topic-name">Extended &amp; Unscented Kalman Filter</span>
-    <span class="topic-sub">Linearisation for nonlinear systems; UKF sigma-point approach; orbit determination</span>
-    <span class="topic-source">Kay · Crassidis &amp; Junkins</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-particle-filter">
-    <input type="checkbox" id="sp-particle-filter">
-    <span class="topic-name">Particle Filters</span>
-    <span class="topic-sub">Sequential Monte Carlo; non-Gaussian state estimation; tracking highly nonlinear dynamics</span>
-    <span class="topic-source">Arulampalam et al. tutorial</span>
-  </div>
-
-  <div class="topic-group-label">Navigation &amp; PNT</div>
+  <div class="phase-sources">Kaplan &amp; Hegarty — Understanding GPS/GNSS · Vallado — Fundamentals of Astrodynamics</div>
 
   <div class="topic-row" data-id="sp-gnss">
     <input type="checkbox" id="sp-gnss">
@@ -1485,7 +1616,18 @@
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p11-bar"></div></div>
   </summary>
-  <div class="phase-sources">Prince — Understanding Deep Learning (MIT Press, 2024) · free PDF at udlbook.github.io</div>
+  <div class="phase-resources">
+    <span><span class="res-label">Glossary</span><span style="color:#ddd">none yet</span></span>
+    <span><span class="res-label">Sources</span><a href="catalog.html">Catalog →</a></span>
+    <span><span class="res-label">Practice</span><span style="color:#ddd">none yet</span></span>
+  </div>
+
+  <div class="source-group">
+    <div class="source-head">
+      <span class="source-name">Prince — Understanding Deep Learning</span>
+      <span class="source-detail">MIT Press 2024 · free at udlbook.github.io</span>
+      <span class="source-status status-current">Current</span>
+    </div>
 
   <div class="topic-group-label">Foundations</div>
 
@@ -1495,12 +1637,18 @@
     <span class="topic-sub">Input–output mappings, loss functions, empirical risk minimisation</span>
     <span class="topic-source">Prince §2</span>
   </div>
+  <div class="topic-viz">
+    <a href="machine-learning/perceptron.html"><span class="viz-tag">viz</span>Perceptron</a>
+  </div>
 
   <div class="topic-row" data-id="dl-shallow">
     <input type="checkbox" id="dl-shallow">
     <span class="topic-name">Shallow Neural Networks</span>
     <span class="topic-sub">One hidden layer, activation functions, universal approximation</span>
     <span class="topic-source">Prince §3</span>
+  </div>
+  <div class="topic-viz">
+    <a href="machine-learning/shallow-network.html"><span class="viz-tag">viz</span>Shallow Neural Network</a>
   </div>
 
   <div class="topic-row" data-id="dl-deep">
@@ -1621,6 +1769,7 @@
     <span class="topic-name">Reinforcement Learning</span>
     <span class="topic-sub">MDP, policy/value functions, Q-learning, policy gradient, RLHF</span>
     <span class="topic-source">Prince §19</span>
+  </div>
   </div>
 </details>
 
