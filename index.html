@@ -147,6 +147,27 @@
     .toc:hover .toc-item.active .toc-tick { width: 16px; }
     @media (max-width: 1100px) { .toc { display: none; } }
 
+    /* Tier bands grouping foundations vs applications */
+    .tier-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 10px 0 20px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 600;
+      color: #999;
+    }
+    .tier-label + .tier-label,
+    .phase + .tier-label { margin-top: 34px; }
+    .tier-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e4e4e4;
+    }
+
     /* Subject sections (accordion) */
     .phase {
       margin-bottom: 16px;
@@ -470,6 +491,8 @@
 <!-- Floating table of contents — built from the subject sections by JS -->
 <nav class="toc" id="toc" aria-label="Contents"></nav>
 
+<div class="tier-label"><span>Mathematical Foundations</span></div>
+
 <!-- ── Linear Algebra───────────────────────────────────────────── -->
 <details class="phase" id="linear-algebra" data-phase="1" open>
   <summary class="phase-summary">
@@ -633,6 +656,11 @@
   </div>
   <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p8-bar"></div></div>
   </summary>
+  <div class="phase-resources">
+    <span><span class="res-label">Glossary</span><a href="probability-glossary.html">Probability Glossary →</a></span>
+    <span><span class="res-label">Sources</span><a href="catalog.html">Catalog →</a></span>
+    <span><span class="res-label">Practice</span><span style="color:#ddd">none yet</span></span>
+  </div>
 
   <div class="source-group">
     <div class="source-head">
@@ -646,6 +674,10 @@
     <span class="topic-name">Counting &amp; Naive Probability</span>
     <span class="topic-sub">Multiplication rule, permutations, combinations; birthday problem</span>
     <span class="topic-source">B&amp;H §1</span>
+    <a href="probability-glossary.html#c-event" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="probability/de-morgans-laws.html"><span class="viz-tag">viz</span>De Morgan's Laws</a>
   </div>
 
   <div class="topic-row" data-id="prob-conditional">
@@ -653,6 +685,11 @@
     <span class="topic-name">Conditional Probability &amp; Bayes</span>
     <span class="topic-sub">P(A|B), law of total probability, Bayes' theorem</span>
     <span class="topic-source">B&amp;H §2</span>
+    <a href="probability-glossary.html#c-conditional" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="probability/conditional-probability.html"><span class="viz-tag">viz</span>Conditional Probability</a>
+    <a href="probability/bayes-rule.html"><span class="viz-tag">viz</span>Bayes' Rule</a>
   </div>
 
   <div class="topic-row" data-id="prob-rvs">
@@ -660,6 +697,7 @@
     <span class="topic-name">Random Variables &amp; Distributions</span>
     <span class="topic-sub">PMF, CDF, Bernoulli, Binomial, Geometric, Poisson</span>
     <span class="topic-source">B&amp;H §3–4</span>
+    <a href="probability-glossary.html#c-rv" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-expectation">
@@ -667,6 +705,7 @@
     <span class="topic-name">Expectation &amp; Variance</span>
     <span class="topic-sub">E[X], linearity of expectation, LOTUS, Var(X)</span>
     <span class="topic-source">B&amp;H §4–5</span>
+    <a href="probability-glossary.html#c-expectation" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-continuous">
@@ -674,6 +713,7 @@
     <span class="topic-name">Continuous Distributions</span>
     <span class="topic-sub">PDF, Uniform, Normal, Exponential, Beta, Gamma</span>
     <span class="topic-source">B&amp;H §5–8</span>
+    <a href="probability-glossary.html#c-pdf" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-joint">
@@ -681,6 +721,11 @@
     <span class="topic-name">Joint Distributions &amp; Independence</span>
     <span class="topic-sub">Joint PDF/PMF, marginals, covariance, correlation</span>
     <span class="topic-source">B&amp;H §7</span>
+    <a href="probability-glossary.html#c-independence" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-viz">
+    <a href="probability/independence.html"><span class="viz-tag">viz</span>Independence of Events</a>
+    <a href="probability/pairwise-independence.html"><span class="viz-tag">viz</span>Pairwise vs. Mutual Independence</a>
   </div>
 
   <div class="topic-row" data-id="prob-limit-theorems">
@@ -688,6 +733,7 @@
     <span class="topic-name">Law of Large Numbers &amp; Central Limit Theorem</span>
     <span class="topic-sub">Convergence in probability; normal approximation</span>
     <span class="topic-source">B&amp;H §10</span>
+    <a href="probability-glossary.html#c-normal" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
 
   <div class="topic-row" data-id="prob-markov">
@@ -707,6 +753,236 @@
     <div class="source-empty">Topics added as I begin this book.</div>
   </div><!-- /source-group Basic Stochastic Processes -->
 </details>
+
+<!-- ── Differential Equations ───────────────────────────────────────────── -->
+<details class="phase" id="differential-equations" data-phase="3">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Differential Equations</span>
+    <span class="phase-progress-text" id="p3-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p3-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Arnold — Ordinary Differential Equations · 3Blue1Brown — Differential Equations</div>
+
+  <div class="topic-group-label">Completed</div>
+
+  <div class="topic-row" data-id="de-ode-overview" data-default="1">
+    <input type="checkbox" id="de-ode-overview">
+    <span class="topic-name">ODE Overview</span>
+    <span class="topic-sub">Slope fields, solution curves, initial conditions, order and linearity</span>
+    <span class="topic-source">Arnold · 3B1B</span>
+    <a href="differential-equations/ode-overview.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="de-pendulum" data-default="1">
+    <input type="checkbox" id="de-pendulum">
+    <span class="topic-name">The Pendulum</span>
+    <span class="topic-sub">SHM, phase portrait, separatrix, nonlinear period corrections</span>
+    <span class="topic-source">Arnold · 3B1B</span>
+    <a href="differential-equations/pendulum.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-row" data-id="de-heat" data-default="1">
+    <input type="checkbox" id="de-heat">
+    <span class="topic-name">Heat Equation</span>
+    <span class="topic-sub">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</span>
+    <span class="topic-source">3B1B</span>
+    <a href="differential-equations/heat-equation.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
+  </div>
+
+  <div class="topic-group-label">To do — 3Blue1Brown</div>
+
+  <div class="topic-row" data-id="de-fourier">
+    <input type="checkbox" id="de-fourier">
+    <span class="topic-name">Fourier Series</span>
+    <span class="topic-sub">Decomposing functions into sine/cosine modes; why they solve the heat equation</span>
+    <span class="topic-source">3B1B</span>
+  </div>
+
+  <div class="topic-row" data-id="de-laplace">
+    <input type="checkbox" id="de-laplace">
+    <span class="topic-name">Laplace Transforms</span>
+    <span class="topic-sub">Solving ODEs via algebraic manipulation in s-domain</span>
+    <span class="topic-source">3B1B</span>
+  </div>
+
+  <div class="topic-group-label">To do — Arnold</div>
+
+  <div class="topic-row" data-id="ar-phase-portraits">
+    <input type="checkbox" id="ar-phase-portraits">
+    <span class="topic-name">Phase Portraits &amp; Vector Fields</span>
+    <span class="topic-sub">Qualitative analysis of autonomous systems; equilibria and orbits</span>
+    <span class="topic-source">Arnold §1–2</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-stability">
+    <input type="checkbox" id="ar-stability">
+    <span class="topic-name">Stability of Equilibria</span>
+    <span class="topic-sub">Lyapunov stability; linearisation; stable vs unstable fixed points</span>
+    <span class="topic-source">Arnold §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-linear-systems">
+    <input type="checkbox" id="ar-linear-systems">
+    <span class="topic-name">Linear ODE Systems</span>
+    <span class="topic-sub">x' = Ax; eigenvalue classification of phase portraits</span>
+    <span class="topic-source">Arnold §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-limit-cycles">
+    <input type="checkbox" id="ar-limit-cycles">
+    <span class="topic-name">Limit Cycles</span>
+    <span class="topic-sub">Isolated closed orbits; Poincaré–Bendixson theorem</span>
+    <span class="topic-source">Arnold §5</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-bifurcations">
+    <input type="checkbox" id="ar-bifurcations">
+    <span class="topic-name">Structural Stability &amp; Bifurcations</span>
+    <span class="topic-sub">How phase portraits change as parameters vary</span>
+    <span class="topic-source">Arnold §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ar-manifolds">
+    <input type="checkbox" id="ar-manifolds">
+    <span class="topic-name">Differential Equations on Manifolds</span>
+    <span class="topic-sub">Flows on surfaces; torus; global qualitative behaviour</span>
+    <span class="topic-source">Arnold §7–8</span>
+  </div>
+</details>
+
+<!-- ── Real Analysis─────────────────────────────────────────────────────── -->
+<details class="phase" id="real-analysis" data-phase="6">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Real Analysis</span>
+    <span class="phase-progress-text" id="p6-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p6-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Abbott — Understanding Analysis (Springer UTM, 2nd ed.)</div>
+
+  <div class="topic-row" data-id="ra-real-numbers">
+    <input type="checkbox" id="ra-real-numbers">
+    <span class="topic-name">The Real Numbers</span>
+    <span class="topic-sub">Axiom of completeness, Archimedean property, uncountability of ℝ</span>
+    <span class="topic-source">Abbott §1</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-sequences">
+    <input type="checkbox" id="ra-sequences">
+    <span class="topic-name">Sequences &amp; Series</span>
+    <span class="topic-sub">Convergence, Cauchy sequences, monotone convergence, infinite series</span>
+    <span class="topic-source">Abbott §2</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-topology-r">
+    <input type="checkbox" id="ra-topology-r">
+    <span class="topic-name">Basic Topology of ℝ</span>
+    <span class="topic-sub">Open and closed sets, compactness, connectedness — the real line version before Armstrong's general treatment</span>
+    <span class="topic-source">Abbott §3</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-continuity">
+    <input type="checkbox" id="ra-continuity">
+    <span class="topic-name">Functional Limits &amp; Continuity</span>
+    <span class="topic-sub">ε–δ definition, uniform continuity, extreme value and intermediate value theorems</span>
+    <span class="topic-source">Abbott §4</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-derivative">
+    <input type="checkbox" id="ra-derivative">
+    <span class="topic-name">The Derivative</span>
+    <span class="topic-sub">Rigorous definition, mean value theorem, L'Hôpital's rule</span>
+    <span class="topic-source">Abbott §5</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-series-functions">
+    <input type="checkbox" id="ra-series-functions">
+    <span class="topic-name">Sequences &amp; Series of Functions</span>
+    <span class="topic-sub">Pointwise vs uniform convergence; power series; Taylor series with rigorous remainder</span>
+    <span class="topic-source">Abbott §6</span>
+  </div>
+
+  <div class="topic-row" data-id="ra-integral">
+    <input type="checkbox" id="ra-integral">
+    <span class="topic-name">The Riemann Integral</span>
+    <span class="topic-sub">Darboux definition, integrability criteria, fundamental theorem of calculus</span>
+    <span class="topic-source">Abbott §7</span>
+  </div>
+</details>
+
+<!-- ── Topology─────────────────────────────────────────────────── -->
+<details class="phase" id="topology" data-phase="7">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Topology</span>
+    <span class="phase-progress-text" id="p7-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Armstrong — Basic Topology (Springer UTM) · Abbott §3 provides the ℝ warm-up</div>
+
+  <div class="topic-row" data-id="top-spaces">
+    <input type="checkbox" id="top-spaces">
+    <span class="topic-name">Topological Spaces &amp; Continuity</span>
+    <span class="topic-sub">Open sets, neighbourhoods, continuous maps — without distance</span>
+    <span class="topic-source">Armstrong §1–2</span>
+  </div>
+
+  <div class="topic-row" data-id="top-homeomorphisms">
+    <input type="checkbox" id="top-homeomorphisms">
+    <span class="topic-name">Homeomorphisms</span>
+    <span class="topic-sub">Topological equivalence; invariants that tell spaces apart</span>
+    <span class="topic-source">Armstrong §2</span>
+  </div>
+
+  <div class="topic-row" data-id="top-connectedness">
+    <input type="checkbox" id="top-connectedness">
+    <span class="topic-name">Connectedness</span>
+    <span class="topic-sub">Path-connected vs connected; intermediate value theorem revisited</span>
+    <span class="topic-source">Armstrong §3</span>
+  </div>
+
+  <div class="topic-row" data-id="top-compactness">
+    <input type="checkbox" id="top-compactness">
+    <span class="topic-name">Compactness</span>
+    <span class="topic-sub">Open covers; Heine–Borel; why compact spaces behave nicely</span>
+    <span class="topic-source">Armstrong §3</span>
+  </div>
+
+  <div class="topic-row" data-id="top-identification">
+    <input type="checkbox" id="top-identification">
+    <span class="topic-name">Identification Spaces &amp; Quotient Topology</span>
+    <span class="topic-sub">Gluing constructions; torus, Möbius band, Klein bottle</span>
+    <span class="topic-source">Armstrong §4</span>
+  </div>
+
+  <div class="topic-row" data-id="top-fundamental-group">
+    <input type="checkbox" id="top-fundamental-group">
+    <span class="topic-name">The Fundamental Group</span>
+    <span class="topic-sub">π₁ — loops based at a point; homotopy; simply connected spaces</span>
+    <span class="topic-source">Armstrong §5</span>
+  </div>
+
+  <div class="topic-row" data-id="top-surfaces">
+    <input type="checkbox" id="top-surfaces">
+    <span class="topic-name">Classification of Surfaces</span>
+    <span class="topic-sub">Genus, orientability; every compact surface is a sphere, connected sum of tori, or projective planes</span>
+    <span class="topic-source">Armstrong §7</span>
+  </div>
+
+  <div class="topic-row" data-id="top-homology">
+    <input type="checkbox" id="top-homology">
+    <span class="topic-name">Simplicial Homology</span>
+    <span class="topic-sub">Triangulations; boundary operator; H₀, H₁, H₂ — holes in different dimensions</span>
+    <span class="topic-source">Armstrong §8</span>
+  </div>
+</details>
+
+
+<div class="tier-label"><span>Applications &amp; Engineering</span></div>
 
 <!-- ── Dynamics & Orbital Mechanics──────────────────────────────────────────────────── -->
 <details class="phase" id="dynamics-orbital-mechanics" data-phase="2">
@@ -892,104 +1168,6 @@
   </div>
 </details>
 
-<!-- ── Differential Equations ───────────────────────────────────────────── -->
-<details class="phase" id="differential-equations" data-phase="3">
-  <summary class="phase-summary">
-  <div class="phase-header">
-    <span class="phase-title">Differential Equations</span>
-    <span class="phase-progress-text" id="p3-text"></span>
-  </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p3-bar"></div></div>
-  </summary>
-  <div class="phase-sources">Arnold — Ordinary Differential Equations · 3Blue1Brown — Differential Equations</div>
-
-  <div class="topic-group-label">Completed</div>
-
-  <div class="topic-row" data-id="de-ode-overview" data-default="1">
-    <input type="checkbox" id="de-ode-overview">
-    <span class="topic-name">ODE Overview</span>
-    <span class="topic-sub">Slope fields, solution curves, initial conditions, order and linearity</span>
-    <span class="topic-source">Arnold · 3B1B</span>
-    <a href="differential-equations/ode-overview.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="de-pendulum" data-default="1">
-    <input type="checkbox" id="de-pendulum">
-    <span class="topic-name">The Pendulum</span>
-    <span class="topic-sub">SHM, phase portrait, separatrix, nonlinear period corrections</span>
-    <span class="topic-source">Arnold · 3B1B</span>
-    <a href="differential-equations/pendulum.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-row" data-id="de-heat" data-default="1">
-    <input type="checkbox" id="de-heat">
-    <span class="topic-name">Heat Equation</span>
-    <span class="topic-sub">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</span>
-    <span class="topic-source">3B1B</span>
-    <a href="differential-equations/heat-equation.html" class="viz-link" onclick="event.stopPropagation()">viz →</a>
-  </div>
-
-  <div class="topic-group-label">To do — 3Blue1Brown</div>
-
-  <div class="topic-row" data-id="de-fourier">
-    <input type="checkbox" id="de-fourier">
-    <span class="topic-name">Fourier Series</span>
-    <span class="topic-sub">Decomposing functions into sine/cosine modes; why they solve the heat equation</span>
-    <span class="topic-source">3B1B</span>
-  </div>
-
-  <div class="topic-row" data-id="de-laplace">
-    <input type="checkbox" id="de-laplace">
-    <span class="topic-name">Laplace Transforms</span>
-    <span class="topic-sub">Solving ODEs via algebraic manipulation in s-domain</span>
-    <span class="topic-source">3B1B</span>
-  </div>
-
-  <div class="topic-group-label">To do — Arnold</div>
-
-  <div class="topic-row" data-id="ar-phase-portraits">
-    <input type="checkbox" id="ar-phase-portraits">
-    <span class="topic-name">Phase Portraits &amp; Vector Fields</span>
-    <span class="topic-sub">Qualitative analysis of autonomous systems; equilibria and orbits</span>
-    <span class="topic-source">Arnold §1–2</span>
-  </div>
-
-  <div class="topic-row" data-id="ar-stability">
-    <input type="checkbox" id="ar-stability">
-    <span class="topic-name">Stability of Equilibria</span>
-    <span class="topic-sub">Lyapunov stability; linearisation; stable vs unstable fixed points</span>
-    <span class="topic-source">Arnold §3</span>
-  </div>
-
-  <div class="topic-row" data-id="ar-linear-systems">
-    <input type="checkbox" id="ar-linear-systems">
-    <span class="topic-name">Linear ODE Systems</span>
-    <span class="topic-sub">x' = Ax; eigenvalue classification of phase portraits</span>
-    <span class="topic-source">Arnold §4</span>
-  </div>
-
-  <div class="topic-row" data-id="ar-limit-cycles">
-    <input type="checkbox" id="ar-limit-cycles">
-    <span class="topic-name">Limit Cycles</span>
-    <span class="topic-sub">Isolated closed orbits; Poincaré–Bendixson theorem</span>
-    <span class="topic-source">Arnold §5</span>
-  </div>
-
-  <div class="topic-row" data-id="ar-bifurcations">
-    <input type="checkbox" id="ar-bifurcations">
-    <span class="topic-name">Structural Stability &amp; Bifurcations</span>
-    <span class="topic-sub">How phase portraits change as parameters vary</span>
-    <span class="topic-source">Arnold §6</span>
-  </div>
-
-  <div class="topic-row" data-id="ar-manifolds">
-    <input type="checkbox" id="ar-manifolds">
-    <span class="topic-name">Differential Equations on Manifolds</span>
-    <span class="topic-sub">Flows on surfaces; torus; global qualitative behaviour</span>
-    <span class="topic-source">Arnold §7–8</span>
-  </div>
-</details>
-
 <!-- ── Signals & Systems ─────────────────────────────────────────────────── -->
 <details class="phase" id="signals-systems" data-phase="4">
   <summary class="phase-summary">
@@ -1066,6 +1244,104 @@
     <span class="topic-name">Z-Transform</span>
     <span class="topic-sub">ROC, poles and zeros, inverse Z-transform; DT system stability</span>
     <span class="topic-source">O&amp;W §10</span>
+  </div>
+</details>
+
+<!-- ── Signal Processing ──────────────────────────────────────────────── -->
+<details class="phase" id="signal-processing" data-phase="10">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Signal Processing</span>
+    <span class="phase-progress-text" id="p10-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing</div>
+
+  <div class="topic-row" data-id="sp-sampling">
+    <input type="checkbox" id="sp-sampling">
+    <span class="topic-name">Sampling &amp; Reconstruction</span>
+    <span class="topic-sub">Nyquist theorem, aliasing, reconstruction from samples</span>
+    <span class="topic-source">Oppenheim §1</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-convolution">
+    <input type="checkbox" id="sp-convolution">
+    <span class="topic-name">Convolution &amp; LTI Systems</span>
+    <span class="topic-sub">Impulse response, linearity, time-invariance, BIBO stability</span>
+    <span class="topic-source">Oppenheim §2</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-ztransform">
+    <input type="checkbox" id="sp-ztransform">
+    <span class="topic-name">Z-Transform</span>
+    <span class="topic-sub">Region of convergence, poles and zeros, inverse Z-transform</span>
+    <span class="topic-source">Oppenheim §3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-dft">
+    <input type="checkbox" id="sp-dft">
+    <span class="topic-name">Discrete Fourier Transform &amp; FFT</span>
+    <span class="topic-sub">DFT as sampled spectrum; FFT algorithm; spectral leakage and windowing</span>
+    <span class="topic-source">Oppenheim §8</span>
+  </div>
+</details>
+
+<!-- ── Estimation &amp; Filtering ─────────────────────────────────────── -->
+<details class="phase" id="estimation-filtering" data-phase="12">
+  <summary class="phase-summary">
+  <div class="phase-header">
+    <span class="phase-title">Estimation &amp; Filtering</span>
+    <span class="phase-progress-text" id="p12-text"></span>
+  </div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p12-bar"></div></div>
+  </summary>
+  <div class="phase-sources">Kay — Statistical Signal Processing (Estimation &amp; Detection) · builds on Probability</div>
+
+  <div class="topic-group-label">Estimation &amp; detection</div>
+
+  <div class="topic-row" data-id="sp-estimation">
+    <input type="checkbox" id="sp-estimation">
+    <span class="topic-name">Estimation Theory</span>
+    <span class="topic-sub">MVUE, Cramér–Rao bound, maximum likelihood estimation, bias vs variance</span>
+    <span class="topic-source">Kay Vol.1 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-detection">
+    <input type="checkbox" id="sp-detection">
+    <span class="topic-name">Detection Theory</span>
+    <span class="topic-sub">Hypothesis testing, Neyman–Pearson, ROC curves, matched filter</span>
+    <span class="topic-source">Kay Vol.2 §1–3</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-wiener">
+    <input type="checkbox" id="sp-wiener">
+    <span class="topic-name">Wiener Filter</span>
+    <span class="topic-sub">Optimal linear filter for stationary processes; MMSE estimation</span>
+    <span class="topic-source">Kay Vol.1 §12</span>
+  </div>
+
+  <div class="topic-group-label">Kalman &amp; sequential filtering</div>
+
+  <div class="topic-row" data-id="sp-kalman-linear">
+    <input type="checkbox" id="sp-kalman-linear">
+    <span class="topic-name">Linear Kalman Filter</span>
+    <span class="topic-sub">State-space model, predict–update cycle, optimal gain, covariance propagation</span>
+    <span class="topic-source">Kay · Welch &amp; Bishop tutorial</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-kalman-ekf">
+    <input type="checkbox" id="sp-kalman-ekf">
+    <span class="topic-name">Extended &amp; Unscented Kalman Filter</span>
+    <span class="topic-sub">Linearisation for nonlinear systems; UKF sigma-point approach; orbit determination</span>
+    <span class="topic-source">Kay · Crassidis &amp; Junkins</span>
+  </div>
+
+  <div class="topic-row" data-id="sp-particle-filter">
+    <input type="checkbox" id="sp-particle-filter">
+    <span class="topic-name">Particle Filters</span>
+    <span class="topic-sub">Sequential Monte Carlo; non-Gaussian state estimation; tracking highly nonlinear dynamics</span>
+    <span class="topic-source">Arulampalam et al. tutorial</span>
   </div>
 </details>
 
@@ -1162,135 +1438,6 @@
   </div>
 </details>
 
-<!-- ── Real Analysis─────────────────────────────────────────────────────── -->
-<details class="phase" id="real-analysis" data-phase="6">
-  <summary class="phase-summary">
-  <div class="phase-header">
-    <span class="phase-title">Real Analysis</span>
-    <span class="phase-progress-text" id="p6-text"></span>
-  </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p6-bar"></div></div>
-  </summary>
-  <div class="phase-sources">Abbott — Understanding Analysis (Springer UTM, 2nd ed.)</div>
-
-  <div class="topic-row" data-id="ra-real-numbers">
-    <input type="checkbox" id="ra-real-numbers">
-    <span class="topic-name">The Real Numbers</span>
-    <span class="topic-sub">Axiom of completeness, Archimedean property, uncountability of ℝ</span>
-    <span class="topic-source">Abbott §1</span>
-  </div>
-
-  <div class="topic-row" data-id="ra-sequences">
-    <input type="checkbox" id="ra-sequences">
-    <span class="topic-name">Sequences &amp; Series</span>
-    <span class="topic-sub">Convergence, Cauchy sequences, monotone convergence, infinite series</span>
-    <span class="topic-source">Abbott §2</span>
-  </div>
-
-  <div class="topic-row" data-id="ra-topology-r">
-    <input type="checkbox" id="ra-topology-r">
-    <span class="topic-name">Basic Topology of ℝ</span>
-    <span class="topic-sub">Open and closed sets, compactness, connectedness — the real line version before Armstrong's general treatment</span>
-    <span class="topic-source">Abbott §3</span>
-  </div>
-
-  <div class="topic-row" data-id="ra-continuity">
-    <input type="checkbox" id="ra-continuity">
-    <span class="topic-name">Functional Limits &amp; Continuity</span>
-    <span class="topic-sub">ε–δ definition, uniform continuity, extreme value and intermediate value theorems</span>
-    <span class="topic-source">Abbott §4</span>
-  </div>
-
-  <div class="topic-row" data-id="ra-derivative">
-    <input type="checkbox" id="ra-derivative">
-    <span class="topic-name">The Derivative</span>
-    <span class="topic-sub">Rigorous definition, mean value theorem, L'Hôpital's rule</span>
-    <span class="topic-source">Abbott §5</span>
-  </div>
-
-  <div class="topic-row" data-id="ra-series-functions">
-    <input type="checkbox" id="ra-series-functions">
-    <span class="topic-name">Sequences &amp; Series of Functions</span>
-    <span class="topic-sub">Pointwise vs uniform convergence; power series; Taylor series with rigorous remainder</span>
-    <span class="topic-source">Abbott §6</span>
-  </div>
-
-  <div class="topic-row" data-id="ra-integral">
-    <input type="checkbox" id="ra-integral">
-    <span class="topic-name">The Riemann Integral</span>
-    <span class="topic-sub">Darboux definition, integrability criteria, fundamental theorem of calculus</span>
-    <span class="topic-source">Abbott §7</span>
-  </div>
-</details>
-
-<!-- ── Topology─────────────────────────────────────────────────── -->
-<details class="phase" id="topology" data-phase="7">
-  <summary class="phase-summary">
-  <div class="phase-header">
-    <span class="phase-title">Topology</span>
-    <span class="phase-progress-text" id="p7-text"></span>
-  </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p7-bar"></div></div>
-  </summary>
-  <div class="phase-sources">Armstrong — Basic Topology (Springer UTM) · Abbott §3 provides the ℝ warm-up</div>
-
-  <div class="topic-row" data-id="top-spaces">
-    <input type="checkbox" id="top-spaces">
-    <span class="topic-name">Topological Spaces &amp; Continuity</span>
-    <span class="topic-sub">Open sets, neighbourhoods, continuous maps — without distance</span>
-    <span class="topic-source">Armstrong §1–2</span>
-  </div>
-
-  <div class="topic-row" data-id="top-homeomorphisms">
-    <input type="checkbox" id="top-homeomorphisms">
-    <span class="topic-name">Homeomorphisms</span>
-    <span class="topic-sub">Topological equivalence; invariants that tell spaces apart</span>
-    <span class="topic-source">Armstrong §2</span>
-  </div>
-
-  <div class="topic-row" data-id="top-connectedness">
-    <input type="checkbox" id="top-connectedness">
-    <span class="topic-name">Connectedness</span>
-    <span class="topic-sub">Path-connected vs connected; intermediate value theorem revisited</span>
-    <span class="topic-source">Armstrong §3</span>
-  </div>
-
-  <div class="topic-row" data-id="top-compactness">
-    <input type="checkbox" id="top-compactness">
-    <span class="topic-name">Compactness</span>
-    <span class="topic-sub">Open covers; Heine–Borel; why compact spaces behave nicely</span>
-    <span class="topic-source">Armstrong §3</span>
-  </div>
-
-  <div class="topic-row" data-id="top-identification">
-    <input type="checkbox" id="top-identification">
-    <span class="topic-name">Identification Spaces &amp; Quotient Topology</span>
-    <span class="topic-sub">Gluing constructions; torus, Möbius band, Klein bottle</span>
-    <span class="topic-source">Armstrong §4</span>
-  </div>
-
-  <div class="topic-row" data-id="top-fundamental-group">
-    <input type="checkbox" id="top-fundamental-group">
-    <span class="topic-name">The Fundamental Group</span>
-    <span class="topic-sub">π₁ — loops based at a point; homotopy; simply connected spaces</span>
-    <span class="topic-source">Armstrong §5</span>
-  </div>
-
-  <div class="topic-row" data-id="top-surfaces">
-    <input type="checkbox" id="top-surfaces">
-    <span class="topic-name">Classification of Surfaces</span>
-    <span class="topic-sub">Genus, orientability; every compact surface is a sphere, connected sum of tori, or projective planes</span>
-    <span class="topic-source">Armstrong §7</span>
-  </div>
-
-  <div class="topic-row" data-id="top-homology">
-    <input type="checkbox" id="top-homology">
-    <span class="topic-name">Simplicial Homology</span>
-    <span class="topic-sub">Triangulations; boundary operator; H₀, H₁, H₂ — holes in different dimensions</span>
-    <span class="topic-source">Armstrong §8</span>
-  </div>
-</details>
-
 <!-- ── RF & Communications──────────────────────────────────────── -->
 <details class="phase" id="rf-communications" data-phase="9">
   <summary class="phase-summary">
@@ -1365,94 +1512,16 @@
   </div>
 </details>
 
-<!-- ── Signal Processing & Estimation──────────────────────────── -->
-<details class="phase" id="signal-processing-estimation" data-phase="10">
+<!-- ── GNSS &amp; Navigation ──────────────────────────────────────────── -->
+<details class="phase" id="gnss-navigation" data-phase="13">
   <summary class="phase-summary">
   <div class="phase-header">
-    <span class="phase-title">Signal Processing &amp; Estimation</span>
-    <span class="phase-progress-text" id="p10-text"></span>
+    <span class="phase-title">GNSS &amp; Navigation</span>
+    <span class="phase-progress-text" id="p13-text"></span>
   </div>
-  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p10-bar"></div></div>
+  <div class="phase-bar-wrap"><div class="phase-bar-fill" id="p13-bar"></div></div>
   </summary>
-  <div class="phase-sources">Oppenheim &amp; Schafer — Discrete-Time Signal Processing · Kay — Statistical Signal Processing · Kaplan &amp; Hegarty — Understanding GPS/GNSS</div>
-
-  <div class="topic-group-label">Discrete-time signals &amp; systems</div>
-
-  <div class="topic-row" data-id="sp-sampling">
-    <input type="checkbox" id="sp-sampling">
-    <span class="topic-name">Sampling &amp; Reconstruction</span>
-    <span class="topic-sub">Nyquist theorem, aliasing, reconstruction from samples</span>
-    <span class="topic-source">Oppenheim §1</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-convolution">
-    <input type="checkbox" id="sp-convolution">
-    <span class="topic-name">Convolution &amp; LTI Systems</span>
-    <span class="topic-sub">Impulse response, linearity, time-invariance, BIBO stability</span>
-    <span class="topic-source">Oppenheim §2</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-ztransform">
-    <input type="checkbox" id="sp-ztransform">
-    <span class="topic-name">Z-Transform</span>
-    <span class="topic-sub">Region of convergence, poles and zeros, inverse Z-transform</span>
-    <span class="topic-source">Oppenheim §3</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-dft">
-    <input type="checkbox" id="sp-dft">
-    <span class="topic-name">Discrete Fourier Transform &amp; FFT</span>
-    <span class="topic-sub">DFT as sampled spectrum; FFT algorithm; spectral leakage and windowing</span>
-    <span class="topic-source">Oppenheim §8</span>
-  </div>
-
-  <div class="topic-group-label">Statistical signal processing</div>
-
-  <div class="topic-row" data-id="sp-estimation">
-    <input type="checkbox" id="sp-estimation">
-    <span class="topic-name">Estimation Theory</span>
-    <span class="topic-sub">MVUE, Cramér–Rao bound, maximum likelihood estimation, bias vs variance</span>
-    <span class="topic-source">Kay Vol.1 §1–3</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-detection">
-    <input type="checkbox" id="sp-detection">
-    <span class="topic-name">Detection Theory</span>
-    <span class="topic-sub">Hypothesis testing, Neyman–Pearson, ROC curves, matched filter</span>
-    <span class="topic-source">Kay Vol.2 §1–3</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-wiener">
-    <input type="checkbox" id="sp-wiener">
-    <span class="topic-name">Wiener Filter</span>
-    <span class="topic-sub">Optimal linear filter for stationary processes; MMSE estimation</span>
-    <span class="topic-source">Kay Vol.1 §12</span>
-  </div>
-
-  <div class="topic-group-label">Kalman filtering — the core target</div>
-
-  <div class="topic-row" data-id="sp-kalman-linear">
-    <input type="checkbox" id="sp-kalman-linear">
-    <span class="topic-name">Linear Kalman Filter</span>
-    <span class="topic-sub">State-space model, predict–update cycle, optimal gain, covariance propagation</span>
-    <span class="topic-source">Kay · Welch &amp; Bishop tutorial</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-kalman-ekf">
-    <input type="checkbox" id="sp-kalman-ekf">
-    <span class="topic-name">Extended &amp; Unscented Kalman Filter</span>
-    <span class="topic-sub">Linearisation for nonlinear systems; UKF sigma-point approach; orbit determination</span>
-    <span class="topic-source">Kay · Crassidis &amp; Junkins</span>
-  </div>
-
-  <div class="topic-row" data-id="sp-particle-filter">
-    <input type="checkbox" id="sp-particle-filter">
-    <span class="topic-name">Particle Filters</span>
-    <span class="topic-sub">Sequential Monte Carlo; non-Gaussian state estimation; tracking highly nonlinear dynamics</span>
-    <span class="topic-source">Arulampalam et al. tutorial</span>
-  </div>
-
-  <div class="topic-group-label">Navigation &amp; PNT</div>
+  <div class="phase-sources">Kaplan &amp; Hegarty — Understanding GPS/GNSS · Vallado — Fundamentals of Astrodynamics</div>
 
   <div class="topic-row" data-id="sp-gnss">
     <input type="checkbox" id="sp-gnss">
