@@ -189,6 +189,19 @@
         </div>
       </div>
 
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-softmax" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">S</span>
+            <span class="term-name">Softmax</span>
+          </div>
+          <div class="term-def">Turns a <strong>vector of raw scores (logits) into a probability distribution</strong>: exponentiate each, then divide by the total. Outputs are all positive and <strong>sum to 1</strong>. The multi-class generalisation of the sigmoid, used at the output of a classifier.</div>
+          <div class="term-formula" id="eq-softmax"></div>
+          <div class="term-note">Exponentiating exaggerates differences — the largest logit dominates. Pairs naturally with cross-entropy loss, whose gradient then simplifies to (prediction − target).</div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -219,6 +232,19 @@
           <div class="term-def">A <strong>single number measuring how wrong</strong> the prediction is versus the target. Training minimises it. Squared error for regression, cross-entropy for classification.</div>
           <div class="term-formula" id="eq-loss"></div>
           <div class="term-note">The loss is the only thing the whole network is optimised against.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-crossentropy" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">H</span>
+            <span class="term-name">Cross-entropy loss</span>
+          </div>
+          <div class="term-def">The classification loss: <strong>how surprised the model is by the correct answer</strong>. With one-hot labels the sum collapses to just the negative log-probability assigned to the true class — so a confident mistake costs <strong>−log(p) → ∞</strong>.</div>
+          <div class="term-formula" id="eq-crossentropy"></div>
+          <div class="term-note">Paired with softmax/sigmoid the gradient is simply <strong>∂L/∂z = p − y</strong>: the a(1−a) factor cancels exactly, so gradients stay large when the model is confidently wrong — the reason classification uses this instead of squared error.<br>In PyTorch, <code>CrossEntropyLoss</code> applies softmax itself — feed it logits, not probabilities.</div>
         </div>
       </div>
 
@@ -289,6 +315,66 @@
     </div>
   </section>
 
+  <!-- ── Section 4: The Training Loop ── -->
+  <section>
+    <h2>The Training Loop</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-batch" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">B</span>
+            <span class="term-name">Batch (mini-batch)</span>
+          </div>
+          <div class="term-def">A <strong>small subset of the training data used to estimate the gradient for one update</strong>. Averaging over a batch is cheaper than using the whole dataset and less noisy than using a single example.</div>
+          <div class="term-formula" id="eq-batch"></div>
+          <div class="term-note">Typical sizes: 32–512. Bigger batches give a smoother gradient estimate but cost more memory per step.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-iteration" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">t</span>
+            <span class="term-name">Iteration (step)</span>
+          </div>
+          <div class="term-def"><strong>One parameter update</strong>: forward pass on a batch, backward pass, then nudge the weights once. The atomic unit of training.</div>
+          <div class="term-formula" id="eq-iteration"></div>
+          <div class="term-note">One iteration ≠ one epoch. An iteration consumes a single batch.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-epoch" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">↻</span>
+            <span class="term-name">Epoch</span>
+          </div>
+          <div class="term-def"><strong>One complete pass through the entire training set</strong> — every example seen exactly once. Purely a bookkeeping unit: nothing special happens at the boundary. The data is reshuffled each epoch so the batches differ.</div>
+          <div class="term-formula" id="eq-epoch"></div>
+          <div class="term-note">50,000 examples with batch size 100 → 500 iterations = 1 epoch.<br>Too few epochs underfits; too many overfits — what early stopping watches for.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-sgd" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">SGD</span>
+            <span class="term-name">Stochastic gradient descent</span>
+          </div>
+          <div class="term-def">Gradient descent where each step's gradient is <strong>estimated from a random mini-batch</strong> rather than the full dataset. The steps are noisy, but each is far cheaper — and the noise itself helps escape poor minima.</div>
+          <div class="term-formula" id="eq-sgd"></div>
+          <div class="term-note">The "stochastic" is the randomness of which examples land in each batch. Adam and friends build on this with per-parameter step sizes.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script>
     // ── KaTeX formulas ──────────────────────────────────────────────────────────
@@ -298,11 +384,17 @@
       'eq-activation':    'a = \\phi(z)',
       'eq-sigmoid':       '\\sigma(z) = \\dfrac{1}{1+e^{-z}}, \\quad \\sigma\'(z) = a(1-a)',
       'eq-relu':          '\\mathrm{ReLU}(z) = \\max(0, z)',
+      'eq-softmax':       '\\mathrm{softmax}(\\mathbf{z})_i = \\dfrac{e^{z_i}}{\\sum_j e^{z_j}}',
       'eq-loss':          'L = \\tfrac{1}{2}(a - y)^2',
+      'eq-crossentropy':  'L = -\\sum_k y_k \\log p_k = -\\log p_c',
       'eq-gradient':      '\\nabla L = \\left(\\tfrac{\\partial L}{\\partial w_1}, \\dots, \\tfrac{\\partial L}{\\partial b}\\right)',
       'eq-backward':      '\\dfrac{\\partial L}{\\partial w} = \\dfrac{\\partial L}{\\partial a}\\,\\dfrac{\\partial a}{\\partial z}\\,\\dfrac{\\partial z}{\\partial w}',
       'eq-chainrule':     '\\dfrac{dL}{dx} = \\dfrac{dL}{du}\\,\\dfrac{du}{dx}',
       'eq-gd':            'w \\leftarrow w - \\eta\\,\\dfrac{\\partial L}{\\partial w}',
+      'eq-batch':         '\\nabla L \\approx \\dfrac{1}{B}\\sum_{i \\in \\mathcal{B}} \\nabla L_i',
+      'eq-iteration':     'w_{t+1} = w_t - \\eta\\,\\nabla L_{\\mathcal{B}_t}(w_t)',
+      'eq-epoch':         '\\text{iterations per epoch} = \\dfrac{N}{B}',
+      'eq-sgd':           '\\mathcal{B}_t \\sim \\text{random subset of the } N \\text{ examples}',
     };
     for (const [id, tex] of Object.entries(eqs)) {
       const el = document.getElementById(id);
@@ -471,6 +563,39 @@
       label(ctx, 'z', R - 4, B + 14, '#bbb', 11, true);
     });
 
+    draw('c-softmax', (ctx, w, h) => {
+      const z = [2.0, 1.0, -0.5];
+      const ex = z.map(v => Math.exp(v));
+      const sum = ex.reduce((a, b) => a + b, 0);
+      const p = ex.map(v => v / sum);          // ≈ 0.69, 0.25, 0.06
+
+      // left: raw logits (can be negative), drawn about a baseline
+      const lb = 88, lx = 20, bw = 13, gap = 6;
+      line(ctx, lx - 4, lb, lx + 3*(bw+gap), lb, '#ddd', 1);
+      z.forEach((v, i) => {
+        const x = lx + i*(bw+gap), hgt = v * 17;
+        ctx.fillStyle = v >= 0 ? '#9db9d6' : '#e0b9a0';
+        ctx.fillRect(x, hgt >= 0 ? lb - hgt : lb, bw, Math.abs(hgt));
+      });
+      label(ctx, 'logits z', lx - 2, 130, '#aaa', 10);
+      label(ctx, '(any real)', lx - 4, 143, '#ccc', 9);
+
+      arrow(ctx, 84, 92, 108, 92, GREY, 1.6);
+      label(ctx, 'S', 92, 84, TEAL, 11, true);
+
+      // right: probabilities, all positive, summing to 1
+      const rb = 130, rx = 118;
+      line(ctx, rx - 4, rb, rx + 3*(bw+gap), rb, '#ddd', 1);
+      p.forEach((v, i) => {
+        const x = rx + i*(bw+gap), hgt = v * 78;
+        ctx.fillStyle = BLUE;
+        ctx.fillRect(x, rb - hgt, bw, hgt);
+        label(ctx, v.toFixed(2), x - 2, rb - hgt - 5, '#888', 9);
+      });
+      label(ctx, 'probabilities', rx - 4, 145, '#aaa', 10);
+      label(ctx, 'sum = 1', rx + 8, 158, TEAL, 10);
+    });
+
     // ── Training ──
     draw('c-forward', (ctx, w, h) => {
       const cy = h/2, xs = [34, 98, 162];
@@ -492,6 +617,32 @@
       ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(0), sy(0), 4, 0, Math.PI*2); ctx.fill();
       label(ctx, 'min L', sx(0) - 14, sy(0) + 16, GREEN, 10);
       label(ctx, 'error (a − y)', 40, 34, '#bbb', 10);
+    });
+
+    draw('c-crossentropy', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const YMAX = 4.5;
+      const sx = p => L + p * (R - L);              // p from 0 → 1
+      const sy = v => B - Math.min(v, YMAX) / YMAX * (B - T);
+      axes(ctx, L, T, R, B, B);
+      // −log(p): explodes as p → 0, hits 0 at p = 1
+      ctx.beginPath(); ctx.strokeStyle = ORANGE; ctx.lineWidth = 2.4;
+      let started = false;
+      for (let i = 1; i <= 120; i++) {
+        const p = i / 120;
+        const v = -Math.log(p);
+        if (v > YMAX) continue;
+        const px = sx(p), py = sy(v);
+        if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      // loss → 0 when the true class is predicted with certainty
+      ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(1), sy(0), 4, 0, Math.PI*2); ctx.fill();
+      label(ctx, 'L = 0', sx(1) - 34, sy(0) - 8, GREEN, 10);
+      label(ctx, '−log(p)', 42, 34, ORANGE, 11);
+      label(ctx, 'confident', 40, B + 14, '#ccc', 9);
+      label(ctx, 'and wrong', 40, B + 25, '#ccc', 9);
+      label(ctx, 'p → 1', R - 34, B + 14, '#ccc', 9);
     });
 
     draw('c-gradient', (ctx, w, h) => {
@@ -549,6 +700,81 @@
       }
       ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(x), sy(x*x), 4, 0, Math.PI*2); ctx.fill();
       label(ctx, 'downhill', 44, 34, GREEN, 10);
+    });
+
+    // ── The training loop ──
+    // a strip of data examples; `hi` = index range to highlight as the current batch
+    function dataStrip(ctx, x0, y, n, cell, hiFrom = -1, hiTo = -1, hiColor = BLUE) {
+      for (let i = 0; i < n; i++) {
+        const x = x0 + i * cell;
+        const inHi = i >= hiFrom && i < hiTo;
+        ctx.fillStyle = inHi ? hiColor : '#e8e8e8';
+        ctx.fillRect(x, y, cell - 2, cell - 2);
+      }
+    }
+
+    draw('c-batch', (ctx, w, h) => {
+      const n = 12, cell = 13, x0 = 22, y = 66;
+      label(ctx, 'training set (N)', 22, 52, '#aaa', 10);
+      dataStrip(ctx, x0, y, n, cell, 4, 8, BLUE);
+      // brace under the highlighted batch
+      const bx0 = x0 + 4*cell, bx1 = x0 + 8*cell - 2;
+      line(ctx, bx0, y + cell + 4, bx1, y + cell + 4, BLUE, 1.6);
+      label(ctx, 'one batch (B)', bx0 - 14, y + cell + 20, BLUE, 10);
+      arrow(ctx, (bx0+bx1)/2, y + cell + 26, (bx0+bx1)/2, y + cell + 48, GREY);
+      label(ctx, '∇L estimate', 48, y + cell + 62, '#888', 10);
+    });
+
+    draw('c-iteration', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const sx = x => L + (x + 2)/4*(R - L);
+      const sy = y => B - y/4*(B - T);
+      axes(ctx, L, T, R, B, B);
+      plot(ctx, x => x*x, -2, 2, 0, 4, L, T, R, B, '#ddd', 2);
+      // exactly one update
+      const x = 1.5, nx = 0.9;
+      ctx.beginPath(); ctx.fillStyle = '#333'; ctx.arc(sx(x), sy(x*x), 4.5, 0, Math.PI*2); ctx.fill();
+      arrow(ctx, sx(x), sy(x*x), sx(nx), sy(nx*nx), GREEN, 2);
+      ctx.beginPath(); ctx.fillStyle = GREEN; ctx.arc(sx(nx), sy(nx*nx), 4.5, 0, Math.PI*2); ctx.fill();
+      label(ctx, 'wₜ', sx(x) + 6, sy(x*x) - 6, '#333', 11, true);
+      label(ctx, 'wₜ₊₁', sx(nx) - 26, sy(nx*nx) - 8, GREEN, 11, true);
+      label(ctx, 'one update', 44, 34, '#aaa', 10);
+    });
+
+    draw('c-epoch', (ctx, w, h) => {
+      const n = 12, cell = 13, x0 = 22, y = 74;
+      label(ctx, 'sweep every example once', 22, 40, '#aaa', 10);
+      dataStrip(ctx, x0, y, n, cell, 0, n, BLUE);
+      // sweeping arrow across the whole strip
+      arrow(ctx, x0, y - 10, x0 + n*cell - 4, y - 10, BLUE, 1.8);
+      // loop-back arc = repeat next epoch
+      ctx.beginPath(); ctx.strokeStyle = ORANGE; ctx.lineWidth = 1.6;
+      ctx.setLineDash([4,3]);
+      ctx.moveTo(x0 + n*cell - 4, y + cell + 8);
+      ctx.bezierCurveTo(x0 + n*cell + 10, y + 52, x0 - 16, y + 52, x0, y + cell + 8);
+      ctx.stroke(); ctx.setLineDash([]);
+      label(ctx, '↻ next epoch (reshuffled)', 26, y + 62, ORANGE, 10);
+    });
+
+    draw('c-sgd', (ctx, w, h) => {
+      const [L,T,R,B] = graphBox();
+      const sx = x => L + (x + 2)/4*(R - L);
+      const sy = y => B - y/4*(B - T);
+      axes(ctx, L, T, R, B, B);
+      plot(ctx, x => x*x, -2, 2, 0, 4, L, T, R, B, '#ddd', 2);
+      // noisy zig-zag descent — the "stochastic" path
+      const xs = [1.7, 1.0, 1.25, 0.6, 0.75, 0.25, 0.35, 0.05];
+      ctx.beginPath(); ctx.strokeStyle = ORANGE; ctx.lineWidth = 2;
+      xs.forEach((x, i) => {
+        const px = sx(x), py = sy(x*x);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+      xs.forEach(x => {
+        ctx.beginPath(); ctx.fillStyle = ORANGE;
+        ctx.arc(sx(x), sy(x*x), 2.6, 0, Math.PI*2); ctx.fill();
+      });
+      label(ctx, 'noisy but cheap steps', 40, 34, ORANGE, 10);
     });
 
     draw('c-lr', (ctx, w, h) => {
