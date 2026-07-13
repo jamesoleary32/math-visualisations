@@ -730,19 +730,18 @@
 
   <div class="topic-row" data-id="prob-counting" data-default="1">
     <input type="checkbox" id="prob-counting">
-    <span class="topic-name">Counting &amp; Naive Probability</span>
-    <span class="topic-sub">Multiplication rule, permutations, combinations; birthday problem</span>
+    <span class="topic-name">Probability &amp; Counting</span>
+    <span class="topic-sub">Sample spaces, naive definition, multiplication rule, binomial coefficients, story proofs</span>
     <span class="topic-source">B&amp;H §1</span>
     <a href="probability-glossary.html#c-event" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
   <div class="topic-viz">
     <a href="probability/de-morgans-laws.html"><span class="viz-tag">viz</span>De Morgan's Laws</a>
   </div>
-
   <div class="topic-row" data-id="prob-conditional" data-default="1">
     <input type="checkbox" id="prob-conditional">
-    <span class="topic-name">Conditional Probability &amp; Bayes</span>
-    <span class="topic-sub">P(A|B), law of total probability, Bayes' theorem</span>
+    <span class="topic-name">Conditional Probability</span>
+    <span class="topic-sub">Bayes' rule, law of total probability, conditional independence, coherency</span>
     <span class="topic-source">B&amp;H §2</span>
     <a href="probability-glossary.html#c-conditional" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
@@ -750,35 +749,38 @@
     <a href="probability/conditional-probability.html"><span class="viz-tag">viz</span>Conditional Probability</a>
     <a href="probability/bayes-rule.html"><span class="viz-tag">viz</span>Bayes' Rule</a>
   </div>
-
   <div class="topic-row" data-id="prob-rvs">
     <input type="checkbox" id="prob-rvs">
-    <span class="topic-name">Random Variables &amp; Distributions</span>
-    <span class="topic-sub">PMF, CDF, Bernoulli, Binomial, Geometric, Poisson</span>
-    <span class="topic-source">B&amp;H §3–4</span>
+    <span class="topic-name">Random Variables &amp; their Distributions</span>
+    <span class="topic-sub">PMFs, Bernoulli, Binomial, Hypergeometric, Discrete Uniform, CDFs, functions of r.v.s</span>
+    <span class="topic-source">B&amp;H §3</span>
     <a href="probability-glossary.html#c-rv" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
-
   <div class="topic-row" data-id="prob-expectation">
     <input type="checkbox" id="prob-expectation">
-    <span class="topic-name">Expectation &amp; Variance</span>
-    <span class="topic-sub">E[X], linearity of expectation, LOTUS, Var(X)</span>
-    <span class="topic-source">B&amp;H §4–5</span>
+    <span class="topic-name">Expectation</span>
+    <span class="topic-sub">Linearity, indicator r.v.s and the fundamental bridge, LOTUS, variance, Geometric, Poisson</span>
+    <span class="topic-source">B&amp;H §4</span>
     <a href="probability-glossary.html#c-expectation" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
-
   <div class="topic-row" data-id="prob-continuous">
     <input type="checkbox" id="prob-continuous">
-    <span class="topic-name">Continuous Distributions</span>
-    <span class="topic-sub">PDF, Uniform, Normal, Exponential, Beta, Gamma</span>
-    <span class="topic-source">B&amp;H §5–8</span>
+    <span class="topic-name">Continuous Random Variables</span>
+    <span class="topic-sub">PDFs, Uniform, universality of the Uniform, Normal, Exponential, memorylessness</span>
+    <span class="topic-source">B&amp;H §5</span>
     <a href="probability-glossary.html#c-pdf" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
-
+  <div class="topic-row" data-id="prob-moments">
+    <input type="checkbox" id="prob-moments">
+    <span class="topic-name">Moments</span>
+    <span class="topic-sub">Interpreting moments, skewness and kurtosis, sample moments, moment generating functions</span>
+    <span class="topic-source">B&amp;H §6</span>
+    <a href="probability-glossary.html#c-variance" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
   <div class="topic-row" data-id="prob-joint" data-default="1">
     <input type="checkbox" id="prob-joint">
-    <span class="topic-name">Joint Distributions &amp; Independence</span>
-    <span class="topic-sub">Joint PDF/PMF, marginals, covariance, correlation</span>
+    <span class="topic-name">Joint Distributions</span>
+    <span class="topic-sub">Joint/marginal/conditional, 2D LOTUS, covariance and correlation, Multinomial, Multivariate Normal</span>
     <span class="topic-source">B&amp;H §7</span>
     <a href="probability-glossary.html#c-independence" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
@@ -786,20 +788,45 @@
     <a href="probability/independence.html"><span class="viz-tag">viz</span>Independence of Events</a>
     <a href="probability/pairwise-independence.html"><span class="viz-tag">viz</span>Pairwise vs. Mutual Independence</a>
   </div>
-
+  <div class="topic-row" data-id="prob-transformations">
+    <input type="checkbox" id="prob-transformations">
+    <span class="topic-name">Transformations</span>
+    <span class="topic-sub">Change of variables, convolutions, Beta, Gamma, Beta–Gamma connections, order statistics</span>
+    <span class="topic-source">B&amp;H §8</span>
+    <a href="probability-glossary.html#c-pdf" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
+  <div class="topic-row" data-id="prob-cond-expectation">
+    <input type="checkbox" id="prob-cond-expectation">
+    <span class="topic-name">Conditional Expectation</span>
+    <span class="topic-sub">Given an event, given an r.v., conditional variance, Adam's law and Eve's law, projection view</span>
+    <span class="topic-source">B&amp;H §9</span>
+    <a href="probability-glossary.html#c-expectation" class="gloss-link" onclick="event.stopPropagation()">def →</a>
+  </div>
   <div class="topic-row" data-id="prob-limit-theorems">
     <input type="checkbox" id="prob-limit-theorems">
-    <span class="topic-name">Law of Large Numbers &amp; Central Limit Theorem</span>
-    <span class="topic-sub">Convergence in probability; normal approximation</span>
+    <span class="topic-name">Inequalities &amp; Limit Theorems</span>
+    <span class="topic-sub">Cauchy–Schwarz, Jensen, Markov, Chebyshev; LLN; CLT; Chi-Square and Student-t</span>
     <span class="topic-source">B&amp;H §10</span>
     <a href="probability-glossary.html#c-normal" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
-
   <div class="topic-row" data-id="prob-markov">
     <input type="checkbox" id="prob-markov">
     <span class="topic-name">Markov Chains</span>
-    <span class="topic-sub">Transition matrices, stationary distributions, PageRank</span>
+    <span class="topic-sub">Markov property and transition matrix, classification of states, stationary distribution, reversibility</span>
     <span class="topic-source">B&amp;H §11</span>
+  </div>
+  <div class="topic-row" data-id="prob-mcmc">
+    <input type="checkbox" id="prob-mcmc">
+    <span class="topic-name">Markov Chain Monte Carlo</span>
+    <span class="topic-sub">Metropolis–Hastings, Gibbs sampling — sampling from distributions you cannot compute</span>
+    <span class="topic-source">B&amp;H §12</span>
+  </div>
+  <div class="topic-row" data-id="prob-poisson-process">
+    <input type="checkbox" id="prob-poisson-process">
+    <span class="topic-name">Poisson Processes</span>
+    <span class="topic-sub">One dimension; conditioning, superposition and thinning; multiple dimensions</span>
+    <span class="topic-source">B&amp;H §13</span>
+    <a href="probability-glossary.html#c-poisson" class="gloss-link" onclick="event.stopPropagation()">def →</a>
   </div>
   </div><!-- /source-group B&H -->
 
