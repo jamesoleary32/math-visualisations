@@ -79,6 +79,22 @@ Key rules:
 - **Practicals** (applied sections): an optional `.practicals` block after the source-groups for
   hands-on projects. `.practical-row`s persist like topics but are **excluded from the progress bar**.
 
+## Topic granularity — one topic per chapter
+
+**A topic is a book chapter, not a subsection.** Probability has 13 topics for Blitzstein & Hwang's
+13 chapters; Deep Learning has one per Prince chapter. Do **not** split a chapter's subsections into
+separate topic rows.
+
+The subsections are not lost — they are represented two ways:
+1. The topic's `topic-sub` line **names that chapter's actual subsections** (e.g. Transformations →
+   "change of variables, convolutions, Beta, Gamma, Beta–Gamma connections, order statistics").
+2. **The nested visualisations implicitly fill them out.** A `topic-viz` block can hold several viz,
+   each covering a subsection of that chapter — so depth is expressed by *attaching visualisations*,
+   not by multiplying checkboxes.
+
+Why: subsection-level rows would push a single subject past ~50 topics and let it dominate the
+overall progress bar, while adding little — chapters are what you actually work through and tick off.
+
 ## Completion & the script
 
 - `initCheckboxes()` seeds each `.topic-row[data-id]` (and `.practical-row[data-id]`) from
