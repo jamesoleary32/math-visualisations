@@ -131,6 +131,19 @@
       </div>
 
       <div class="term">
+        <div class="term-diagram"><canvas id="c-logit" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">z</span>
+            <span class="term-name">Logit</span>
+          </div>
+          <div class="term-def">The <strong>output layer's</strong> pre-activation: the raw, unbounded score for each class, before softmax (or sigmoid) turns it into a probability. Same kind of object as any z — the name is simply reserved for the final layer, the numbers a classification loss is computed from.</div>
+          <div class="term-formula" id="eq-logit"></div>
+          <div class="term-note">The name comes from <strong>log-odds</strong>: the logit function log(p/(1−p)) is the <strong>inverse of the sigmoid</strong>, mapping a probability in (0,1) back to an unbounded score.<br>In PyTorch, <code>CrossEntropyLoss</code> and <code>BCEWithLogitsLoss</code> expect <strong>logits, not probabilities</strong> — applying softmax yourself first is a classic bug.</div>
+        </div>
+      </div>
+
+      <div class="term">
         <div class="term-diagram"><canvas id="c-activation" width="196" height="180"></canvas></div>
         <div class="term-body">
           <div class="term-header">
@@ -382,6 +395,7 @@
       'eq-weights':       'z = w_1 x_1 + \\dots + w_n x_n + b',
       'eq-preactivation': 'z = \\mathbf{w}\\cdot\\mathbf{x} + b',
       'eq-activation':    'a = \\phi(z)',
+      'eq-logit':         '\\mathrm{logit}(p) = \\log\\dfrac{p}{1-p} = \\sigma^{-1}(p)',
       'eq-sigmoid':       '\\sigma(z) = \\dfrac{1}{1+e^{-z}}, \\quad \\sigma\'(z) = a(1-a)',
       'eq-relu':          '\\mathrm{ReLU}(z) = \\max(0, z)',
       'eq-softmax':       '\\mathrm{softmax}(\\mathbf{z})_i = \\dfrac{e^{z_i}}{\\sum_j e^{z_j}}',
@@ -525,6 +539,33 @@
       node(ctx, 172, cy, 12, 'a', GREEN, '#eef6ef');
       // mini nonlinear curve inside the phi node
       plot(ctx, x => 1/(1+Math.exp(-x*2)), -1.2, 1.2, 0, 1, 82, cy - 10, 110, cy + 10, TEAL, 1.6);
+    });
+
+    draw('c-logit', (ctx, w, h) => {
+      const L = 34, T = 24, R = 178, B = 150, YMAX = 4;
+      const sx = p => L + p * (R - L);
+      const sy = v => B - (v + YMAX) / (2 * YMAX) * (B - T);
+      const y0 = sy(0);
+      line(ctx, L, y0, R, y0, '#ddd', 1);     // p axis
+      line(ctx, L, T, L, B, '#eee', 1);
+      ctx.beginPath(); ctx.strokeStyle = BLUE; ctx.lineWidth = 2.4;
+      let started = false;
+      for (let i = 1; i < 400; i++) {
+        const p = i / 400, v = Math.log(p / (1 - p));
+        if (v < -YMAX || v > YMAX) continue;
+        const px = sx(p), py = sy(v);
+        started ? ctx.lineTo(px, py) : (ctx.moveTo(px, py), started = true);
+      }
+      ctx.stroke();
+      // p = 0.5 maps to a logit of 0 (even odds)
+      ctx.beginPath(); ctx.fillStyle = GREEN;
+      ctx.arc(sx(0.5), y0, 3.6, 0, Math.PI * 2); ctx.fill();
+      label(ctx, 'log p/(1−p)', 42, 20, BLUE, 10);
+      label(ctx, '0', L - 9, y0 + 4, '#bbb', 9);
+      label(ctx, 'p', R - 4, y0 + 14, '#bbb', 10, true);
+      label(ctx, '0', L - 2, B + 12, '#ccc', 9);
+      label(ctx, '1', R - 6, B + 12, '#ccc', 9);
+      label(ctx, 'inverse of σ', 40, B + 24, TEAL, 10);
     });
 
     // ── Activation functions ──
