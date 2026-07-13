@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tech Tree — Self-Study Syllabus</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 40px 48px 64px;
+    }
+
+    .back {
+      display: inline-block; font-size: 13px; color: #999;
+      text-decoration: none; margin-bottom: 20px;
+    }
+    .back:hover { color: #555; }
+
+    h1 { font-size: 28px; font-weight: 600; color: #111; margin-bottom: 10px; }
+    header p { font-size: 14px; color: #999; max-width: 780px; line-height: 1.6; }
+    header { margin-bottom: 28px; }
+
+    /* legend */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 18px; align-items: center;
+      margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #ececec;
+      font-size: 12px; color: #888;
+    }
+    .key { display: flex; align-items: center; gap: 7px; }
+    .swatch { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid; }
+    .k-done    { background: #eaf5eb; border-color: #2e7d32; }
+    .k-current { background: #e9f1fb; border-color: #1565c0; }
+    .k-ready   { background: #e6f4f2; border-color: #00897b; }
+    .k-later   { background: #fff;    border-color: #d8d8d8; }
+    .key-edge { display: flex; align-items: center; gap: 7px; }
+    .key-edge svg { display: block; }
+
+    /* the tree */
+    #tree { position: relative; overflow-x: auto; padding-bottom: 20px; }
+    #edges { position: absolute; top: 0; left: 0; pointer-events: none; }
+
+    .node {
+      position: absolute;
+      width: 190px;
+      background: #fff;
+      border: 1.5px solid #d8d8d8;
+      border-radius: 10px;
+      padding: 12px 14px 11px;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.15s, transform 0.1s, border-color 0.15s;
+    }
+    .node:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.10); transform: translateY(-1px); }
+
+    .node.done    { border-color: #2e7d32; background: #f7fbf7; }
+    .node.current { border-color: #1565c0; background: #f6f9fd; }
+    .node.ready   { border-color: #00897b; }
+    .node.later   { opacity: 0.72; }
+
+    .n-title { font-size: 13px; font-weight: 600; color: #222; line-height: 1.35; }
+    .n-meta  { font-size: 11px; color: #aaa; margin-top: 5px; }
+
+    .n-bar {
+      height: 4px; background: #eee; border-radius: 2px;
+      overflow: hidden; margin-top: 8px;
+    }
+    .n-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+    .done    .n-fill { background: #2e7d32; }
+    .current .n-fill { background: #1565c0; }
+    .ready   .n-fill { background: #00897b; }
+    .later   .n-fill { background: #ccc; }
+
+    .n-state {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
+      margin-top: 8px; font-weight: 600;
+    }
+    .done    .n-state { color: #2e7d32; }
+    .current .n-state { color: #1565c0; }
+    .ready   .n-state { color: #00897b; }
+    .later   .n-state { color: #bbb; text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 11px; }
+
+    .tier-band {
+      position: absolute; top: 0;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.6px;
+      color: #ccc; font-weight: 600; white-space: nowrap;
+    }
+
+    .note {
+      margin-top: 32px; padding-top: 20px; border-top: 1px solid #ececec;
+      font-size: 12px; color: #aaa; line-height: 1.7; max-width: 820px;
+    }
+    .note strong { color: #888; }
+    #err { color: #c62828; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back">← Syllabus</a>
+
+  <header>
+    <h1>Tech Tree</h1>
+    <p>What unlocks what. The syllabus lists subjects; this shows the <strong>dependencies between
+    them</strong> — why a subject is worth learning, and what it opens up. Progress is read live from
+    the syllabus, so this is a second lens on the same data, not a copy of it. Click any subject to
+    jump to it.</p>
+  </header>
+
+  <div class="legend">
+    <span class="key"><span class="swatch k-done"></span>done</span>
+    <span class="key"><span class="swatch k-current"></span>in progress</span>
+    <span class="key"><span class="swatch k-ready"></span>ready to start</span>
+    <span class="key"><span class="swatch k-later"></span>needs groundwork first</span>
+    <span class="key-edge">
+      <svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="#c4c4c4" stroke-width="2"/></svg>
+      prerequisite
+    </span>
+    <span class="key-edge">
+      <svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="#d9c9e6" stroke-width="2" stroke-dasharray="4 3"/></svg>
+      adds rigour (not required)
+    </span>
+  </div>
+
+  <div id="tree"><svg id="edges"></svg><div id="err"></div></div>
+
+  <div class="note">
+    <strong>Soft, not gated.</strong> Real study is not a game — nothing here is locked. A subject
+    whose groundwork is unfinished simply says what you would want first; you are free to dive in
+    anyway, and you have. <br>
+    <strong>The edges are a judgement, not a fact.</strong> They say "you will struggle without this",
+    not "this is forbidden". Declared in <code>PREREQS</code> in this file's source.
+  </div>
+
+  <script>
+    // The ONE thing this page declares that the syllabus does not: the dependency edges.
+    // Everything else (subjects, topics, progress) is read from the syllabus itself.
+    const PREREQS = {
+      'linear-algebra':             [],
+      'probability':                [],
+      'real-analysis':              [],
+      'topology':                   ['real-analysis'],
+      'differential-equations':     ['linear-algebra'],
+      'deep-learning':              ['linear-algebra', 'probability'],
+      'dynamics-orbital-mechanics': ['linear-algebra', 'differential-equations'],
+      'signals-systems':            ['linear-algebra', 'differential-equations'],
+      'signal-processing':          ['signals-systems'],
+      'control-systems':            ['signals-systems', 'differential-equations'],
+      'rf-communications':          ['signals-systems', 'probability'],
+      'estimation-filtering':       ['probability', 'linear-algebra', 'signal-processing'],
+      'gnss-navigation':            ['estimation-filtering', 'rf-communications', 'dynamics-orbital-mechanics'],
+    };
+
+    // enrichment, not prerequisite — real analysis makes probability rigorous but is not needed for it
+    const SOFT = { 'probability': ['real-analysis'] };
+
+    const STORAGE_KEY = 'syllabus-v1';   // the same key the syllabus writes
+    const NODE_W = 190, COL_GAP = 96, ROW_GAP = 30;
+
+    const loadState = () => {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    };
+
+    // Read the subjects, their titles and their topic ids straight out of the syllabus,
+    // so the tree can never drift out of sync with it.
+    async function readSyllabus() {
+      const res = await fetch('index.html', { cache: 'no-store' });
+      if (!res.ok) throw new Error('could not load index.html');
+      const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+      const saved = loadState();
+      const subjects = {};
+      doc.querySelectorAll('.phase[id]').forEach(sec => {
+        const rows = [...sec.querySelectorAll('.topic-row[data-id]')];
+        const total = rows.length;
+        const done = rows.filter(r => {
+          const id = r.dataset.id;
+          return id in saved ? saved[id] === true : r.dataset.default === '1';
+        }).length;
+        subjects[sec.id] = {
+          id: sec.id,
+          title: (sec.querySelector('.phase-title')?.textContent || sec.id).trim(),
+          total, done,
+          pct: total ? done / total : 0,
+        };
+      });
+      return subjects;
+    }
+
+    // longest-path depth => which column a subject sits in
+    function depthOf(id, memo = {}) {
+      if (id in memo) return memo[id];
+      const ps = PREREQS[id] || [];
+      memo[id] = ps.length ? 1 + Math.max(...ps.map(p => depthOf(p, memo))) : 0;
+      return memo[id];
+    }
+
+    function stateOf(s, subjects) {
+      if (s.total && s.pct === 1) return 'done';
+      if (s.done > 0) return 'current';
+      const ps = PREREQS[s.id] || [];
+      const ready = ps.every(p => (subjects[p]?.pct ?? 0) >= 0.5);
+      return ready ? 'ready' : 'later';
+    }
+
+    function unmet(s, subjects) {
+      return (PREREQS[s.id] || [])
+        .filter(p => (subjects[p]?.pct ?? 0) < 0.5)
+        .map(p => subjects[p]?.title || p);
+    }
+
+    function render(subjects) {
+      const tree = document.getElementById('tree');
+      const svg = document.getElementById('edges');
+      document.getElementById('err').remove();
+
+      const ids = Object.keys(PREREQS).filter(id => subjects[id]);
+      const memo = {};
+      const cols = {};
+      ids.forEach(id => {
+        const d = depthOf(id, memo);
+        (cols[d] = cols[d] || []).push(id);
+      });
+
+      // place nodes
+      const pos = {};
+      const maxRows = Math.max(...Object.values(cols).map(c => c.length));
+      const NODE_H = 92;
+      const height = maxRows * (NODE_H + ROW_GAP) + 40;
+      Object.entries(cols).forEach(([d, list]) => {
+        const x = 8 + d * (NODE_W + COL_GAP);
+        const colH = list.length * (NODE_H + ROW_GAP) - ROW_GAP;
+        const y0 = 34 + (height - 40 - colH) / 2;
+        list.forEach((id, i) => { pos[id] = { x, y: y0 + i * (NODE_H + ROW_GAP) }; });
+      });
+
+      const width = (Math.max(...Object.keys(cols).map(Number)) + 1) * (NODE_W + COL_GAP) + 20;
+      tree.style.height = height + 'px';
+      svg.setAttribute('width', width);
+      svg.setAttribute('height', height);
+
+      // tier bands (columns are roughly foundations -> applications)
+      Object.keys(cols).forEach(d => {
+        const b = document.createElement('div');
+        b.className = 'tier-band';
+        b.style.left = (8 + d * (NODE_W + COL_GAP)) + 'px';
+        b.textContent = d === '0' ? 'foundations' : 'layer ' + d;
+        tree.appendChild(b);
+      });
+
+      // edges first, so nodes sit on top
+      const edge = (from, to, soft) => {
+        const a = pos[from], b = pos[to];
+        if (!a || !b) return;
+        const x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2;
+        const x2 = b.x,          y2 = b.y + NODE_H / 2;
+        const mx = (x1 + x2) / 2;
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+        p.setAttribute('fill', 'none');
+        p.setAttribute('stroke', soft ? '#d9c9e6' : '#c4c4c4');
+        p.setAttribute('stroke-width', soft ? 2 : 2);
+        if (soft) p.setAttribute('stroke-dasharray', '4 3');
+        svg.appendChild(p);
+      };
+      ids.forEach(id => (PREREQS[id] || []).forEach(p => edge(p, id, false)));
+      Object.entries(SOFT).forEach(([id, ps]) => ps.forEach(p => edge(p, id, true)));
+
+      // nodes
+      ids.forEach(id => {
+        const s = subjects[id];
+        const st = stateOf(s, subjects);
+        const a = document.createElement('a');
+        a.className = 'node ' + st;
+        a.href = 'index.html#' + id;
+        a.style.left = pos[id].x + 'px';
+        a.style.top = pos[id].y + 'px';
+
+        const miss = unmet(s, subjects);
+        const label =
+          st === 'done'    ? 'complete' :
+          st === 'current' ? 'in progress' :
+          st === 'ready'   ? 'ready to start' :
+          'wants ' + miss.slice(0, 2).join(' + ') + (miss.length > 2 ? ' …' : '') + ' first';
+
+        a.innerHTML = `
+          <div class="n-title">${s.title}</div>
+          <div class="n-meta">${s.done} / ${s.total} topics</div>
+          <div class="n-bar"><div class="n-fill" style="width:${(s.pct * 100).toFixed(0)}%"></div></div>
+          <div class="n-state">${label}</div>`;
+        tree.appendChild(a);
+      });
+    }
+
+    readSyllabus()
+      .then(render)
+      .catch(e => {
+        document.getElementById('err').textContent =
+          'Could not read the syllabus (' + e.message + '). This page must be served over http, '
+          + 'not opened as a file — try: python3 -m http.server 8000';
+      });
+  </script>
+</body>
+</html>
