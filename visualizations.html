@@ -25,30 +25,6 @@
       margin-bottom: 10px;
     }
 
-    .header-meta {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .header-meta p {
-      font-size: 14px;
-      color: #999;
-    }
-
-    .catalog-link {
-      font-size: 12px;
-      color: #aaa;
-      text-decoration: none;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 3px 10px;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    .catalog-link:hover { border-color: #bbb; color: #555; }
-
     section {
       margin-bottom: 40px;
     }
@@ -91,6 +67,22 @@
       margin-bottom: 6px;
     }
 
+    .back {
+      display: inline-block; font-size: 13px; color: #999;
+      text-decoration: none; margin-bottom: 20px;
+    }
+    .back:hover { color: #555; }
+
+    h2 a { color: inherit; text-decoration: none; }
+    h2 a:hover .to-syllabus { color: #1565c0; }
+    .to-syllabus {
+      font-size: 10px; letter-spacing: 0.5px; color: #d5d5d5;
+      text-transform: none; margin-left: 8px;
+    }
+
+    header p a { color: #1565c0; text-decoration: none; }
+    header p a:hover { text-decoration: underline; }
+
     .card-desc {
       font-size: 12px;
       color: #999;
@@ -99,37 +91,15 @@
   </style>
 </head>
 <body>
+  <a href="index.html" class="back">← Syllabus</a>
+
   <header>
-    <h1>Learning Visualizations</h1>
-    <div class="header-meta">
-      <p>Interactive explorations of mathematics and physics</p>
-      <a href="catalog.html" class="catalog-link">Sources &amp; Textbooks →</a>
-      <a href="glossary.html" class="catalog-link">Orbital Mechanics Glossary →</a>
-      <a href="linear-algebra-glossary.html" class="catalog-link">Linear Algebra Glossary →</a>
-      <a href="probability-glossary.html" class="catalog-link">Probability Glossary →</a>
-      <a href="deep-learning-glossary.html" class="catalog-link">Deep Learning Glossary →</a>
-      <a href="index.html" class="catalog-link">Syllabus →</a>
-      <a href="practice.html" class="catalog-link">Practice Problems →</a>
-      <a href="#tools" class="catalog-link">Tools →</a>
-    </div>
+    <h1>All Visualizations</h1>
+    <p>Every visualization in one place, grouped by subject. This is a flat browse view — the <a href="index.html">syllabus</a> is the entry point, where each of these hangs off the topic it belongs to.</p>
   </header>
 
-  <section id="tools">
-    <h2>Tools</h2>
-    <div class="grid">
-      <a href="tools/distribution-calculator.html" class="card">
-        <div class="card-title">Distribution Calculator</div>
-        <div class="card-desc">PMF/PDF and CDF of named distributions with live parameter sliders, point and inverse-CDF queries, and moments — Normal, Binomial, Poisson, t, χ², Gamma, Beta and more</div>
-      </a>
-      <a href="tools/statistical-tests.html" class="card">
-        <div class="card-title">Statistical Tests</div>
-        <div class="card-desc">One- and two-sample t-tests, paired t-test, and chi-square goodness-of-fit — paste data, pick α, read the statistic, df, p-value and verdict</div>
-      </a>
-    </div>
-  </section>
-
   <section>
-    <h2>Linear Algebra</h2>
+    <h2><a href="index.html#linear-algebra">Linear Algebra <span class="to-syllabus">→ in the syllabus</span></a></h2>
     <div class="grid">
       <a href="linear-algebra/basis-and-independence.html" class="card">
         <div class="card-title">Basis, Span &amp; Linear Independence</div>
@@ -213,9 +183,50 @@
       </a>
     </div>
   </section>
-
   <section>
-    <h2>Kinematics</h2>
+    <h2><a href="index.html#probability">Probability <span class="to-syllabus">→ in the syllabus</span></a></h2>
+    <div class="grid">
+      <a href="probability/de-morgans-laws.html" class="card">
+        <div class="card-title">De Morgan's Laws</div>
+        <div class="card-desc">(A∪B)ᶜ = Aᶜ∩Bᶜ and (A∩B)ᶜ = Aᶜ∪Bᶜ — visualised as Venn diagrams</div>
+      </a>
+      <a href="probability/conditional-probability.html" class="card">
+        <div class="card-title">Conditional Probability</div>
+        <div class="card-desc">P(A|B) = P(A∩B)/P(B) as shrinking the sample space — and why P(A|B) ≠ P(B|A)</div>
+      </a>
+      <a href="probability/bayes-rule.html" class="card">
+        <div class="card-title">Bayes' Rule &amp; Total Probability</div>
+        <div class="card-desc">Partitioning P(A), inverting conditionals, the rare-disease test, and the chain rule for n events</div>
+      </a>
+      <a href="probability/independence.html" class="card">
+        <div class="card-title">Independence of Events</div>
+        <div class="card-desc">P(A∩B)=P(A)P(B), why independent ≠ disjoint, and conditional independence</div>
+      </a>
+      <a href="probability/pairwise-independence.html" class="card">
+        <div class="card-title">Pairwise vs. Mutual Independence</div>
+        <div class="card-desc">Why every pair being independent doesn't make events mutually independent — the two-coin parity counterexample</div>
+      </a>
+    </div>
+  </section>
+  <section>
+    <h2><a href="index.html#differential-equations">Differential Equations <span class="to-syllabus">→ in the syllabus</span></a></h2>
+    <div class="grid">
+      <a href="differential-equations/ode-overview.html" class="card">
+        <div class="card-title">ODE Overview</div>
+        <div class="card-desc">Slope fields, solution curves, initial conditions, order and linearity</div>
+      </a>
+      <a href="differential-equations/pendulum.html" class="card">
+        <div class="card-title">The Pendulum</div>
+        <div class="card-desc">SHM, phase portrait, separatrix, and nonlinear period corrections</div>
+      </a>
+      <a href="differential-equations/heat-equation.html" class="card">
+        <div class="card-title">The Heat Equation</div>
+        <div class="card-desc">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</div>
+      </a>
+    </div>
+  </section>
+  <section>
+    <h2><a href="index.html#dynamics-orbital-mechanics">Dynamics &amp; Orbital Mechanics <span class="to-syllabus">→ in the syllabus</span></a></h2>
     <div class="grid">
       <a href="kinematics/angular-velocity.html" class="card">
         <div class="card-title">Angular Velocity</div>
@@ -241,12 +252,6 @@
         <div class="card-title">Circular Motion</div>
         <div class="card-desc">v = rω, centripetal and tangential acceleration</div>
       </a>
-    </div>
-  </section>
-
-  <section>
-    <h2>Particle Dynamics — Kepler's Laws</h2>
-    <div class="grid">
       <a href="particle-dynamics/kepler-first.html" class="card">
         <div class="card-title">Kepler's First Law</div>
         <div class="card-desc">Orbits are conic sections — derived from Newton's inverse-square law via Binet's substitution</div>
@@ -259,12 +264,6 @@
         <div class="card-title">Kepler's Third Law</div>
         <div class="card-desc">T² = 4π²a³/K — period depends only on semi-major axis, not eccentricity</div>
       </a>
-    </div>
-  </section>
-
-  <section>
-    <h2>Particle Dynamics</h2>
-    <div class="grid">
       <a href="particle-dynamics/a.html" class="card">
         <div class="card-title">Impulse &amp; Momentum</div>
         <div class="card-desc">Visualisation of impulse and momentum</div>
@@ -285,12 +284,6 @@
         <div class="card-title">Hohmann Transfer</div>
         <div class="card-desc">Cotangential transfer between coplanar circular orbits, Δv₁, Δv₂, transfer time</div>
       </a>
-    </div>
-  </section>
-
-  <section>
-    <h2>Particle Dynamics — Scenarios</h2>
-    <div class="grid">
       <a href="particle-dynamics/scenarios/repulsive-orbit.html" class="card">
         <div class="card-title">Repulsive Inverse-Square Force</div>
         <div class="card-desc">F = +K/r² produces the repulsive branch of a hyperbola — Rutherford scattering geometry</div>
@@ -303,12 +296,6 @@
         <div class="card-title">Orbit from Burnout (Ex. 4.13-I)</div>
         <div class="card-desc">Given χ = r₀v₀²/K, β₀, and r₀/R at engine cutoff, derive e, a/R, and initial position θ₀ relative to perigee</div>
       </a>
-    </div>
-  </section>
-
-  <section>
-    <h2>Geometry</h2>
-    <div class="grid">
       <a href="geometry/conic-sections.html" class="card">
         <div class="card-title">Conic Sections</div>
         <div class="card-desc">Eccentricity, focus-directrix definition, and the polar equation</div>
@@ -317,55 +304,22 @@
         <div class="card-title">Ellipse Geometry</div>
         <div class="card-desc">Semi-axes, area = πab, focal properties, and the bridge to orbital mechanics</div>
       </a>
-    </div>
-  </section>
-
-  <section>
-    <h2>Differential Equations</h2>
-    <div class="grid">
-      <a href="differential-equations/ode-overview.html" class="card">
-        <div class="card-title">ODE Overview</div>
-        <div class="card-desc">Slope fields, solution curves, initial conditions, order and linearity</div>
+      <a href="gyrodynamics/polhode-herpolhode.html" class="card">
+        <div class="card-title">Polhode &amp; Herpolhode</div>
+        <div class="card-desc">The motion of the instantaneous rotation axis in body and space frames</div>
       </a>
-      <a href="differential-equations/pendulum.html" class="card">
-        <div class="card-title">The Pendulum</div>
-        <div class="card-desc">SHM, phase portrait, separatrix, and nonlinear period corrections</div>
+      <a href="gyrodynamics/moment-of-momentum.html" class="card">
+        <div class="card-title">Moment of Momentum</div>
+        <div class="card-desc">Velocity of a point on a rigid body → h_i = r_i × m_i v_i → H = Iω</div>
       </a>
-      <a href="differential-equations/heat-equation.html" class="card">
-        <div class="card-title">The Heat Equation</div>
-        <div class="card-desc">∂u/∂t = α ∂²u/∂x² — Fourier modes, diffusion, decay rates</div>
+      <a href="gyrodynamics/bar-inertia.html" class="card">
+        <div class="card-title">Bar Inertia &amp; Angular Momentum</div>
+        <div class="card-desc">Inertia tensor of a slender bar at angle θ — moments, products, and H = [I]·ω when spinning about z</div>
       </a>
     </div>
   </section>
-
   <section>
-    <h2>Probability</h2>
-    <div class="grid">
-      <a href="probability/de-morgans-laws.html" class="card">
-        <div class="card-title">De Morgan's Laws</div>
-        <div class="card-desc">(A∪B)ᶜ = Aᶜ∩Bᶜ and (A∩B)ᶜ = Aᶜ∪Bᶜ — visualised as Venn diagrams</div>
-      </a>
-      <a href="probability/conditional-probability.html" class="card">
-        <div class="card-title">Conditional Probability</div>
-        <div class="card-desc">P(A|B) = P(A∩B)/P(B) as shrinking the sample space — and why P(A|B) ≠ P(B|A)</div>
-      </a>
-      <a href="probability/bayes-rule.html" class="card">
-        <div class="card-title">Bayes' Rule &amp; Total Probability</div>
-        <div class="card-desc">Partitioning P(A), inverting conditionals, the rare-disease test, and the chain rule for n events</div>
-      </a>
-      <a href="probability/independence.html" class="card">
-        <div class="card-title">Independence of Events</div>
-        <div class="card-desc">P(A∩B)=P(A)P(B), why independent ≠ disjoint, and conditional independence</div>
-      </a>
-      <a href="probability/pairwise-independence.html" class="card">
-        <div class="card-title">Pairwise vs. Mutual Independence</div>
-        <div class="card-desc">Why every pair being independent doesn't make events mutually independent — the two-coin parity counterexample</div>
-      </a>
-    </div>
-  </section>
-
-  <section>
-    <h2>Machine Learning</h2>
+    <h2><a href="index.html#deep-learning">Deep Learning <span class="to-syllabus">→ in the syllabus</span></a></h2>
     <div class="grid">
       <a href="machine-learning/perceptron.html" class="card">
         <div class="card-title">Perceptron</div>
@@ -405,21 +359,16 @@
       </a>
     </div>
   </section>
-
-  <section>
-    <h2>Gyrodynamics</h2>
+  <section id="tools">
+    <h2>Tools</h2>
     <div class="grid">
-      <a href="gyrodynamics/polhode-herpolhode.html" class="card">
-        <div class="card-title">Polhode &amp; Herpolhode</div>
-        <div class="card-desc">The motion of the instantaneous rotation axis in body and space frames</div>
+      <a href="tools/distribution-calculator.html" class="card">
+        <div class="card-title">Distribution Calculator</div>
+        <div class="card-desc">PMF/PDF and CDF of named distributions with live parameter sliders, point and inverse-CDF queries, and moments — Normal, Binomial, Poisson, t, χ², Gamma, Beta and more</div>
       </a>
-      <a href="gyrodynamics/moment-of-momentum.html" class="card">
-        <div class="card-title">Moment of Momentum</div>
-        <div class="card-desc">Velocity of a point on a rigid body → h_i = r_i × m_i v_i → H = Iω</div>
-      </a>
-      <a href="gyrodynamics/bar-inertia.html" class="card">
-        <div class="card-title">Bar Inertia &amp; Angular Momentum</div>
-        <div class="card-desc">Inertia tensor of a slender bar at angle θ — moments, products, and H = [I]·ω when spinning about z</div>
+      <a href="tools/statistical-tests.html" class="card">
+        <div class="card-title">Statistical Tests</div>
+        <div class="card-desc">One- and two-sample t-tests, paired t-test, and chi-square goodness-of-fit — paste data, pick α, read the statistic, df, p-value and verdict</div>
       </a>
     </div>
   </section>
