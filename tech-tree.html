@@ -130,13 +130,14 @@
       'real-analysis':              [],
       'topology':                   ['real-analysis'],
       'differential-equations':     ['linear-algebra'],
-      'deep-learning':              ['linear-algebra', 'probability'],
+      'statistical-inference':      ['probability', 'linear-algebra'],
+      'deep-learning':              ['statistical-inference'],
       'dynamics-orbital-mechanics': ['linear-algebra', 'differential-equations'],
       'signals-systems':            ['linear-algebra', 'differential-equations'],
       'signal-processing':          ['signals-systems'],
       'control-systems':            ['signals-systems', 'differential-equations'],
       'rf-communications':          ['signals-systems', 'probability'],
-      'estimation-filtering':       ['probability', 'linear-algebra', 'signal-processing'],
+      'estimation-filtering':       ['statistical-inference', 'signal-processing'],
       'gnss-navigation':            ['estimation-filtering', 'rf-communications', 'dynamics-orbital-mechanics'],
     };
 
