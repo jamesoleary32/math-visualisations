@@ -65,11 +65,19 @@
       padding: 22px 24px;
       width: 300px;
       position: relative;
+      scroll-margin-top: 24px;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .book-card:hover {
       border-color: #bbb;
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    /* Card deep-linked from the syllabus source name */
+    .book-card:target {
+      border-color: #4a6fa5;
+      box-shadow: 0 0 0 3px rgba(74,111,165,0.18);
     }
 
     .book-card.planned {
@@ -146,7 +154,7 @@
     <h2>Video Series</h2>
     <div class="book-grid">
 
-      <div class="book-card">
+      <div class="book-card" id="src-3b1b-linalg">
         <div class="book-title">Essence of Linear Algebra</div>
         <div class="book-authors">3Blue1Brown (Grant Sanderson)</div>
         <div class="book-edition">YouTube — 16 videos</div>
@@ -161,7 +169,7 @@
         <div class="book-notes">Primary source for the linear algebra section. Builds geometric intuition first — transformations, area scaling, eigendirections — before algebraic formalism. Pairs with Singh for rigour.</div>
       </div>
 
-      <div class="book-card">
+      <div class="book-card" id="src-3b1b-diffeq">
         <div class="book-title">Differential Equations</div>
         <div class="book-authors">3Blue1Brown (Grant Sanderson)</div>
         <div class="book-edition">YouTube — 8 videos</div>
@@ -179,7 +187,7 @@
     <h2>Textbooks — Engineering &amp; Physics</h2>
     <div class="book-grid">
 
-      <div class="book-card">
+      <div class="book-card" id="src-thomson">
         <div class="book-title">Introduction to Space Dynamics</div>
         <div class="book-authors">William T. Thomson</div>
         <div class="book-edition">Dover Publications</div>
@@ -202,7 +210,7 @@
     <h2>Online Resources</h2>
     <div class="book-grid">
 
-      <div class="book-card">
+      <div class="book-card" id="src-weber">
         <div class="book-title">Probability — Course Notes</div>
         <div class="book-authors">Richard Weber</div>
         <div class="book-edition">University of Cambridge, Statistical Laboratory · 2015</div>
@@ -214,7 +222,7 @@
         <div class="book-notes">Part IA course notes for first-year mathematicians at Cambridge. Self-contained lecture units covering classical probability, distributions, random walks, and generating functions. Includes examples sheets and a table of distributions.<br><br><a href="https://www.statslab.cam.ac.uk/~rrw1/prob/index.html" style="font-size:11px;color:#aaa;">statslab.cam.ac.uk/~rrw1/prob</a></div>
       </div>
 
-      <div class="book-card">
+      <div class="book-card" id="src-cambridge-sheets">
         <div class="book-title">Probability — Example Sheets</div>
         <div class="book-authors">Cambridge DPMMS</div>
         <div class="book-edition">Part IA, 2025–2026</div>
@@ -225,7 +233,7 @@
         <div class="book-notes">Official Part IA Probability example sheets from the Department of Pure Mathematics and Mathematical Statistics. Four sheets per year; archive goes back to 2007.<br><br><a href="https://www.dpmms.cam.ac.uk/study/IA/Probability/" style="font-size:11px;color:#aaa;">dpmms.cam.ac.uk/study/IA/Probability</a></div>
       </div>
 
-      <div class="book-card">
+      <div class="book-card" id="src-stats200">
         <div class="book-title">STATS 200: Introduction to Statistical Inference</div>
         <div class="book-authors">Zhou Fan</div>
         <div class="book-edition">Stanford University · Autumn 2016</div>
@@ -246,7 +254,7 @@
     <h2>Textbooks — Mathematics</h2>
     <div class="book-grid">
 
-      <div class="book-card">
+      <div class="book-card" id="src-singh">
         <div class="book-title">Linear Algebra: Step by Step</div>
         <div class="book-authors">Kuldeep Singh</div>
         <div class="book-edition">Oxford University Press, 2013</div>
@@ -259,7 +267,7 @@
         <div class="book-notes">Supplementary reference for the linear algebra section alongside 3Blue1Brown. Provides formal algebraic treatment alongside 3B1B's geometric approach.</div>
       </div>
 
-      <div class="book-card">
+      <div class="book-card" id="src-arnold">
         <div class="book-title">Ordinary Differential Equations</div>
         <div class="book-authors">V.I. Arnold, trans. Silverman</div>
         <div class="book-edition">MIT Press, 1978</div>
@@ -272,7 +280,7 @@
         <div class="book-notes">Source for the ODE overview and pendulum lessons. Arnold's geometric/qualitative approach — phase portraits, slope fields, separatrices — shapes how the visualizations are framed.</div>
       </div>
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-abbott">
         <div class="planned-tag">PHASE 4</div>
         <div class="book-title">Understanding Analysis</div>
         <div class="book-authors">Stephen Abbott</div>
@@ -286,7 +294,7 @@
         <div class="book-notes">Real analysis foundation before Armstrong's topology. Abbott's §3 (topology of ℝ — open sets, compactness, connectedness) directly prepares for Armstrong's general treatment. Oct–Dec 2026.</div>
       </div>
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-topology">
         <div class="planned-tag">PHASE 5</div>
         <div class="book-title">Basic Topology</div>
         <div class="book-authors">M.A. Armstrong</div>
@@ -300,7 +308,7 @@
         <div class="book-notes">Planned source for the topology section. Covers point-set topology through to algebraic topology — connectedness, compactness, classification of surfaces, simplicial homology. Jan–Apr 2027.</div>
       </div>
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-blitzstein-hwang">
         <div class="planned-tag">PHASE 6</div>
         <div class="book-title">Introduction to Probability</div>
         <div class="book-authors">Joseph K. Blitzstein &amp; Jessica Hwang</div>
@@ -321,7 +329,7 @@
     <h2>Textbooks — Signal Processing &amp; Navigation</h2>
     <div class="book-grid">
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-oppenheim">
         <div class="planned-tag">PHASE 7</div>
         <div class="book-title">Discrete-Time Signal Processing</div>
         <div class="book-authors">Alan V. Oppenheim &amp; Ronald W. Schafer</div>
@@ -335,7 +343,7 @@
         <div class="book-notes">Standard reference for discrete-time signals and systems. Covers LTI systems, Z-transform, DFT, FFT, and filter design — the mathematical machinery underlying all digital signal processing.</div>
       </div>
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-kay">
         <div class="planned-tag">PHASE 7</div>
         <div class="book-title">Statistical Signal Processing (2 vols.)</div>
         <div class="book-authors">Steven M. Kay</div>
@@ -349,7 +357,7 @@
         <div class="book-notes">The definitive reference for statistical signal processing. Vol. 1 covers estimation (MVUE, MLE, Cramér–Rao, Kalman filtering). Vol. 2 covers detection theory. Central to SSA and PNT work.</div>
       </div>
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-gray">
         <div class="planned-tag">PHASE 7</div>
         <div class="book-title">An Introduction to Statistical Signal Processing</div>
         <div class="book-authors">Robert M. Gray &amp; Lee D. Davisson</div>
@@ -363,7 +371,7 @@
         <div class="book-notes">Measure-theoretic yet accessible foundation in probability and random processes for signal processing. Builds the theory of random processes, second-order moments, and spectral analysis that underpins Kay's estimation and detection results. Freely available from Stanford.</div>
       </div>
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-gps">
         <div class="planned-tag">PHASE 7</div>
         <div class="book-title">Understanding GPS/GNSS: Principles and Applications</div>
         <div class="book-authors">Elliott Kaplan &amp; Christopher Hegarty</div>
@@ -385,7 +393,7 @@
     <h2>Textbooks — Machine Learning &amp; AI</h2>
     <div class="book-grid">
 
-      <div class="book-card planned">
+      <div class="book-card planned" id="src-prince">
         <div class="planned-tag">PHASE 8</div>
         <div class="book-title">Understanding Deep Learning</div>
         <div class="book-authors">Simon J. D. Prince</div>
