@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bench — Electronics &amp; RF Track</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 48px 64px;
+      max-width: 1040px;
+    }
+
+    .back { display: inline-block; font-size: 13px; color: #999; text-decoration: none; margin-bottom: 20px; }
+    .back:hover { color: #555; }
+
+    header { margin-bottom: 28px; }
+    h1 { font-size: 28px; font-weight: 600; color: #111; margin-bottom: 10px; }
+    header p { font-size: 14px; color: #888; line-height: 1.6; max-width: 760px; }
+    header p a { color: #1565c0; text-decoration: none; }
+    header p a:hover { text-decoration: underline; }
+
+    /* summary meters */
+    .meters { display: flex; gap: 40px; flex-wrap: wrap; margin: 26px 0 8px; }
+    .meter { flex: 1; min-width: 240px; }
+    .meter-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .meter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; }
+    .meter-val { font-size: 13px; font-weight: 600; color: #555; }
+    .meter-bar { height: 7px; background: #ececec; border-radius: 4px; overflow: hidden; }
+    .meter-fill { height: 100%; border-radius: 4px; transition: width 0.25s; }
+    .meter-fill.rungs { background: #2e7d32; }
+    .meter-fill.spend { background: #1565c0; }
+
+    .reset-btn {
+      font-size: 11px; color: #bbb; background: none; border: 1px solid #e0e0e0;
+      border-radius: 5px; padding: 4px 9px; cursor: pointer; margin-left: 12px;
+    }
+    .reset-btn:hover { border-color: #c62828; color: #c62828; }
+
+    h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #aaa; margin: 42px 0 16px; }
+    .section-intro { font-size: 13px; color: #999; line-height: 1.6; margin: -8px 0 18px; max-width: 760px; }
+
+    /* rungs */
+    .rung {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #fff; border: 1px solid #e6e6e6; border-radius: 10px;
+      padding: 16px 18px; margin-bottom: 10px; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .rung:hover { border-color: #cdd8ce; background: #fcfdfc; }
+    .rung.checked { background: #f4f9f5; border-color: #d9e8dc; }
+
+    .rung input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none; flex: none;
+      width: 18px; height: 18px; margin-top: 2px;
+      border: 1.5px solid #c4c4c4; border-radius: 5px; background: #fff; cursor: pointer; position: relative;
+    }
+    .rung.checked input[type="checkbox"], .buy-row.checked input[type="checkbox"] { background: #2e7d32; border-color: #2e7d32; }
+    .rung input[type="checkbox"]:checked::after, .buy-row input[type="checkbox"]:checked::after {
+      content: ''; position: absolute; left: 5px; top: 1.5px; width: 5px; height: 10px;
+      border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+
+    .rung-num {
+      flex: none; width: 26px; height: 26px; border-radius: 7px; background: #eef3ef; color: #5b8a63;
+      font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: -1px;
+    }
+    .rung.checked .rung-num { background: #2e7d32; color: #fff; }
+    .rung-body { flex: 1; }
+    .rung-title { font-size: 15px; font-weight: 600; color: #222; margin-bottom: 5px; }
+    .rung.checked .rung-title { color: #6c9673; }
+    .rung-meta { font-size: 12.5px; color: #777; line-height: 1.55; }
+    .rung-meta b, .rung-links b { display: inline-block; width: 74px; color: #aaa; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .rung-links { font-size: 12.5px; color: #777; line-height: 1.55; margin-top: 2px; }
+    .rung-links a { color: #1565c0; text-decoration: none; }
+    .rung-links a:hover { text-decoration: underline; }
+
+    /* shopping list */
+    .phase-head { display: flex; align-items: baseline; gap: 10px; margin: 22px 0 8px; }
+    .phase-name { font-size: 13px; font-weight: 700; color: #444; }
+    .phase-sub { font-size: 11.5px; color: #b3b3b3; }
+    .phase-total { font-size: 11.5px; color: #999; margin-left: auto; }
+
+    .buy-row {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1px solid #ececec; border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 6px; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .buy-row:hover { border-color: #cdd8ce; }
+    .buy-row.checked { background: #f4f9f5; border-color: #d9e8dc; }
+    .buy-row input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none; flex: none;
+      width: 16px; height: 16px; border: 1.5px solid #c4c4c4; border-radius: 4px; background: #fff; cursor: pointer; position: relative;
+    }
+    .buy-name { font-size: 13.5px; color: #333; font-weight: 500; flex: none; }
+    .buy-row.checked .buy-name { color: #8bab91; text-decoration: line-through; }
+    .buy-note { font-size: 11.5px; color: #aaa; flex: 1; }
+    .buy-price { font-size: 13px; font-weight: 600; color: #555; font-variant-numeric: tabular-nums; min-width: 46px; text-align: right; }
+    .buy-row.checked .buy-price { color: #9cbfa2; }
+    .buy-link { font-size: 11.5px; color: #1565c0; text-decoration: none; white-space: nowrap; flex: none; }
+    .buy-link:hover { text-decoration: underline; }
+
+    /* notes */
+    .note-card {
+      background: #fff; border: 1px solid #eaeaea; border-left: 3px solid #1565c0;
+      border-radius: 8px; padding: 13px 16px; margin-bottom: 10px;
+    }
+    .note-card.warn { border-left-color: #e8710a; }
+    .note-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 3px; }
+    .note-body { font-size: 12.5px; color: #888; line-height: 1.6; }
+    .note-body code { background: #f0f0f0; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+
+    .later { font-size: 12.5px; color: #999; line-height: 1.7; margin-top: 12px; }
+    .later b { color: #777; }
+
+    /* itemized component breakdown — each part expands to an internal doc */
+    .parts { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+    .parts-col { flex: 1; min-width: 320px; background: #fff; border: 1px solid #eaeaea; border-radius: 10px; padding: 14px 18px; }
+    .parts-head { font-size: 11px; font-weight: 700; color: #5b8a63; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+    .part { border-top: 1px solid #f4f4f4; }
+    .part:first-of-type { border-top: none; }
+    .part > summary {
+      display: flex; align-items: baseline; gap: 14px;
+      font-size: 12.5px; padding: 5px 0; cursor: pointer; list-style: none;
+    }
+    .part > summary::-webkit-details-marker { display: none; }
+    .part > summary::after { content: '›'; display: inline-block; color: #cbcbcb; flex: none; transition: transform 0.15s; }
+    .part[open] > summary::after { transform: rotate(90deg); color: #5b8a63; }
+    .part > summary:hover .part-name { color: #000; }
+    .part-name { color: #333; }
+    .part-name code, .part-doc code { background: #f0f0f0; padding: 0 4px; border-radius: 3px; font-size: 11px; }
+    .part-note { color: #aaa; text-align: right; white-space: nowrap; flex: 1; }
+    .part-doc { font-size: 12px; color: #7a7a7a; line-height: 1.62; padding: 1px 0 10px; }
+
+    @media (max-width: 620px) {
+      body { padding: 32px 22px; }
+      .buy-row { flex-wrap: wrap; }
+      .buy-note { flex-basis: 100%; order: 3; }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back">← Syllabus</a>
+
+  <header>
+    <h1>Bench — Electronics &amp; RF</h1>
+    <p>A standalone, hands-on track that runs alongside the <a href="index.html">syllabus</a> rather than inside it:
+      physical electronics from the ground up, laddering into RF and SDR. Every rung is <em>build → measure → understand</em>,
+      and reinforces theory you meet elsewhere in the syllabus. Progress and purchases are saved in this browser.</p>
+  </header>
+
+  <div class="meters">
+    <div class="meter">
+      <div class="meter-top">
+        <span class="meter-label">Rungs completed</span>
+        <span class="meter-val" id="rung-val">0 / 8</span>
+      </div>
+      <div class="meter-bar"><div class="meter-fill rungs" id="rung-fill" style="width:0%"></div></div>
+    </div>
+    <div class="meter">
+      <div class="meter-top">
+        <span class="meter-label">Equipment acquired</span>
+        <span class="meter-val"><span id="spend-val">£0</span> / <span id="spend-total">£0</span>
+          <button class="reset-btn" id="reset">Reset</button></span>
+      </div>
+      <div class="meter-bar"><div class="meter-fill spend" id="spend-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- ── The ladder ─────────────────────────────────────────────────── -->
+  <h2>The ladder · low-level → RF → SDR</h2>
+  <p class="section-intro">Climb in order — each rung assumes the gear and the intuition from the one below. The
+    “reinforces” links jump to the syllabus subject that rung makes physical.</p>
+
+  <div class="rung" data-id="rung-0">
+    <input type="checkbox">
+    <span class="rung-num">0</span>
+    <div class="rung-body">
+      <div class="rung-title">Bench &amp; DC fundamentals</div>
+      <div class="rung-meta"><b>Build</b> Voltage dividers, LED current-limiting, potentiometer control, Wheatstone bridge</div>
+      <div class="rung-meta"><b>Measure</b> I–V of a resistor, continuity and voltage with the DMM, source resistance</div>
+      <div class="rung-links"><b>Reinforces</b> Foundation — the substrate for everything above</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-1">
+    <input type="checkbox">
+    <span class="rung-num">1</span>
+    <div class="rung-body">
+      <div class="rung-title">AC, reactance &amp; the oscilloscope</div>
+      <div class="rung-meta"><b>Build</b> RC / RL / RLC passive filters, diode rectifier + smoothing capacitor → a DC supply</div>
+      <div class="rung-meta"><b>Measure</b> Corner frequency, phase shift vs frequency, LC resonance and its Q</div>
+      <div class="rung-links"><b>Reinforces</b> <a href="index.html#differential-equations">Differential Equations</a> (RLC = 2nd-order ODE, damping) · <a href="index.html#signals-systems">Signals &amp; Systems</a> (frequency response)</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-2">
+    <input type="checkbox">
+    <span class="rung-num">2</span>
+    <div class="rung-body">
+      <div class="rung-title">Active analog — transistors &amp; op-amps</div>
+      <div class="rung-meta"><b>Build</b> Common-emitter amp, emitter follower, op-amp inverting / non-inverting, Sallen-Key active filter, Schmitt trigger</div>
+      <div class="rung-meta"><b>Measure</b> Voltage gain, bandwidth, input/output impedance, clipping and distortion</div>
+      <div class="rung-links"><b>Reinforces</b> <a href="index.html#signals-systems">Signals &amp; Systems</a> (transfer functions, poles) · <a href="index.html#control-systems">Control Systems</a> (feedback <em>is</em> the op-amp)</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-3">
+    <input type="checkbox">
+    <span class="rung-num">3</span>
+    <div class="rung-body">
+      <div class="rung-title">Oscillators — RF is born</div>
+      <div class="rung-meta"><b>Build</b> Colpitts / Hartley LC oscillator, crystal oscillator; wind your own toroidal inductors</div>
+      <div class="rung-meta"><b>Measure</b> Frequency and its drift/stability, measured inductance, a first faint carrier on a nearby AM radio</div>
+      <div class="rung-links"><b>Reinforces</b> <a href="index.html#rf-communications">RF &amp; Communications</a> (oscillators) · <a href="index.html#signals-systems">Signals &amp; Systems</a> (resonance)</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-4">
+    <input type="checkbox">
+    <span class="rung-num">4</span>
+    <div class="rung-body">
+      <div class="rung-title">RF building blocks &amp; measurement</div>
+      <div class="rung-meta"><b>Build</b> L-network impedance match, diode-ring mixer (by hand), crystal ladder filter, a half-wave dipole</div>
+      <div class="rung-meta"><b>Measure</b> S11 / S21 and Smith chart on the NanoVNA, SWR, transmission-line velocity factor</div>
+      <div class="rung-links"><b>Reinforces</b> <a href="index.html#rf-communications">RF &amp; Communications</a> (matching, antennas, link budget)</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-5">
+    <input type="checkbox">
+    <span class="rung-num">5</span>
+    <div class="rung-body">
+      <div class="rung-title">Analog receivers</div>
+      <div class="rung-meta"><b>Build</b> Crystal radio → amplified AM envelope detector → a direct-conversion (Tayloe) receiver for a ham band</div>
+      <div class="rung-meta"><b>Measure</b> Sensitivity, demodulated audio, image rejection; hear a real signal you built the whole chain for</div>
+      <div class="rung-links"><b>Reinforces</b> <a href="index.html#rf-communications">RF &amp; Communications</a> (analog modulation, mixers, superhet) · <a href="index.html#signals-systems">Signals &amp; Systems</a> (mixing = frequency shift)</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-6">
+    <input type="checkbox">
+    <span class="rung-num">6</span>
+    <div class="rung-body">
+      <div class="rung-title">SDR &amp; digital communications</div>
+      <div class="rung-meta"><b>Build</b> Decode ADS-B / NOAA APT / AIS; capture GPS L1 and correlate against the C/A codes; a GNU Radio QPSK link (HackRF TX → attenuators → RTL-SDR RX)</div>
+      <div class="rung-meta"><b>Measure</b> BER vs Eb/N₀ against theory, the constellation, spectral occupancy via FFT</div>
+      <div class="rung-links"><b>Reinforces</b> <a href="index.html#signal-processing">Signal Processing</a> (FFT, sampling) · <a href="index.html#rf-communications">RF &amp; Communications</a> (digital mod, spread spectrum) · <a href="index.html#gnss-navigation">GNSS &amp; Navigation</a> (C/A correlation) · <a href="index.html#estimation-filtering">Estimation &amp; Filtering</a> (matched filter)</div>
+    </div>
+  </div>
+
+  <div class="rung" data-id="rung-7">
+    <input type="checkbox">
+    <span class="rung-num">7</span>
+    <div class="rung-body">
+      <div class="rung-title">Capstone — tie it all together</div>
+      <div class="rung-meta"><b>Build</b> A software GPS receiver (acquire → track → pseudorange → position fix) <em>or</em> a QPSK modem link with forward-error-correction over the two-radio bench</div>
+      <div class="rung-meta"><b>Measure</b> End-to-end link performance; a real position fix from raw IQ you captured</div>
+      <div class="rung-links"><b>Reinforces</b> RF + <a href="index.html#signal-processing">DSP</a> + <a href="index.html#gnss-navigation">GNSS</a> + <a href="index.html#estimation-filtering">Estimation</a>, integrated</div>
+    </div>
+  </div>
+
+  <!-- ── Shopping list ──────────────────────────────────────────────── -->
+  <h2>Shopping list · ~£1,085 build (UK retailers, inc VAT)</h2>
+  <p class="section-intro">Genuine parts from UK retailers with UK stock/shipping — no clones. Buy in phases as you climb; the
+    “equipment acquired” meter tracks spend. Prices are current 2026 GBP inc VAT and drift — check the linked page.
+    <b>Tip:</b> the RX-only core (everything except the Pluto) is ~£860 and covers rungs 0–6 — add the Pluto when
+    you reach the transmit work to keep initial spend lower.</p>
+
+  <div class="phase-head">
+    <span class="phase-name">Phase 1 · Bench</span>
+    <span class="phase-sub">unlocks rungs 0–2</span>
+    <span class="phase-total">~£275</span>
+  </div>
+  <div class="buy-row" data-id="buy-iron" data-price="55">
+    <input type="checkbox"><span class="buy-name">Soldering iron — Pinecil V2 + solder / stand / USB-C PD supply</span>
+    <span class="buy-note">iron ~£45 (Mechboards, UK); budget extra for a PD brick + tips</span><span class="buy-price">£55</span>
+    <a class="buy-link" href="https://mechboards.co.uk/products/pine64-pinecil-v2-smart-mini-portable-soldering-iron" target="_blank" rel="noopener">Mechboards →</a>
+  </div>
+  <div class="buy-row" data-id="buy-dmm" data-price="40">
+    <input type="checkbox"><span class="buy-name">Digital multimeter — UNI-T UT61E+</span>
+    <span class="buy-note">true-RMS, 22000-count (or any decent DMM)</span><span class="buy-price">£40</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/UNI-T-Handheld-Professional-Digital-Multimeter/dp/B093BS9MYM" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-breadboard" data-price="15">
+    <input type="checkbox"><span class="buy-name">Breadboards + jumper wire kit</span>
+    <span class="buy-note">HUAREW 830 + 400 pt breadboards + jumper set</span><span class="buy-price">£15</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/HUAREW-Breadboard-Jumper-Include-Points/dp/B0B5TCKTQH" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-psu" data-price="70">
+    <input type="checkbox"><span class="buy-name">Bench power supply — RUZIZAO 30 V / 5 A</span>
+    <span class="buy-note">adjustable, 4-digit, current-limiting saves parts</span><span class="buy-price">£70</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/RUZIZAO-Power-Supply-Variable-Adjustable/dp/B09H7D1FDS" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-components" data-price="60">
+    <input type="checkbox"><span class="buy-name">Component assortment</span>
+    <span class="buy-note">a 1900-pc mega kit as a base, then add the specifics itemised below (£60–90 all-in)</span><span class="buy-price">£60</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/Electronic-Component-Assortment-Capacitors-Transistors/dp/B073TKQNL3" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-tools" data-price="35">
+    <input type="checkbox"><span class="buy-name">Helping hands + hand tools + ESD mat</span>
+    <span class="buy-note">Lytool third-hand + magnifier; add cutters / strippers / tweezers</span><span class="buy-price">£35</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/Soldering-Lytool-Magnifying-Dimmable-Flexible/dp/B0CFXJCV25" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+
+  <div class="phase-head">
+    <span class="phase-name">Phase 2 · Measurement</span>
+    <span class="phase-sub">unlocks rungs 1–5 · the pivotal spend</span>
+    <span class="phase-total">~£469</span>
+  </div>
+  <div class="buy-row" data-id="buy-scope" data-price="319">
+    <input type="checkbox"><span class="buy-name">Oscilloscope — Rigol DHO802</span>
+    <span class="buy-note">12-bit, 70 MHz, 2-ch; £319 inc VAT, next-day UK delivery (4-ch DHO804 costs more)</span><span class="buy-price">£319</span>
+    <a class="buy-link" href="https://www.rigol-uk.co.uk/product/rigol-dho802-2ch-12bit-70mhz-1-25gsa-s-usb-powered-digital-oscilloscope/" target="_blank" rel="noopener">Rigol-UK →</a>
+  </div>
+  <div class="buy-row" data-id="buy-funcgen" data-price="40">
+    <input type="checkbox"><span class="buy-name">Function generator — FeelTech FY6900</span>
+    <span class="buy-note">dual-channel DDS, sweepable sine/square/triangle</span><span class="buy-price">£40</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/FeelTech-Function-Generator-Arbitrary-Frequency/dp/B0CTTT1XD7" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-nanovna" data-price="110">
+    <input type="checkbox"><span class="buy-name">NanoVNA-H4 (authorized)</span>
+    <span class="buy-note">Nooelec listing on Amazon.co.uk: EMI-shielded, SOLT cal kit + cables + warranty</span><span class="buy-price">£110</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/NooElec-NanoVNA-H-Distributor-50kHz-1-5GHz-Calibration/dp/B08FD35LRW" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+
+  <div class="phase-head">
+    <span class="phase-name">Phase 3 · RF / SDR</span>
+    <span class="phase-sub">unlocks rungs 6–7</span>
+    <span class="phase-total">~£339</span>
+  </div>
+  <div class="buy-row" data-id="buy-rtlsdr" data-price="38">
+    <input type="checkbox"><span class="buy-name">RTL-SDR Blog V3 + dipole antenna kit</span>
+    <span class="buy-note">RX; V4 is end-of-life — buy the V3 (The Pi Hut, UK stock)</span><span class="buy-price">£38</span>
+    <a class="buy-link" href="https://thepihut.com/products/rtl-sdr-blog-v3-usb-dongle-with-dipole-antenna-kit" target="_blank" rel="noopener">The Pi Hut →</a>
+  </div>
+  <div class="buy-row" data-id="buy-pluto" data-price="223">
+    <input type="checkbox"><span class="buy-name">ADALM-Pluto SDR (TX/RX, genuine)</span>
+    <span class="buy-note">Analog Devices, full-duplex 325 MHz–3.8 GHz; ~£223 inc VAT at Farnell UK</span><span class="buy-price">£223</span>
+    <a class="buy-link" href="https://uk.farnell.com/analog-devices/adalm-pluto/learning-module-plutosdr-3-8ghz/dp/4032976" target="_blank" rel="noopener">Farnell UK →</a>
+  </div>
+  <div class="buy-row" data-id="buy-rf-accessories" data-price="60">
+    <input type="checkbox"><span class="buy-name">RF accessories — attenuator kit + dummy load + cables</span>
+    <span class="buy-note">Nooelec 6-pc SMA attenuator kit (~£40, Amazon.co.uk) + 50 Ω dummy load + adapters</span><span class="buy-price">£60</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/NooElec-SMA-Attenuator-Kit-Line/dp/B07YYMT65T" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-toroids" data-price="18">
+    <input type="checkbox"><span class="buy-name">Toroid cores + enamel wire</span>
+    <span class="buy-note">T37-6 / FT37-43 from Bowood Electronics (UK); QRP Labs also cheap</span><span class="buy-price">£18</span>
+    <a class="buy-link" href="https://www.bowood-electronics.co.uk/buy/t-37-6-micrometals-iron-powder-toroid/" target="_blank" rel="noopener">Bowood →</a>
+  </div>
+
+  <p class="later"><b>First upgrades, when you want them (not counted above):</b> TinySA Ultra spectrum analyzer (~£110 —
+    with the Pluto you lose HackRF's <code>hackrf_sweep</code>, so this is the handiest add) · a two-channel bench
+    function generator · a better dummy load / RF power meter. <b>On HackRF:</b> the original HackRF One is now
+    discontinued and mostly out of stock in the UK (a “HackRF Pro” is incoming), which is the practical reason the
+    Pluto is the recommended TX radio here.</p>
+
+  <!-- ── Component kit, itemised ────────────────────────────────────── -->
+  <h2>Component kit · itemised</h2>
+  <p class="section-intro">What the “component assortment” line should actually contain to carry you through rungs 0–5.
+    Buy assortment kits where sensible (resistors, ceramics) and specific part numbers where they matter (RF diodes,
+    JFETs, mixer ICs). <b>Click any part for a note on what it is and why it's here.</b> UK sources:
+    <a href="https://www.rapidonline.com/" target="_blank" rel="noopener">Rapid</a>,
+    <a href="https://cpc.farnell.com/" target="_blank" rel="noopener">CPC</a>,
+    <a href="https://uk.farnell.com/" target="_blank" rel="noopener">Farnell</a>, and
+    <a href="http://shop.qrp-labs.com/" target="_blank" rel="noopener">QRP Labs</a> for RF bits.</p>
+
+  <div class="parts">
+    <div class="parts-col">
+      <div class="parts-head">Passives</div>
+      <details class="part"><summary><span class="part-name">¼ W resistor kit, E12 10 Ω–1 MΩ</span><span class="part-note">~600 pc</span></summary>
+        <div class="part-doc">The workhorse. E12 is the standard 12-values-per-decade ladder for 5% parts. Prefer metal-film over carbon for lower noise — you'll notice it in the receiver front end. Through-hole ¼ W is fine into low VHF; higher up, lead inductance starts to bite.</div></details>
+      <details class="part"><summary><span class="part-name">1% metal-film 50 Ω / 51 Ω / 100 Ω</span><span class="part-note">RF terminations · 10 each</span></summary>
+        <div class="part-doc">50 Ω is the universal RF system impedance; the E24 range has no exact 50, so <code>51 Ω</code> is the stand-in (or two 100 Ω in parallel). A single ¼ W 51 Ω makes a usable low-power dummy load to ~VHF; parasitic inductance limits it at UHF.</div></details>
+      <details class="part"><summary><span class="part-name">Multiturn trim pots 1k / 10k / 100k</span><span class="part-note">5 each</span></summary>
+        <div class="part-doc">Set-and-forget internal adjustments — bias points, oscillator amplitude, calibration. Multiturn (25-turn) gives fine, stable resolution vs a single-turn trimmer.</div></details>
+      <details class="part"><summary><span class="part-name">Panel potentiometer 10 kΩ linear</span><span class="part-note">×3</span></summary>
+        <div class="part-doc">A user-facing knob: receiver volume, a VCO tuning voltage, output level. Linear taper, not logarithmic/audio taper.</div></details>
+      <details class="part"><summary><span class="part-name">Ceramic cap kit, 1 pF–100 nF (incl. C0G/NP0)</span><span class="part-note">assortment</span></summary>
+        <div class="part-doc">Dielectric class is everything. <b>C0G/NP0 (Class I)</b> is low-loss and rock-stable → use in oscillator tanks and filters. <b>X7R/X5R (Class II)</b> packs more capacitance but its value slides with voltage and temperature → bypass/decoupling only. An X7R in a tuned circuit will drift on you.</div></details>
+      <details class="part"><summary><span class="part-name">Film caps 1 nF–1 µF</span><span class="part-note">audio / filters</span></summary>
+        <div class="part-doc">Non-polarised and low-distortion — the right choice for audio-band filters (Sallen-Key) and coupling. Polypropylene is the lowest-distortion type.</div></details>
+      <details class="part"><summary><span class="part-name">Electrolytics 1–1000 µF</span><span class="part-note">assortment</span></summary>
+        <div class="part-doc">Bulk capacitance for supply smoothing (rung 1 rectifier) and audio coupling. Polarised (reverse them and they pop), have real ESR, and age — never in an RF path.</div></details>
+      <details class="part"><summary><span class="part-name">Trimmer caps 5–30 pF</span><span class="part-note">osc tuning · ×5</span></summary>
+        <div class="part-doc">Small variable capacitors to net an oscillator exactly onto frequency or fine-tune a matching network.</div></details>
+      <details class="part"><summary><span class="part-name">Silver-mica / C0G 10–470 pF</span><span class="part-note">RF resonators</span></summary>
+        <div class="part-doc">The high-Q, ultra-stable RF capacitor. Silver-mica is the classic (superb stability, bulky, pricey); C0G ceramic is the modern equal. For filters and tanks where Q and drift are what count.</div></details>
+      <details class="part"><summary><span class="part-name">Inductor assortment 0.1–1000 µH</span><span class="part-note">filters</span></summary>
+        <div class="part-doc">For quick LC breadboarding and DC chokes. For real RF you'll wind your own on the toroids — higher Q and a known value — rather than trust a molded choke.</div></details>
+    </div>
+
+    <div class="parts-col">
+      <div class="parts-head">Semiconductors — discrete</div>
+      <details class="part"><summary><span class="part-name"><code>2N3904</code> NPN / <code>2N3906</code> PNP</span><span class="part-note">×25 each</span></summary>
+        <div class="part-doc">The canonical small-signal BJTs — a complementary NPN/PNP pair, ~200 MHz fT. The “hello world” of transistor circuits (rung 2 common-emitter amp).</div></details>
+      <details class="part"><summary><span class="part-name"><code>2N2222A</code> general-purpose NPN</span><span class="part-note">×20</span></summary>
+        <div class="part-doc">A beefier classic NPN (~800 mA, ~300 MHz fT) for switching and small-signal where the 3904 runs short on current.</div></details>
+      <details class="part"><summary><span class="part-name"><code>BC547</code> / <code>BC557</code></span><span class="part-note">×20 each</span></summary>
+        <div class="part-doc">The European NPN/PNP equivalents of the 3904/3906 — same roles, and what most UK kits and literature use.</div></details>
+      <details class="part"><summary><span class="part-name"><code>2N7000</code> N-MOSFET</span><span class="part-note">×10</span></summary>
+        <div class="part-doc">A logic-level N-channel MOSFET: voltage-controlled with very high input impedance — genuinely different physics from a BJT, and a clean switch / level-shifter to feel the contrast.</div></details>
+      <details class="part"><summary><span class="part-name"><code>J310</code> / <code>MPF102</code> JFET</span><span class="part-note">RF amps/osc · ×10</span></summary>
+        <div class="part-doc">Low-noise, high-impedance JFETs that shine at RF — receiver front ends and Colpitts oscillators. They're depletion-mode (conducting at Vgs = 0), which shapes the bias design. Buy the J310; wild MPF102s are often relabelled fakes.</div></details>
+      <details class="part"><summary><span class="part-name"><code>2N3866</code> / <code>MPSH10</code> RF transistor</span><span class="part-note">×5</span></summary>
+        <div class="part-doc">For when the 3904 runs out of frequency. 2N3866 is a small ~½ W RF power device (TX driver/buffer, good to a few hundred MHz); MPSH10 is a cheap VHF/UHF small-signal NPN (fT ~650 MHz). Here fT and layout matter more than DC gain.</div></details>
+      <details class="part"><summary><span class="part-name"><code>1N4148</code> signal diode</span><span class="part-note">mixers · ×50</span></summary>
+        <div class="part-doc">The ubiquitous fast switching diode — detectors, clamps, switching. Buy 50 so you can select matched quads for a hand-built diode-ring mixer (rung 4).</div></details>
+      <details class="part"><summary><span class="part-name"><code>1N4007</code> rectifier</span><span class="part-note">×20</span></summary>
+        <div class="part-doc">1 A / 1000 V mains rectifier for the rung-1 power supply. Rugged and cheap, but slow — not for RF or fast switching.</div></details>
+      <details class="part"><summary><span class="part-name"><code>1N34A</code> / <code>BAT85</code> Schottky</span><span class="part-note">AM detector, ring mixer · ×10</span></summary>
+        <div class="part-doc">Low forward drop (~0.2–0.3 V). The germanium 1N34A is the classic crystal-radio AM envelope detector — its low turn-on recovers audio from a weak RF envelope; the BAT85 silicon-Schottky is the modern equal, also good in ring mixers.</div></details>
+      <details class="part"><summary><span class="part-name">Zener assortment 3V3–12 V · LEDs</span><span class="part-note">assortment</span></summary>
+        <div class="part-doc">Zeners clamp to a set reverse-breakdown voltage — references, regulation, protection. LEDs are indicators (and rough ~1.8 V references).</div></details>
+    </div>
+
+    <div class="parts-col">
+      <div class="parts-head">ICs</div>
+      <details class="part"><summary><span class="part-name"><code>TL072</code> dual op-amp</span><span class="part-note">×5</span></summary>
+        <div class="part-doc">JFET-input dual op-amp: low noise, high input impedance — the default for active filters and buffers (rung 2). Not rail-to-rail; wants a couple of volts of headroom.</div></details>
+      <details class="part"><summary><span class="part-name"><code>LM358</code> / <code>NE5532</code></span><span class="part-note">×5 each</span></summary>
+        <div class="part-doc">A deliberate contrast. LM358 is cheap and single-supply-friendly (works near the negative rail) but noisy — fine for DC/sensor/control. NE5532 is the low-noise audio-grade part for the receiver's audio chain. The lesson: there's no universal “best” op-amp.</div></details>
+      <details class="part"><summary><span class="part-name"><code>LM393</code> comparator</span><span class="part-note">×5</span></summary>
+        <div class="part-doc">A comparator, not an op-amp: built to switch fast, with an open-collector output that needs a pull-up. Turns an analog threshold into a clean digital edge — Schmitt trigger, squaring an oscillator, zero-cross detect.</div></details>
+      <details class="part"><summary><span class="part-name"><code>NE555</code> timer</span><span class="part-note">×5</span></summary>
+        <div class="part-doc">The legendary astable/monostable RC timer: clocks, PWM, test tones, and a hands-on lesson in RC timing. Not precise or quiet, but endlessly useful.</div></details>
+      <details class="part"><summary><span class="part-name"><code>78L05</code> / <code>7805</code> / <code>LM317</code> regulators</span><span class="part-note">assortment</span></summary>
+        <div class="part-doc">Linear regulators for clean, quiet DC rails — fixed 5 V at 100 mA / 1 A, and the resistor-set adjustable LM317. Linear means low noise but heat to dissipate; that quietness helps oscillators and receivers.</div></details>
+      <details class="part"><summary><span class="part-name"><code>NE602/SA612</code> mixer (or ADE-1/SBL-1)</span><span class="part-note">rungs 4–5 ref · ×3</span></summary>
+        <div class="part-doc">Mixers, and worth having both kinds. The NE602/SA612 is a Gilbert-cell <b>active</b> mixer-plus-oscillator “receiver on a chip” (tiny parts count, little LO drive). The ADE-1/SBL-1 are Mini-Circuits <b>passive</b> diode-ring modules — higher dynamic range but needing a strong LO. Your known-good reference to compare a hand-built ring mixer against.</div></details>
+      <details class="part"><summary><span class="part-name"><code>LM386</code> audio amp</span><span class="part-note">receiver audio · ×3</span></summary>
+        <div class="part-doc">The tiny audio power amp that drives a small speaker or headphones — the standard final stage of a homebrew receiver (rung 5). Build the RF and detector, then the LM386 makes it audible.</div></details>
+    </div>
+
+    <div class="parts-col">
+      <div class="parts-head">RF, oscillator &amp; construction</div>
+      <details class="part"><summary><span class="part-name">Crystals: 3.579, 4.9152, 7.68, 10, 14.318 MHz</span><span class="part-note">several each</span></summary>
+        <div class="part-doc">A quartz crystal is a mechanically-resonant sliver of quartz that behaves electrically as a very-high-Q series RLC (the “motional” <code>Lₘ/Cₘ/Rₘ</code>) shunted by electrode capacitance <code>C₀</code>. Its Q of 10k–100k+ is far beyond any LC tank, which is why a crystal oscillator holds frequency to ppm while an LC one drifts. It has two close resonances — series <code>fs</code> (low-Z) and parallel <code>fp</code> a few kHz above — and the gap between them is its “pullability” (how far a trimmer can drag it). The listed values are all cheap, mass-produced ones: 3.579545 MHz is the NTSC colour-burst crystal (the near-free hobbyist staple), 14.318 is 4× that (old ISA-bus part), 4.9152 a UART baud crystal.</div></details>
+      <details class="part"><summary><span class="part-name">Matched 10 MHz crystals</span><span class="part-note">ladder filter · ×8</span></summary>
+        <div class="part-doc">A crystal ladder filter — the narrow ~2–3 kHz IF bandpass at the heart of a superhet — is several near-identical crystals, each contributing a pole. They must match within tens of hertz or the passband smears and ripples, so you buy a batch, measure each (on the NanoVNA, or a test oscillator + frequency counter), and select a matched set. Hence over-buying eight.</div></details>
+      <details class="part"><summary><span class="part-name">Ferrite beads / RF chokes</span><span class="part-note">assortment</span></summary>
+        <div class="part-doc">A ferrite bead is a frequency-dependent resistor that soaks up RF (decoupling, killing parasitic oscillation, EMI). An RF choke feeds DC bias into an RF stage while blocking the signal from escaping. Small parts, but they keep RF where you put it.</div></details>
+      <details class="part"><summary><span class="part-name">SMA PCB/edge connectors + pigtails</span><span class="part-note">×5</span></summary>
+        <div class="part-doc">SMA is the 50 Ω coax standard your NanoVNA, Pluto and attenuators all speak; these attach your homebrew boards to that world.</div></details>
+      <details class="part"><summary><span class="part-name">BNC connectors</span><span class="part-note">×2</span></summary>
+        <div class="part-doc">The bayonet connector on your scope and function generator (the sub-GHz instrument side); bridges bench gear to the circuit.</div></details>
+      <details class="part"><summary><span class="part-name">Single-sided copper-clad board</span><span class="part-note">Manhattan/dead-bug RF</span></summary>
+        <div class="part-doc">A blank PCB used as a ground plane for “Manhattan” (glued pads over a solid ground) or “dead-bug” (ICs upside-down, leads in air) RF construction. Breadboards are hopeless above a few MHz — stray L and C everywhere — so a solid ground and short leads are non-negotiable at RF. The build style is itself a rung-3/4 skill.</div></details>
+      <details class="part"><summary><span class="part-name">Perfboard / stripboard</span><span class="part-note">assortment</span></summary>
+        <div class="part-doc">For making lower-frequency (audio, DC, control) builds semi-permanent once they work. Stripboard has copper strips; perfboard is plain holes. Not for RF.</div></details>
+      <details class="part"><summary><span class="part-name">Header pins + Dupont · 22 AWG solid hookup wire</span><span class="part-note">multi-colour</span></summary>
+        <div class="part-doc">Solid-core 22 AWG is the correct gauge for breadboards — it fits the springs and holds its shape; multi-colour keeps you sane. Use stranded only for flexible off-board leads.</div></details>
+      <details class="part"><summary><span class="part-name">DC barrel jacks + 9 V battery clips</span><span class="part-note">power</span></summary>
+        <div class="part-doc">Power input. The battery clip isn't just convenience — running a sensitive receiver from a battery removes mains hum and supply noise, making rung-5 measurements much cleaner.</div></details>
+    </div>
+  </div>
+
+  <!-- ── How the RF bench works ─────────────────────────────────────── -->
+  <h2>Working notes</h2>
+
+  <div class="note-card">
+    <div class="note-title">The loopback BER bench</div>
+    <div class="note-body">For the digital-comms rungs, loop transmit into receive over coax through attenuators — either the
+      <b>Pluto in full duplex</b> (TX and RX on one box) or <b>Pluto TX → RTL-SDR RX</b>. Dial the attenuators to sweep BER
+      against Eb/N₀. No antenna radiates, so it's legal and it's a cleaner measurement than any over-the-air link.</div>
+  </div>
+
+  <div class="note-card warn">
+    <div class="note-title">Transmit legally: loopback first</div>
+    <div class="note-body">Radiating on ham bands generally needs a licence (US Technician / UK Foundation). Keep all TX work on a
+      <b>dummy load + attenuators over cable</b> — no antenna radiating — which needs no licence and is better for measurement anyway.
+      A licence later just unlocks going on-air.</div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-title">Seeing spectrum</div>
+    <div class="note-body">The Pluto has no built-in wideband sweep, so cover spectrum with the RTL-SDR (to ~1.7 GHz), the NanoVNA,
+      and the scope's FFT; a TinySA Ultra (~£110) is the first upgrade for a proper spectrum analyzer. (A genuine HackRF
+      would give you <code>hackrf_sweep</code> to 6 GHz for free, but it's discontinued and scarce in the UK — see the note above.)</div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-title">Homebrew depth</div>
+    <div class="note-body">Wind your own toroids and build the L-match and diode-ring mixer <b>by hand</b> in rungs 3–4 — that's where the
+      RF intuition lives — but keep a jelly-bean mixer IC (ADE-1 / SBL-1) on the shelf as a known-good reference to compare against.</div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'bench-v1';
+    const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } };
+    const save = s => localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    const money = n => '£' + n.toLocaleString('en-GB');
+
+    const rows = Array.from(document.querySelectorAll('.rung[data-id], .buy-row[data-id]'));
+
+    function refresh() {
+      const rungs = document.querySelectorAll('.rung[data-id]');
+      let rDone = 0;
+      rungs.forEach(r => { if (r.classList.contains('checked')) rDone++; });
+      document.getElementById('rung-val').textContent = `${rDone} / ${rungs.length}`;
+      document.getElementById('rung-fill').style.width = (100 * rDone / rungs.length) + '%';
+
+      const buys = document.querySelectorAll('.buy-row[data-id]');
+      let total = 0, spent = 0;
+      buys.forEach(b => {
+        const p = parseInt(b.dataset.price, 10) || 0;
+        total += p;
+        if (b.classList.contains('checked')) spent += p;
+      });
+      document.getElementById('spend-val').textContent = money(spent);
+      document.getElementById('spend-total').textContent = money(total);
+      document.getElementById('spend-fill').style.width = (total ? 100 * spent / total : 0) + '%';
+    }
+
+    function apply(state) {
+      rows.forEach(row => {
+        const on = state[row.dataset.id] === true;
+        row.classList.toggle('checked', on);
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = on;
+      });
+      refresh();
+    }
+
+    rows.forEach(row => {
+      row.addEventListener('click', e => {
+        if (e.target.closest('a')) return;              // let syllabus links through
+        const on = !row.classList.contains('checked');
+        row.classList.toggle('checked', on);
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = on;
+        const s = load(); s[row.dataset.id] = on; save(s);
+        refresh();
+      });
+    });
+
+    document.getElementById('reset').addEventListener('click', e => {
+      e.stopPropagation();
+      localStorage.removeItem(STORAGE_KEY);
+      apply({});
+    });
+
+    apply(load());
+  </script>
+</body>
+</html>
