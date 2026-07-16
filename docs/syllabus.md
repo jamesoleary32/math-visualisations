@@ -44,7 +44,7 @@ Every subject body follows the same shape — do not invent per-section layouts:
 
 <div class="source-group">
   <div class="source-head">
-    <span class="source-name">Book — Title</span>
+    <span class="source-name"><a href="catalog.html#src-slug">Book — Title</a></span>
     <span class="source-detail">publisher / note</span>
     <span class="source-status status-current">Current</span>   <!-- or status-done / -next / -planned -->
   </div>
@@ -71,6 +71,10 @@ Key rules:
   `topic-group-label` only for *thematic* sub-groups inside a source.
 - **Status badge** lives on the source, not the topics: `status-done` / `status-current` /
   `status-next` / `status-planned`.
+- **`source-name` deep-links to the catalog.** Wrap the name in `<a href="catalog.html#src-slug">`
+  pointing at that book's `book-card` id in `catalog.html` (a combined source links each name
+  separately, e.g. `<a …#src-3b1b-linalg>3Blue1Brown</a> · <a …#src-singh>Singh</a>`). Every source
+  cited here should have a matching card; add one to the catalog before linking.
 - **Per topic**: an inline `def →` (`gloss-link`) to the glossary anchor when one exists, and a
   nested `topic-viz` block listing associated visualizations (each `<a>` = one viz).
 - Sources come in three shapes: **single book** (one source-group), **sequential books** (one
