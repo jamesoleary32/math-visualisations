@@ -388,6 +388,89 @@
     </div>
   </section>
 
+  <section>
+    <h2>Convolutional Networks</h2>
+    <div class="terms">
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-convolution" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">∗</span>
+            <span class="term-name">Convolution</span>
+          </div>
+          <div class="term-def">A small kernel <strong>slides across the input and takes a dot product</strong> at each position, writing one number into the output. It replaces the dense "every output to every pixel" layer with a local, reusable operation that respects spatial structure.</div>
+          <div class="term-formula" id="eq-convolution"></div>
+          <div class="term-note">Strictly this is cross-correlation (no kernel flip), which is what deep-learning libraries actually compute — the name "convolution" stuck anyway.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-kernel" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">K</span>
+            <span class="term-name">Kernel (filter)</span>
+          </div>
+          <div class="term-def">The <strong>small grid of learned weights</strong> that does the detecting. A kernel spans the full input depth, so a 3×3 kernel on a <em>C</em>-channel input is really 3×3×<em>C</em> weights (plus a bias) — and it produces exactly one output channel.</div>
+          <div class="term-formula" id="eq-kernel"></div>
+          <div class="term-note">The nine (or 3×3×C) weights are not hand-designed — gradient descent learns which little patterns are worth detecting.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-channel" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">C</span>
+            <span class="term-name">Channel</span>
+          </div>
+          <div class="term-def">The <strong>depth axis of the tensor</strong> — how many 2D feature maps are stacked together. An RGB image has 3 input channels (R, G, B); a hidden layer has as many channels as it has filters. One channel is one 2D slice of that stack.</div>
+          <div class="term-formula" id="eq-channel"></div>
+          <div class="term-note">Key asymmetry: a filter <strong>spans</strong> channels (covers all of them at once) but <strong>slides</strong> over space. Output channels = number of filters — an input axis you receive, an output axis you choose.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-featuremap" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">▦</span>
+            <span class="term-name">Feature map</span>
+          </div>
+          <div class="term-def">The <strong>2D output of a single filter</strong> — one channel of a conv layer's output. Each cell records how strongly that filter's pattern matched the input at that location. A layer with <em>K</em> filters produces <em>K</em> feature maps.</div>
+          <div class="term-note">"Feature map", "activation map", and "output channel" are the same object. Bright where the feature is present, dark where it is not.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-pooling" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">↓</span>
+            <span class="term-name">Pooling</span>
+          </div>
+          <div class="term-def"><strong>Downsampling</strong> a feature map by summarising each small window with one number — usually its maximum. It halves the resolution and, by reporting <em>whether</em> a feature was present rather than exactly where, adds a little translation invariance.</div>
+          <div class="term-formula" id="eq-pooling"></div>
+          <div class="term-note">Convolution is equivariant (a feature moves with the input); pooling adds invariance (small shifts stop mattering). Pooling has no learnable weights.</div>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-diagram"><canvas id="c-receptivefield" width="196" height="180"></canvas></div>
+        <div class="term-body">
+          <div class="term-header">
+            <span class="term-symbol">▣</span>
+            <span class="term-name">Receptive field</span>
+          </div>
+          <div class="term-def">The <strong>region of the input a given unit can "see"</strong>. A single 3×3 conv sees a 3×3 patch; stack another and each unit now depends on a 5×5 patch. Stride and pooling enlarge it faster.</div>
+          <div class="term-note">Layer by layer the receptive field grows, so deep units respond to large, abstract structure — edges become textures become parts become objects.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script>
     // ── KaTeX formulas ──────────────────────────────────────────────────────────
@@ -409,6 +492,10 @@
       'eq-iteration':     'w_{t+1} = w_t - \\eta\\,\\nabla L_{\\mathcal{B}_t}(w_t)',
       'eq-epoch':         '\\text{iterations per epoch} = \\dfrac{N}{B}',
       'eq-sgd':           '\\mathcal{B}_t \\sim \\text{random subset of the } N \\text{ examples}',
+      'eq-convolution':   '(\\mathbf{I} * \\mathbf{K})_{ij} = \\sum_{c,a,b} \\mathbf{I}_{c,\\,i+a,\\,j+b}\\,\\mathbf{K}_{c,a,b}',
+      'eq-kernel':        '\\mathbf{K} \\in \\mathbb{R}^{C_{\\text{in}} \\times k_H \\times k_W}',
+      'eq-channel':       '\\text{tensor}:\\; H \\times W \\times C',
+      'eq-pooling':       '(\\text{pool})_{ij} = \\max_{a,b}\\, x_{2i+a,\\,2j+b}',
     };
     for (const [id, tex] of Object.entries(eqs)) {
       const el = document.getElementById(id);
@@ -830,6 +917,78 @@
       label(ctx, 'small η', sx(1.0) - 4, sy(1.0) - 8, GREEN, 10);
       arrow(ctx, sx(1.5), sy(1.5*1.5), sx(-1.3), sy(1.3*1.3), ORANGE, 1.8);
       label(ctx, 'large η (overshoot)', 40, 30, ORANGE, 10);
+    });
+
+    // ── Convolutional Networks diagrams ─────────────────────────────────────────
+    const cnnLerp = (a, b, t) => a + (b - a) * t;
+    function cnnCells(ctx, x, y, cell, rows, cols, fill, border = '#dcdcdc') {
+      for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) { ctx.fillStyle = fill(i, j); ctx.fillRect(x + j * cell, y + i * cell, cell - 1, cell - 1); }
+      ctx.strokeStyle = border; ctx.lineWidth = 1; ctx.strokeRect(x - 0.5, y - 0.5, cols * cell, rows * cell);
+    }
+    const heat = v => `rgb(${255 - (255 - 21) * v | 0},${255 - (255 - 101) * v | 0},${255 - (255 - 192) * v | 0})`;
+
+    draw('c-convolution', (ctx) => {
+      const cell = 17, gx = 14, gy = 46;
+      cnnCells(ctx, gx, gy, cell, 5, 5, (i, j) => (i + j) % 2 ? '#eef1f4' : '#f8f9fb');
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 2.4; ctx.strokeRect(gx - 1, gy - 1, 3 * cell + 1, 3 * cell + 1);
+      label(ctx, 'input', gx + 6, gy - 8, '#999', 11);
+      const ox = 152, oy = 66;
+      ctx.fillStyle = '#1565c0'; ctx.fillRect(ox, oy, 20, 20); ctx.strokeStyle = '#0d3f7a'; ctx.strokeRect(ox - 0.5, oy - 0.5, 20, 20);
+      arrow(ctx, gx + 3 * cell + 6, gy + 1.5 * cell, ox - 6, oy + 10, '#bbb', 1.6);
+      label(ctx, 'one value', ox - 6, oy - 8, '#999', 10);
+      label(ctx, 'feature map', 106, gy + 5 * cell + 16, '#bbb', 10);
+    });
+
+    draw('c-kernel', (ctx) => {
+      const cell = 26, kx = 60, ky = 58, wts = [[1, 0, -1], [2, 0, -2], [1, 0, -1]];
+      for (let k = 2; k >= 1; k--) { ctx.fillStyle = 'rgba(21,101,192,0.08)'; ctx.fillRect(kx + k * 9, ky - k * 9, 3 * cell, 3 * cell); ctx.strokeStyle = '#cdd8e6'; ctx.strokeRect(kx + k * 9 - 0.5, ky - k * 9 - 0.5, 3 * cell, 3 * cell); }
+      cnnCells(ctx, kx, ky, cell, 3, 3, (i, j) => { const v = wts[i][j]; return v > 0 ? '#cfe0f3' : v < 0 ? '#f7ddc8' : '#f4f4f4'; });
+      ctx.fillStyle = '#555'; ctx.font = '12px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) ctx.fillText(String(wts[i][j]), kx + j * cell + cell / 2, ky + i * cell + cell / 2);
+      ctx.textBaseline = 'alphabetic'; label(ctx, '3×3×C weights', 50, ky + 3 * cell + 22, '#999', 11);
+    });
+
+    draw('c-channel', (ctx) => {
+      const cell = 20, bx = 34, by = 56, chT = [[229, 115, 115], [129, 199, 132], [100, 181, 246]]; // R,G,B; 0 = front
+      for (let p = 2; p >= 0; p--) {
+        const ox = bx + p * 13, oy = by - p * 13, t = chT[p];
+        if (p === 0) {
+          cnnCells(ctx, ox, oy, cell, 5, 5, (i, j) => { const v = ((i * 7 + j * 3) % 5) / 5 * 0.7 + 0.12; return `rgb(${cnnLerp(255, t[0], v) | 0},${cnnLerp(255, t[1], v) | 0},${cnnLerp(255, t[2], v) | 0})`; });
+        } else {
+          ctx.fillStyle = `rgba(${t[0]},${t[1]},${t[2]},0.30)`; ctx.fillRect(ox, oy, 5 * cell, 5 * cell);
+          ctx.strokeStyle = `rgba(${t[0]},${t[1]},${t[2]},0.65)`; ctx.lineWidth = 1; ctx.strokeRect(ox - 0.5, oy - 0.5, 5 * cell, 5 * cell);
+        }
+      }
+      label(ctx, 'H × W × 3', bx - 2, by + 5 * cell + 20, '#999', 11);
+      ['R', 'G', 'B'].forEach((n, i) => { const t = chT[i]; ctx.fillStyle = `rgb(${t[0]},${t[1]},${t[2]})`; ctx.beginPath(); ctx.arc(150, 34 + i * 15, 4, 0, Math.PI * 2); ctx.fill(); label(ctx, n, 159, 38 + i * 15, '#888', 10); });
+    });
+
+    draw('c-featuremap', (ctx) => {
+      const cell = 24, gx = 46, gy = 40;
+      cnnCells(ctx, gx, gy, cell, 5, 5, (i, j) => heat(Math.abs(i - j) <= 1 ? 0.85 : 0.1));
+      label(ctx, 'one filter → one map', 32, gy + 5 * cell + 20, '#999', 11);
+    });
+
+    draw('c-pooling', (ctx) => {
+      const cell = 20, gx = 14, gy = 48, src = [[1, 3, 2, 1], [4, 2, 0, 1], [0, 1, 5, 2], [2, 1, 3, 4]];
+      cnnCells(ctx, gx, gy, cell, 4, 4, (i, j) => heat(src[i][j] / 5));
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 1.6;
+      [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([bi, bj]) => ctx.strokeRect(gx + bj * 2 * cell - 1, gy + bi * 2 * cell - 1, 2 * cell + 1, 2 * cell + 1));
+      const pooled = [[4, 2], [5, 4]], px = 144, py = 58, pc = 22;
+      arrow(ctx, gx + 4 * cell + 6, gy + 2 * cell, px - 8, py + pc, '#bbb', 1.6);
+      cnnCells(ctx, px, py, pc, 2, 2, (i, j) => heat(pooled[i][j] / 5));
+      label(ctx, 'max 2×2', 92, 40, '#999', 10);
+    });
+
+    draw('c-receptivefield', (ctx) => {
+      const cell = 14, layers = [{ n: 7, y: 126, a: 1, b: 5 }, { n: 5, y: 82, a: 1, b: 3 }, { n: 3, y: 40, a: 1, b: 1 }];
+      layers.forEach(L => {
+        const totalW = L.n * cell, x0 = (196 - totalW) / 2;
+        for (let j = 0; j < L.n; j++) { const on = j >= L.a && j <= L.b; ctx.fillStyle = on ? '#cfe0f3' : '#f2f2f2'; ctx.fillRect(x0 + j * cell, L.y, cell - 1, cell - 1); ctx.strokeStyle = '#dcdcdc'; ctx.strokeRect(x0 + j * cell - 0.5, L.y - 0.5, cell - 1, cell - 1); }
+        ctx.strokeStyle = '#111'; ctx.lineWidth = 1.8; ctx.strokeRect(x0 + L.a * cell - 1, L.y - 1, (L.b - L.a + 1) * cell, cell);
+      });
+      label(ctx, 'deep unit', 72, 32, '#999', 10);
+      label(ctx, 'sees a 5×5 input patch', 44, 158, '#999', 10);
     });
   </script>
 </body>
