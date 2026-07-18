@@ -33,12 +33,60 @@ function plEval(m, x) {
 
 const sigmoid = z => 1 / (1 + Math.exp(-z));
 
+// Fixed 3-unit network for the Prince-3.3 "computation through" walk-through.
+// Kinks at x = -b/w land at 0.25, 1.22, 1.56 — deliberately NOT evenly spaced.
+const XR0 = 0, XR1 = 2;
+const UNITS = [{ w: 0.6, b: -0.15 }, { w: -0.9, b: 1.1 }, { w: 0.9, b: -1.4 }];
+const PHI = [0.1, -0.9, 0.95, 1.4];               // φ0, φ1, φ2, φ3
+const UCOL = ['#d2691e', '#2e9e5b', '#5b6b76'];
+const preAct = (u, x) => u.b + u.w * x;
+const hUnit = (u, x) => relu(preAct(u, x));
+const kinkOf = u => -u.b / u.w;
+const sumY = x => PHI[0] + UNITS.reduce((s, u, j) => s + PHI[j + 1] * hUnit(u, x), 0);
+
 // ── Colours ─────────────────────────────────────────────────────────────────
 const CURVE = '#1565c0', LIN = '#c62828', HINGE = '#2e7d32', FAINT = '#c9c9c9', KINK = '#e8710a';
+
+// ── Small multiple plot (for the computation-through grid) ──────────────────────
+function miniPlot(ctx, x, y, w, h, fn, o) {
+  const [xr0, xr1] = o.xr, [yr0, yr1] = o.yr;
+  const px = t => x + (t - xr0) / (xr1 - xr0) * w;
+  const py = v => y + h - (v - yr0) / (yr1 - yr0) * h;
+  ctx.strokeStyle = '#e4e4e4'; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h);
+  if (yr0 < 0 && yr1 > 0) { ctx.strokeStyle = '#efefef'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(x, py(0)); ctx.lineTo(x + w, py(0)); ctx.stroke(); ctx.setLineDash([]); }
+  if (o.breakpoints) { ctx.strokeStyle = '#e7c9b8'; ctx.setLineDash([2, 3]); o.breakpoints.forEach(bp => { if (bp > xr0 && bp < xr1) { ctx.beginPath(); ctx.moveTo(px(bp), y); ctx.lineTo(px(bp), y + h); ctx.stroke(); } }); ctx.setLineDash([]); }
+  ctx.strokeStyle = o.color; ctx.lineWidth = o.width || 2; ctx.beginPath();
+  for (let i = 0; i <= 140; i++) { const t = xr0 + (xr1 - xr0) * i / 140; const v = Math.max(yr0, Math.min(yr1, fn(t))); const X = px(t), Y = py(v); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }
+  ctx.stroke();
+  if (o.kink != null && o.kink > xr0 && o.kink < xr1) { ctx.fillStyle = KINK; ctx.beginPath(); ctx.arc(px(o.kink), py(fn(o.kink)), 3, 0, Math.PI * 2); ctx.fill(); }
+  ctx.fillStyle = '#9a9a9a'; ctx.font = '10px system-ui'; ctx.textAlign = 'center'; ctx.fillText(o.label, x + w / 2, y + h + 12);
+}
+
+function drawThrough(ctx, c) {
+  const gx0 = 34, gy0 = 24, gridW = Math.min(c.width * 0.66, c.width - 210), colW = gridW / 3, rowH = (c.height * 0.6) / 3;
+  const yrPre = [-1.3, 1.5], yrH = [-0.25, 1.25], yrS = [-1.5, 1.5];
+  for (let j = 0; j < 3; j++) {
+    const cx = gx0 + j * colW, pw = colW - 24;
+    miniPlot(ctx, cx, gy0, pw, rowH - 20, x => preAct(UNITS[j], x), { xr: [XR0, XR1], yr: yrPre, color: UCOL[j], label: `θ${j + 1}₀ + θ${j + 1}₁·x` });
+    miniPlot(ctx, cx, gy0 + rowH, pw, rowH - 20, x => hUnit(UNITS[j], x), { xr: [XR0, XR1], yr: yrH, color: UCOL[j], label: `h${j + 1} = ReLU(·)`, kink: kinkOf(UNITS[j]) });
+    miniPlot(ctx, cx, gy0 + 2 * rowH, pw, rowH - 20, x => PHI[j + 1] * hUnit(UNITS[j], x), { xr: [XR0, XR1], yr: yrS, color: UCOL[j], label: `φ${j + 1}·h${j + 1}` });
+  }
+  const sy0 = gy0 + 3 * rowH + 8, sw = gridW - 24, sh = c.height - sy0 - 26;
+  miniPlot(ctx, gx0, sy0, sw, sh, sumY, { xr: [XR0, XR1], yr: [-1.5, 1.5], color: '#12385f', width: 2.8, label: 'y = φ₀ + φ₁h₁ + φ₂h₂ + φ₃h₃   (network output)', breakpoints: UNITS.map(kinkOf) });
+  const rx = gx0 + gridW + 16; let ry = 40; ctx.textAlign = 'left';
+  ctx.fillStyle = '#555'; ctx.font = '600 13px system-ui'; ctx.fillText('read each column down:', rx, ry); ry += 21;
+  ctx.fillStyle = '#888'; ctx.font = '12px system-ui';
+  ['line → ReLU clips it to a', 'hinge → φ scales it. Then', 'sum the three (plus φ₀).', '', 'Each hinge is ON only past', 'its kink, so every segment', 'of y is the SUM of whichever', 'units are active there —', 'usually more than one.'].forEach((l, i) => ctx.fillText(l, rx, ry + i * 17)); ry += 9 * 17 + 12;
+  ctx.fillStyle = '#555'; ctx.font = '600 12.5px system-ui'; ctx.fillText('breakpoints  x = −b/w:', rx, ry); ry += 19;
+  ctx.fillStyle = KINK; ctx.font = '600 14px system-ui'; ctx.fillText(UNITS.map(u => kinkOf(u).toFixed(2)).join(',  '), rx, ry); ry += 19;
+  ctx.fillStyle = '#999'; ctx.font = '11.5px system-ui';
+  ['not evenly spaced — each sits', 'wherever its weights land.'].forEach((l, i) => ctx.fillText(l, rx, ry + i * 15));
+}
 
 // ── Drawing ───────────────────────────────────────────────────────────────────
 function draw(c2d, st, o) {
   c2d.raw((ctx, c) => {
+    if (o.mode === 'through') { drawThrough(ctx, c); return; }
     const S = Math.min(c.height - 90, c.width - 340);
     const L = 66, T = (c.height - S) / 2, R = L + S, B = T + S;
     const px = x => L + (x - X0) / (X1 - X0) * (R - L);
@@ -214,10 +262,18 @@ export default {
       update(c2d, st) { c2d.clearPersistent(); draw(c2d, st, { mode: 'unit' }); },
     },
     {
+      title: 'Follow the computation through',
+      description: 'Here is a whole tiny network — three ReLU units — computed end to end (after Prince, Fig 3.3). Read each column top-to-bottom: a linear pre-activation $\\theta_{j0}+\\theta_{j1}x$ is clipped by ReLU into a hinge $h_j$, then scaled by $\\phi_j$. The wide bottom panel adds the three contributions (plus $\\phi_0$) into the output $y$.',
+      equation: 'y = \\phi_0 + \\phi_1 h_1 + \\phi_2 h_2 + \\phi_3 h_3, \\qquad h_j = \\mathrm{ReLU}(\\theta_{j0}+\\theta_{j1}x)',
+      notes: 'This is the answer to "does one unit own each region?" — no. Each hinge switches on only past its own kink, so on any segment of $y$ the slope is the SUM of whichever units are active there (often more than one). Cross a kink and exactly one unit flips on or off, changing the slope.\n\nAnd the three breakpoints are plainly NOT evenly spaced: each sits at $x = -b/w$, wherever that unit\'s weights put it.',
+      setup(c2d, st) { clearControls(st); },
+      update(c2d, st) { c2d.clearPersistent(); draw(c2d, st, { mode: 'through' }); },
+    },
+    {
       title: 'Sum the hinges → any shape',
       description: 'Add several ReLU units, $y = \\sum_i a_i\\,\\mathrm{ReLU}(w_ix + b_i) + c$. Each contributes one kink, and where they overlap their slopes add. With enough units the piecewise-linear result traces any continuous curve as closely as you like — universal approximation, built from nothing but hinges.',
       equation: 'y = \\sum_{i=1}^{n} a_i\\,\\mathrm{ReLU}(w_i x + b_i) + c',
-      notes: 'Drag the number of hidden units. Each new unit adds a breakpoint and the blue fit hugs the grey target more tightly — a shallow network with one ReLU hidden layer, where width buys accuracy.\n\nEvery one of these bends is impossible with linear layers alone: that is the whole reason for the nonlinearity.',
+      notes: 'Drag the number of hidden units. Each new unit adds a breakpoint and the blue fit hugs the grey target more tightly — a shallow network with one ReLU hidden layer, where width buys accuracy.\n\nEvery one of these bends is impossible with linear layers alone: that is the whole reason for the nonlinearity.\n\n(The breakpoints look evenly spaced only because we placed the fitting knots uniformly to interpolate the target. In a trained network they sit at $x=-b/w$, wherever the weights land — as in the previous step.)',
       setup(c2d, st) { clearControls(st); addSlider(st, 'hidden units', 1, 12, 1, () => st.n, v => st.n = v, v => String(v)); },
       update(c2d, st) { c2d.clearPersistent(); draw(c2d, st, { mode: 'sum' }); },
     },
