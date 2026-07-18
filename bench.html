@@ -78,6 +78,15 @@
     .rung-links { font-size: 12.5px; color: #777; line-height: 1.55; margin-top: 2px; }
     .rung-links a { color: #1565c0; text-decoration: none; }
     .rung-links a:hover { text-decoration: underline; }
+    .rung-projects { margin-top: 9px; }
+    .rung-projects > summary { cursor: pointer; list-style: none; font-size: 11.5px; font-weight: 700; color: #5b8a63; letter-spacing: 0.3px; padding: 2px 0; display: inline-block; }
+    .rung-projects > summary::-webkit-details-marker { display: none; }
+    .rung-projects > summary::before { content: '▸'; display: inline-block; margin-right: 5px; color: #9ac0a1; transition: transform 0.15s; }
+    .rung-projects[open] > summary::before { transform: rotate(90deg); }
+    .proj { font-size: 12px; color: #7c7c7c; line-height: 1.55; padding: 5px 0 5px 12px; border-left: 2px solid #e3efe5; margin: 6px 0; }
+    .proj b { color: #333; }
+    .proj-target { color: #4e8256; font-weight: 600; }
+    .rung.checked .rung-projects > summary { color: #9ec4a5; }
 
     /* shopping list */
     .phase-head { display: flex; align-items: baseline; gap: 10px; margin: 22px 0 8px; }
@@ -185,6 +194,11 @@
       <div class="rung-meta"><b>Build</b> Voltage dividers, LED current-limiting, potentiometer control, Wheatstone bridge</div>
       <div class="rung-meta"><b>Measure</b> I–V of a resistor, continuity and voltage with the DMM, source resistance</div>
       <div class="rung-links"><b>Reinforces</b> Foundation — the substrate for everything above</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>Ohm's law &amp; tolerance</b> — drive known resistors at 5 V, predict then measure the current; grab 10 of one value and log the spread. <span class="proj-target">Target: readings within meter tolerance; spread inside the rated ±5%.</span></div>
+        <div class="proj"><b>Voltage divider under load</b> — 10k/10k reads 2.5 V open, then sags when you hang a 10k load on the tap. <span class="proj-target">Target: loaded output matches the Thévenin prediction (1.67 V).</span></div>
+        <div class="proj"><b>Diode / LED I–V</b> — plot a few Vf/If points, find the ~1.8–2 V knee, then size a series R for exactly 10 mA. <span class="proj-target">Target: your chosen R lands within a mA of 10.</span></div>
+      </details>
     </div>
   </div>
 
@@ -196,6 +210,11 @@
       <div class="rung-meta"><b>Build</b> RC / RL / RLC passive filters, diode rectifier + smoothing capacitor → a DC supply</div>
       <div class="rung-meta"><b>Measure</b> Corner frequency, phase shift vs frequency, LC resonance and its Q</div>
       <div class="rung-links"><b>Reinforces</b> <a href="index.html#differential-equations">Differential Equations</a> (RLC = 2nd-order ODE, damping) · <a href="index.html#signals-systems">Signals &amp; Systems</a> (frequency response)</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>RC low-pass</b> — R 1.6k, C 100 nF → fc ≈ 1 kHz; sweep the function gen 100 Hz–100 kHz and find the corner. <span class="proj-target">Target: −3 dB point within 10% of 1 kHz, −20 dB/decade slope, −45° phase at fc.</span></div>
+        <div class="proj"><b>RLC resonance</b> — series RLC; find f₀ = 1/(2π√LC), measure Q from the −3 dB bandwidth, vary R from under- to over-damped. <span class="proj-target">Target: f₀ within 10%; Q roughly the R-predicted value.</span></div>
+        <div class="proj"><b>Rectifier + smoothing</b> — full-wave rectify, add a cap, measure ripple vs load. <span class="proj-target">Target: ripple within ~20% of I/(f·C).</span></div>
+      </details>
     </div>
   </div>
 
@@ -207,6 +226,12 @@
       <div class="rung-meta"><b>Build</b> Common-emitter amp, emitter follower, op-amp inverting / non-inverting, Sallen-Key active filter, Schmitt trigger</div>
       <div class="rung-meta"><b>Measure</b> Voltage gain, bandwidth, input/output impedance, clipping and distortion</div>
       <div class="rung-links"><b>Reinforces</b> <a href="index.html#signals-systems">Signals &amp; Systems</a> (transfer functions, poles) · <a href="index.html#control-systems">Control Systems</a> (feedback <em>is</em> the op-amp)</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>Common-emitter amp</b> (2N3904, Av ≈ −10) — measure mid-band gain, the −3 dB bandwidth, and watch it clip when overdriven. <span class="proj-target">Target: gain within 20% of −Rc/Re; you can point to both roll-offs.</span></div>
+        <div class="proj"><b>Op-amp gain–bandwidth</b> (TL072) — build ×1, ×10, ×100 and measure the bandwidth of each. <span class="proj-target">Target: gain × bandwidth ≈ constant (~3 MHz).</span></div>
+        <div class="proj"><b>Sallen-Key vs passive RC</b> — same fc, second-order active filter. <span class="proj-target">Target: a visibly steeper −40 dB/decade skirt, plus any peaking near fc.</span></div>
+        <div class="proj"><b>Schmitt trigger</b> — measure the two switching thresholds (the hysteresis window) and clean up a noisy ramp. <span class="proj-target">Target: a stable output on an input that makes a plain comparator chatter.</span></div>
+      </details>
     </div>
   </div>
 
@@ -218,6 +243,11 @@
       <div class="rung-meta"><b>Build</b> Colpitts / Hartley LC oscillator, crystal oscillator; wind your own toroidal inductors</div>
       <div class="rung-meta"><b>Measure</b> Frequency and its drift/stability, measured inductance, a first faint carrier on a nearby AM radio</div>
       <div class="rung-links"><b>Reinforces</b> <a href="index.html#rf-communications">RF &amp; Communications</a> (oscillators) · <a href="index.html#signals-systems">Signals &amp; Systems</a> (resonance)</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>Wind your own toroid</b> — N turns on a T37-6; compute L = A<sub>L</sub>·N² and measure it on the NanoVNA. <span class="proj-target">Target: measured L within ~10% of the A<sub>L</sub>·N² prediction.</span></div>
+        <div class="proj"><b>Colpitts LC oscillator</b> (~7 MHz) — measure frequency, then the drift over a 10-minute warm-up, and how a trimmer pulls it.</div>
+        <div class="proj"><b>Crystal oscillator</b> — same circuit, crystal instead of the LC tank. <span class="proj-target">Target (the payoff): drift of a few ppm vs the LC's hundreds — stability you can watch appear.</span></div>
+      </details>
     </div>
   </div>
 
@@ -229,6 +259,13 @@
       <div class="rung-meta"><b>Build</b> L-network impedance match, diode-ring mixer (by hand), crystal ladder filter, a half-wave dipole</div>
       <div class="rung-meta"><b>Measure</b> S11 / S21 and Smith chart on the NanoVNA, SWR, transmission-line velocity factor</div>
       <div class="rung-links"><b>Reinforces</b> <a href="index.html#rf-communications">RF &amp; Communications</a> (matching, antennas, link budget)</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>VNA calibration + Smith chart</b> — SOL-calibrate, then measure a known 50 Ω load. <span class="proj-target">Target: S11 lands at chart centre, return loss &gt; 30 dB.</span></div>
+        <div class="proj"><b>L-network match</b> — match a 200 Ω load to 50 Ω at a chosen frequency with an L and C. <span class="proj-target">Target: return loss &gt; 20 dB at the design frequency; watch it walk to centre.</span></div>
+        <div class="proj"><b>Homebrew diode-ring mixer</b> — 4× matched 1N4148 + two trifilar toroids; measure the sum/difference products and conversion loss, compare to an SA612. <span class="proj-target">Target: ~6–8 dB conversion loss.</span></div>
+        <div class="proj"><b>Crystal ladder filter</b> — select a matched set from your batch, build a 4-crystal ladder, sweep S21 on the NanoVNA. <span class="proj-target">Target: a clean bandpass ~2–3 kHz wide with measurable insertion loss and shape.</span></div>
+        <div class="proj"><b>Dipole + SWR</b> — build a half-wave dipole, sweep SWR, trim to resonance. <span class="proj-target">Target: SWR &lt; 1.5 at the target band.</span></div>
+      </details>
     </div>
   </div>
 
@@ -240,6 +277,11 @@
       <div class="rung-meta"><b>Build</b> Crystal radio → amplified AM envelope detector → a direct-conversion (Tayloe) receiver for a ham band</div>
       <div class="rung-meta"><b>Measure</b> Sensitivity, demodulated audio, image rejection; hear a real signal you built the whole chain for</div>
       <div class="rung-links"><b>Reinforces</b> <a href="index.html#rf-communications">RF &amp; Communications</a> (analog modulation, mixers, superhet) · <a href="index.html#signals-systems">Signals &amp; Systems</a> (mixing = frequency shift)</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>Crystal radio</b> — 1N34A envelope detector + LC tuned circuit + high-Z earpiece. <span class="proj-target">Target: receive a local MW station with zero power.</span></div>
+        <div class="proj"><b>+ LM386 audio</b> — add the amp to drive a speaker; note the sensitivity jump.</div>
+        <div class="proj"><b>Direct-conversion RX</b> — SA612 mixer + crystal/VFO local oscillator + audio amp, on 40 m. <span class="proj-target">Target: actually copy SSB/CW audio through a chain you built end-to-end.</span></div>
+      </details>
     </div>
   </div>
 
@@ -251,6 +293,12 @@
       <div class="rung-meta"><b>Build</b> Decode ADS-B / NOAA APT / AIS; capture GPS L1 and correlate against the C/A codes; a GNU Radio QPSK link (HackRF TX → attenuators → RTL-SDR RX)</div>
       <div class="rung-meta"><b>Measure</b> BER vs Eb/N₀ against theory, the constellation, spectral occupancy via FFT</div>
       <div class="rung-links"><b>Reinforces</b> <a href="index.html#signal-processing">Signal Processing</a> (FFT, sampling) · <a href="index.html#rf-communications">RF &amp; Communications</a> (digital mod, spread spectrum) · <a href="index.html#gnss-navigation">GNSS &amp; Navigation</a> (C/A correlation) · <a href="index.html#estimation-filtering">Estimation &amp; Filtering</a> (matched filter)</div>
+      <details class="rung-projects"><summary>Projects</summary>
+        <div class="proj"><b>Decode ADS-B</b> (1090 MHz, dump1090) — your first real capture: live aircraft on a map.</div>
+        <div class="proj"><b>NOAA APT</b> (137 MHz) — decode a weather-satellite image on a pass (an antenna + timing challenge).</div>
+        <div class="proj"><b>GPS L1 acquisition</b> — capture raw IQ at 1575.42 MHz and correlate against the C/A Gold codes in Python/GNU Radio. <span class="proj-target">Target: a clear correlation peak (code phase + Doppler) for ≥1 satellite.</span></div>
+        <div class="proj"><b>QPSK link + BER curve</b> — Pluto TX → attenuators → RTL-SDR RX; sweep attenuation and plot BER vs Eb/N₀ over the theoretical Q-function. <span class="proj-target">Target: measured BER tracks theory within 1–2 dB; a clean constellation.</span></div>
+      </details>
     </div>
   </div>
 
@@ -262,6 +310,10 @@
       <div class="rung-meta"><b>Build</b> A software GPS receiver (acquire → track → pseudorange → position fix) <em>or</em> a QPSK modem link with forward-error-correction over the two-radio bench</div>
       <div class="rung-meta"><b>Measure</b> End-to-end link performance; a real position fix from raw IQ you captured</div>
       <div class="rung-links"><b>Reinforces</b> RF + <a href="index.html#signal-processing">DSP</a> + <a href="index.html#gnss-navigation">GNSS</a> + <a href="index.html#estimation-filtering">Estimation</a>, integrated</div>
+      <details class="rung-projects"><summary>Projects — pick one</summary>
+        <div class="proj"><b>A · Software GPS receiver</b> — extend rung 6: acquisition → DLL/PLL tracking → nav-message decode → pseudoranges → least-squares fix. <span class="proj-target">Target: a position fix within tens of metres from your own captured IQ.</span></div>
+        <div class="proj"><b>B · QPSK modem with FEC</b> — add framing, sync, and convolutional coding + Viterbi to the rung-6 link. <span class="proj-target">Target: demonstrate the coding-gain shift in the BER curve and transfer a file error-free.</span></div>
+      </details>
     </div>
   </div>
 
@@ -530,7 +582,7 @@
 
     rows.forEach(row => {
       row.addEventListener('click', e => {
-        if (e.target.closest('a')) return;              // let syllabus links through
+        if (e.target.closest('a, .rung-projects')) return;   // links + project sheets don't toggle done
         const on = !row.classList.contains('checked');
         row.classList.toggle('checked', on);
         const cb = row.querySelector('input[type="checkbox"]');
