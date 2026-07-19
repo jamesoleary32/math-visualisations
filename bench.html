@@ -318,21 +318,36 @@
   </div>
 
   <!-- ── Shopping list ──────────────────────────────────────────────── -->
-  <h2>Shopping list · ~£1,080 build (Amazon.co.uk, inc VAT)</h2>
+  <h2>Shopping list · ~£1,145 build (Amazon.co.uk, inc VAT)</h2>
   <p class="section-intro">All sourced from Amazon.co.uk (UK stock, inc VAT) — genuine parts, no clones. Buy in phases as you climb; the
     “equipment acquired” meter tracks spend. Prices are current 2026 GBP and drift — check the linked page.
-    <b>Tip:</b> the RX-only core (everything except the Pluto) is ~£855 and covers rungs 0–6 — add the Pluto when
+    <b>Tip:</b> the RX-only core (everything except the Pluto) is ~£920 and covers rungs 0–6 — add the Pluto when
     you reach the transmit work to keep initial spend lower.</p>
 
   <div class="phase-head">
     <span class="phase-name">Phase 1 · Bench</span>
     <span class="phase-sub">unlocks rungs 0–2</span>
-    <span class="phase-total">~£275</span>
+    <span class="phase-total">~£340</span>
   </div>
   <div class="buy-row" data-id="buy-iron" data-price="55">
-    <input type="checkbox"><span class="buy-name">Soldering iron — Pinecil V2 + solder / stand / USB-C PD supply</span>
-    <span class="buy-note">genuine PINE64 (SNN002); add a USB-C PD brick + tips</span><span class="buy-price">£55</span>
+    <input type="checkbox"><span class="buy-name">Soldering iron — Pinecil V2 + tips + USB-C PD supply</span>
+    <span class="buy-note">genuine PINE64 (SNN002); needs a USB-C PD brick (or DC5525 supply) to run</span><span class="buy-price">£55</span>
     <a class="buy-link" href="https://www.amazon.co.uk/PINECIL-Smart-Portable-Soldering-Version/dp/B0CVLD3D75" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-solder" data-price="10">
+    <input type="checkbox"><span class="buy-name">Solder — 60/40 leaded, 0.7 mm (100–250 g)</span>
+    <span class="buy-note">leaded melts easiest for hand work; lead-free is an option. The fumes are rosin flux, not lead</span><span class="buy-price">£10</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/s?k=60%2F40+solder+wire+0.7mm+100g" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-fume" data-price="25">
+    <input type="checkbox"><span class="buy-name">Fume extractor — fan + activated-carbon filter</span>
+    <span class="buy-note">pulls rosin-flux smoke away from your face; the Loops bench unit ships with spare filters</span><span class="buy-price">£25</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/Loops-Extractor-Filter-Soldering-Absorber/dp/B01HDHEK8U" target="_blank" rel="noopener">Amazon.co.uk →</a>
+  </div>
+  <div class="buy-row" data-id="buy-soldersafe" data-price="30">
+    <input type="checkbox"><span class="buy-name">Soldering safety &amp; cleanup</span>
+    <span class="buy-note">safety glasses + silicone heat mat + brass tip-cleaner + flux + solder wick (desoldering braid)</span><span class="buy-price">£30</span>
+    <a class="buy-link" href="https://www.amazon.co.uk/s?k=soldering+accessory+kit+brass+tip+cleaner+wick+flux" target="_blank" rel="noopener">Amazon.co.uk →</a>
   </div>
   <div class="buy-row" data-id="buy-dmm" data-price="35">
     <input type="checkbox"><span class="buy-name">Digital multimeter — UNI-T UT139C</span>
@@ -515,6 +530,14 @@
 
   <!-- ── How the RF bench works ─────────────────────────────────────── -->
   <h2>Working notes</h2>
+
+  <div class="note-card warn">
+    <div class="note-title">Solder safely</div>
+    <div class="note-body">The smoke off the iron is <b>vaporised rosin flux</b>, not lead — it irritates the airways, so run the
+      <b>fume extractor</b> and work in a ventilated spot. The lead risk is <b>ingestion</b>, not fumes: don't eat or drink at
+      the bench and <b>wash your hands</b> afterwards. Wear <b>safety glasses</b> (flicked solder and clipped leads), and rest the
+      hot iron on its stand over the silicone mat.</div>
+  </div>
 
   <div class="note-card">
     <div class="note-title">The loopback BER bench</div>
