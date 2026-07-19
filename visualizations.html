@@ -210,6 +210,14 @@
         <div class="card-title">The Multivariate Normal</div>
         <div class="card-desc">A normal random vector as a cloud in the plane: every projection is a bell, μ and Σ pin it down, Σ's eigenvectors are the ellipse axes, uncorrelated ⇒ independent (the Gaussian miracle), and conditioning gives the regression line</div>
       </a>
+      <a href="probability/change-of-variables.html" class="card">
+        <div class="card-title">Change of Variables &amp; the Jacobian</div>
+        <div class="card-desc">How a density transforms under Y = g(X): conserving probability gives f_Y = f_X/|g′(x)| in 1D; in 2D the Jacobian is the local linear map, |det J| is the area-scaling factor, and f_Y = f_X/|det J| — visualized with grid deformation, a |det J| field, and a pushed-through Gaussian cloud</div>
+      </a>
+      <a href="probability/convolution-sum.html" class="card">
+        <div class="card-title">Convolution: Sum of Two R.V.s</div>
+        <div class="card-desc">The density of T = X + Y (B&amp;H Thm 8.2.1), two ways: summing the independent joint PMF along the anti-diagonal x+y=t, and the continuous flip-and-slide — f_T(t) = ∫ f_X(x)f_Y(t−x)dx as the overlap area of f_X with a flipped, shifted f_Y. Shows uniform⊛uniform = triangle and why sums smooth toward a bell</div>
+      </a>
       <a href="probability/independence.html" class="card">
         <div class="card-title">Independence of Events</div>
         <div class="card-desc">P(A∩B)=P(A)P(B), why independent ≠ disjoint, and conditional independence</div>
