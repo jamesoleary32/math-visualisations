@@ -210,6 +210,10 @@
         <div class="card-title">The Multivariate Normal</div>
         <div class="card-desc">A normal random vector as a cloud in the plane: every projection is a bell, μ and Σ pin it down, Σ's eigenvectors are the ellipse axes, uncorrelated ⇒ independent (the Gaussian miracle), and conditioning gives the regression line</div>
       </a>
+      <a href="probability/moment-generating-functions.html" class="card">
+        <div class="card-title">Moment Generating Functions</div>
+        <div class="card-desc">M(t)=E[e^{tX}] as one function that packages a distribution: the Taylor expansion showing moments ARE the coefficients, reading them off as derivatives at 0 (M′(0)=E[X], Var=M″(0)−M′(0)²), sums becoming products (n exponentials → (λ/(λ−t))ⁿ = Gamma's MGF), and uniqueness as the fingerprint that makes it a proof</div>
+      </a>
       <a href="probability/change-of-variables.html" class="card">
         <div class="card-title">Change of Variables &amp; the Jacobian</div>
         <div class="card-desc">How a density transforms under Y = g(X): conserving probability gives f_Y = f_X/|g′(x)| in 1D; in 2D the Jacobian is the local linear map, |det J| is the area-scaling factor, and f_Y = f_X/|det J| — visualized with grid deformation, a |det J| field, and a pushed-through Gaussian cloud</div>
@@ -225,6 +229,10 @@
       <a href="probability/beta-distribution.html" class="card">
         <div class="card-title">The Beta Distribution</div>
         <div class="card-desc">The distribution of a probability: two shape parameters sculpt every shape on [0,1] (Uniform, U, skew, spike), the mean α/(α+β) and concentration α+β, and the conjugate-prior magic — flip coins and watch Beta(α,β) → Beta(α+s, β+f) update by just adding counts, with α,β as pseudo-counts</div>
+      </a>
+      <a href="probability/gamma-distribution.html" class="card">
+        <div class="card-title">The Gamma Distribution</div>
+        <div class="card-desc">The waiting time for the α-th event: shape α and rate λ, the Exponential as α=1, Gamma as a sum of α exponential waits (time to the α-th Poisson event) drifting to a bell as α grows (CLT), mean α/λ and variance α/λ², and the Beta–Gamma split X/(X+Y) ~ Beta</div>
       </a>
       <a href="probability/independence.html" class="card">
         <div class="card-title">Independence of Events</div>
