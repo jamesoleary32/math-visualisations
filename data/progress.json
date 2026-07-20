@@ -1,5 +1,5 @@
 {
-  "revision": 1,
+  "revision": 2,
   "updated": "2026-07-20",
   "note": "Canonical syllabus progress. This committed file is the source of truth. Edit it on GitHub (or use 'Export progress' on the syllabus to regenerate it), and bump 'revision' so browsers re-seed from it. Entries are the data-id of each completed topic/practical row.",
   "completed": [
@@ -10,13 +10,22 @@
     "la-eigenvectors",
     "la-eigenspaces",
     "la-transformations",
+    "la-composition",
     "la-span-basis",
     "la-spaces",
+    "la-change-of-basis",
     "la-projection",
     "la-diagonalisation",
+    "la-svd",
     "prob-counting",
     "prob-conditional",
+    "prob-rvs",
+    "prob-expectation",
+    "prob-continuous",
+    "prob-moments",
     "prob-joint",
+    "prob-transformations",
+    "prob-cond-expectation",
     "de-ode-overview",
     "de-pendulum",
     "de-heat",
@@ -40,6 +49,16 @@
     "th-euler-eqs",
     "th-moi-tensor",
     "dl-supervised",
-    "dl-shallow"
+    "dl-shallow",
+    "dl-activations",
+    "dl-deep",
+    "dl-loss",
+    "dl-gradient-descent",
+    "dl-init-grad",
+    "dl-performance",
+    "dl-regularisation",
+    "dl-convnets",
+    "dl-resnets",
+    "dl-transformers"
   ]
 }
