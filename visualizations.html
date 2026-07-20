@@ -405,6 +405,10 @@
         <div class="card-title">Channels in CNNs</div>
         <div class="card-desc">The depth axis untangled: an image as an H×W×C stack, one filter spanning all input channels to collapse them into a single feature map, K filters making K output channels, why space is weight-shared but channels are dense, channels as feature types, and the 1×1 convolution as pure channel mixing</div>
       </a>
+      <a href="machine-learning/many-output-channels.html" class="card">
+        <div class="card-title">Why Multiple Output Channels?</div>
+        <div class="card-desc">The "not four copies" lesson: one filter answers one question, why running the same filter four times would be redundant, four different learned filters giving four different feature maps, output channels as four different questions, untangling the within-filter (input-channel) index from the across-filter index in h^(k), and K as a design dial you drag</div>
+      </a>
       <a href="machine-learning/self-attention.html" class="card">
         <div class="card-title">Dot-Product Self-Attention</div>
         <div class="card-desc">The transformer's core op, step by step: tokens as vectors, the shared W_Q/W_K/W_V projections (parameter sharing across positions), scores as dot products q_i·k_j, softmax into attention weights, and the output as a weighted sum of values — closing on the shared-weights-vs-dynamic-attention distinction</div>
