@@ -510,6 +510,19 @@
       transition: border-color 0.15s, color 0.15s;
     }
     .reset-btn:hover { border-color: #c62828; color: #c62828; }
+
+    .export-btn {
+      font-size: 12px;
+      color: #ccc;
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      margin-right: 8px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .export-btn:hover { border-color: #2e7d32; color: #2e7d32; }
   </style>
 </head>
 <body>
@@ -2109,12 +2122,14 @@
 </details>
 
 <div class="footer">
-  <p>Progress saved automatically in your browser.</p>
-  <button class="reset-btn" id="reset-btn">Reset progress</button>
+  <p>Progress saves in your browser, seeded from the committed <code>data/progress.json</code>. Export to publish it on GitHub.</p>
+  <button class="export-btn" id="export-btn">Export progress</button>
+  <button class="reset-btn" id="reset-btn">Reset to file</button>
 </div>
 
 <script>
   const STORAGE_KEY = 'syllabus-v1';
+  const REV_KEY     = 'syllabus-file-rev';   // last committed-file revision applied locally
 
   function loadState() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; }
@@ -2125,19 +2140,41 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
-  function initCheckboxes() {
+  // Fetch the committed source-of-truth file (null if unavailable/offline).
+  async function loadProgressFile() {
+    try {
+      const res = await fetch('data/progress.json', { cache: 'no-store' });
+      return res.ok ? await res.json() : null;
+    } catch { return null; }
+  }
+
+  // fileData: parsed data/progress.json (or null). The committed file is the seed
+  // and source of truth; localStorage holds the user's local toggles between file
+  // revisions. When the file's revision is bumped, it re-seeds and wins.
+  function initCheckboxes(fileData) {
     // Topic rows count toward progress; practical rows persist the same way but don't.
     const rows = document.querySelectorAll('.topic-row[data-id], .practical-row[data-id]');
-    let saved = loadState();
-    const firstLoad = saved === null;
+    const fileDone   = new Set(fileData?.completed || []);
+    const fileRev    = fileData?.revision ?? 0;
+    const appliedRev = parseInt(localStorage.getItem(REV_KEY) || '0', 10);
 
-    if (firstLoad) {
-      saved = {};
+    // Seed from the file when there are completed entries, else from data-default markup.
+    const seed = () => {
+      const s = {};
       rows.forEach(row => {
-        const id = row.dataset.id;
-        saved[id] = row.dataset.default === '1';
+        s[row.dataset.id] = fileData
+          ? fileDone.has(row.dataset.id)
+          : (row.dataset.default === '1');
       });
+      return s;
+    };
+
+    let saved = loadState();
+    if (saved === null || (fileData && fileRev > appliedRev)) {
+      // First ever load, or the committed file was bumped → file becomes truth.
+      saved = seed();
       saveState(saved);
+      if (fileData) localStorage.setItem(REV_KEY, String(fileRev));
     }
 
     rows.forEach(row => {
@@ -2145,7 +2182,7 @@
       const cb = row.querySelector('input[type="checkbox"]');
       if (!cb || cb.disabled) return;
 
-      const checked = firstLoad ? (row.dataset.default === '1') : (saved[id] === true);
+      const checked = saved[id] === true;
       cb.checked = checked;
       row.classList.toggle('checked', checked);
 
@@ -2192,9 +2229,34 @@
   }
 
   document.getElementById('reset-btn').addEventListener('click', () => {
-    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    if (!confirm('Discard local changes and reset to the committed data/progress.json?')) return;
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(REV_KEY);
     location.reload();
+  });
+
+  // Regenerate data/progress.json from the current checkbox state, bumping the
+  // revision, and download it — commit the file to GitHub to publish progress.
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const rows = document.querySelectorAll('.topic-row[data-id], .practical-row[data-id]');
+    const completed = [];
+    rows.forEach(row => {
+      const cb = row.querySelector('input[type="checkbox"]');
+      if (cb && cb.checked) completed.push(row.dataset.id);
+    });
+    const rev = parseInt(localStorage.getItem(REV_KEY) || '0', 10) + 1;
+    const payload = {
+      revision: rev,
+      updated: new Date().toISOString().slice(0, 10),
+      note: "Canonical syllabus progress. This committed file is the source of truth. Edit it on GitHub (or use 'Export progress' on the syllabus to regenerate it), and bump 'revision' so browsers re-seed from it. Entries are the data-id of each completed topic/practical row.",
+      completed,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2) + '\n'], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'progress.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
   });
 
   // Build the floating table of contents from the subject sections, and
@@ -2250,10 +2312,13 @@
     }
   }
 
-  initCheckboxes();
-  updateProgress();
-  initToc();
-  openHashSection();
+  (async () => {
+    const fileData = await loadProgressFile();
+    initCheckboxes(fileData);
+    updateProgress();
+    initToc();
+    openHashSection();
+  })();
 </script>
 </body>
 </html>
