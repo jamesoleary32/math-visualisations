@@ -41,6 +41,12 @@
     }
     .reset-btn:hover { border-color: #c62828; color: #c62828; }
 
+    .export-btn {
+      font-size: 11px; color: #bbb; background: none; border: 1px solid #e0e0e0;
+      border-radius: 5px; padding: 4px 9px; cursor: pointer; margin-left: 12px;
+    }
+    .export-btn:hover { border-color: #2e7d32; color: #2e7d32; }
+
     h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #aaa; margin: 42px 0 16px; }
     .section-intro { font-size: 13px; color: #999; line-height: 1.6; margin: -8px 0 18px; max-width: 760px; }
 
@@ -160,7 +166,8 @@
     <h1>Bench — Electronics &amp; RF</h1>
     <p>A standalone, hands-on track that runs alongside the <a href="index.html">syllabus</a> rather than inside it:
       physical electronics from the ground up, laddering into RF and SDR. Every rung is <em>build → measure → understand</em>,
-      and reinforces theory you meet elsewhere in the syllabus. Progress and purchases are saved in this browser.</p>
+      and reinforces theory you meet elsewhere in the syllabus. Progress and purchases save in your browser, seeded from
+      the committed <code>data/bench.json</code>; export to publish it on GitHub.</p>
   </header>
 
   <div class="meters">
@@ -175,7 +182,8 @@
       <div class="meter-top">
         <span class="meter-label">Equipment acquired</span>
         <span class="meter-val"><span id="spend-val">£0</span> / <span id="spend-total">£0</span>
-          <button class="reset-btn" id="reset">Reset</button></span>
+          <button class="export-btn" id="export">Export</button>
+          <button class="reset-btn" id="reset">Reset to file</button></span>
       </div>
       <div class="meter-bar"><div class="meter-fill spend" id="spend-fill" style="width:0%"></div></div>
     </div>
@@ -568,11 +576,20 @@
 
   <script>
     const STORAGE_KEY = 'bench-v1';
+    const REV_KEY     = 'bench-file-rev';   // last committed-file revision applied locally
     const load = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } };
     const save = s => localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
     const money = n => '£' + n.toLocaleString('en-GB');
 
     const rows = Array.from(document.querySelectorAll('.rung[data-id], .buy-row[data-id]'));
+
+    // Fetch the committed source-of-truth file (null if unavailable/offline).
+    async function loadBenchFile() {
+      try {
+        const res = await fetch('data/bench.json', { cache: 'no-store' });
+        return res.ok ? await res.json() : null;
+      } catch { return null; }
+    }
 
     function refresh() {
       const rungs = document.querySelectorAll('.rung[data-id]');
@@ -615,13 +632,68 @@
       });
     });
 
+    // Reset → discard local changes and re-seed from the committed file.
     document.getElementById('reset').addEventListener('click', e => {
       e.stopPropagation();
+      if (!confirm('Discard local bench progress and reset to the committed data/bench.json?')) return;
       localStorage.removeItem(STORAGE_KEY);
-      apply({});
+      localStorage.removeItem(REV_KEY);
+      location.reload();
     });
 
-    apply(load());
+    // Export → regenerate data/bench.json from the current state (revision bumped)
+    // and download it — commit the file to GitHub to publish bench progress.
+    document.getElementById('export').addEventListener('click', e => {
+      e.stopPropagation();
+      const done = rows.filter(r => r.classList.contains('checked')).map(r => r.dataset.id);
+      const rev = parseInt(localStorage.getItem(REV_KEY) || '0', 10) + 1;
+      const payload = {
+        revision: rev,
+        updated: new Date().toISOString().slice(0, 10),
+        note: "Canonical practicals (bench) progress — completed rungs and acquired equipment. This committed file is the source of truth for bench.html. Edit it on GitHub (or use 'Export' on the bench page to regenerate it), and bump 'revision' so browsers re-seed from it. Entries are the data-id of each completed rung / acquired item.",
+        done,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2) + '\n'], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bench.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    // Boot: the committed file is the seed/source of truth; localStorage holds local
+    // toggles between file revisions; a genuine revision bump re-seeds and wins.
+    (async () => {
+      const file       = await loadBenchFile();
+      const fileDone   = new Set(file?.done || []);
+      const fileRev    = file?.revision ?? 0;
+      const appliedRev = parseInt(localStorage.getItem(REV_KEY) || '0', 10);
+      const hasLocal   = localStorage.getItem(STORAGE_KEY) !== null;
+
+      const seedFromFile = () => {
+        const s = {};
+        rows.forEach(r => { s[r.dataset.id] = fileDone.has(r.dataset.id); });
+        save(s);
+        if (file) localStorage.setItem(REV_KEY, String(fileRev));
+        return s;
+      };
+
+      let state;
+      if (!hasLocal) {
+        // Brand new here → seed from the committed file.
+        state = seedFromFile();
+      } else if (file && appliedRev > 0 && fileRev > appliedRev) {
+        // The committed file was genuinely bumped → it wins and re-seeds.
+        state = seedFromFile();
+      } else {
+        // Existing local state — including the FIRST time the file model appears
+        // (appliedRev 0) — is preserved, never clobbered by the seed file. Adopt
+        // the file's revision so future bumps still re-seed.
+        state = load();
+        if (file && fileRev > appliedRev) localStorage.setItem(REV_KEY, String(fileRev));
+      }
+      apply(state);
+    })();
   </script>
 </body>
 </html>

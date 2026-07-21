@@ -1,0 +1,6 @@
+{
+  "revision": 1,
+  "updated": "2026-07-21",
+  "note": "Canonical practicals (bench) progress — completed rungs and acquired equipment. This committed file is the source of truth for bench.html. Edit it on GitHub (or use 'Export' on the bench page to regenerate it), and bump 'revision' so browsers re-seed from it. Entries are the data-id of each completed rung / acquired item. Seeded empty; export from the bench page to publish your current state.",
+  "done": []
+}
