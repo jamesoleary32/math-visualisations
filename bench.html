@@ -662,21 +662,35 @@
     });
 
     // Boot: the committed file is the seed/source of truth; localStorage holds local
-    // toggles between file revisions; a bumped revision re-seeds and wins.
+    // toggles between file revisions; a genuine revision bump re-seeds and wins.
     (async () => {
       const file       = await loadBenchFile();
       const fileDone   = new Set(file?.done || []);
       const fileRev    = file?.revision ?? 0;
       const appliedRev = parseInt(localStorage.getItem(REV_KEY) || '0', 10);
+      const hasLocal   = localStorage.getItem(STORAGE_KEY) !== null;
+
+      const seedFromFile = () => {
+        const s = {};
+        rows.forEach(r => { s[r.dataset.id] = fileDone.has(r.dataset.id); });
+        save(s);
+        if (file) localStorage.setItem(REV_KEY, String(fileRev));
+        return s;
+      };
 
       let state;
-      if (localStorage.getItem(STORAGE_KEY) === null || (file && fileRev > appliedRev)) {
-        state = {};
-        rows.forEach(r => { state[r.dataset.id] = fileDone.has(r.dataset.id); });
-        save(state);
-        if (file) localStorage.setItem(REV_KEY, String(fileRev));
+      if (!hasLocal) {
+        // Brand new here → seed from the committed file.
+        state = seedFromFile();
+      } else if (file && appliedRev > 0 && fileRev > appliedRev) {
+        // The committed file was genuinely bumped → it wins and re-seeds.
+        state = seedFromFile();
       } else {
+        // Existing local state — including the FIRST time the file model appears
+        // (appliedRev 0) — is preserved, never clobbered by the seed file. Adopt
+        // the file's revision so future bumps still re-seed.
         state = load();
+        if (file && fileRev > appliedRev) localStorage.setItem(REV_KEY, String(fileRev));
       }
       apply(state);
     })();
